@@ -72,3 +72,7 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# My customization ignored file
+.vsconfig
+Mage.sln.DotSettings.user
