@@ -13,5 +13,6 @@ UCLASS()
 class MAGE_API AMageCharacte : public AMageCharacterBase
 {
 	GENERATED_BODY()
-	
+public:
+	AMageCharacte();
 };
