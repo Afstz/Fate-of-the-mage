@@ -15,4 +15,9 @@ class MAGE_API AMageCharacte : public AMageCharacterBase
 	GENERATED_BODY()
 public:
 	AMageCharacte();
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+private:
+	void InitAbilityActorInfo();
 };

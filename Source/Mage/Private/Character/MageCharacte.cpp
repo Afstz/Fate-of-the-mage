@@ -3,7 +3,9 @@
 
 #include "Character/MageCharacte.h"
 
+#include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/MagePlayerState.h"
 
 AMageCharacte::AMageCharacte()
 {
@@ -17,4 +19,31 @@ AMageCharacte::AMageCharacte()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+	
+}
+
+void AMageCharacte::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Init Ability Actor Info in the Server.
+	InitAbilityActorInfo();
+}
+
+void AMageCharacte::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Init Ability Actor Info in the Client.
+	InitAbilityActorInfo();
+	
+}
+
+void AMageCharacte::InitAbilityActorInfo()
+{
+	AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
+	check(MagePlayerState);
+	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
+	AttributeSet = MagePlayerState->GetAttributeSet();
+	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
 }

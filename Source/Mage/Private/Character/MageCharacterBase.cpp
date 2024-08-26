@@ -1,4 +1,4 @@
-// Copyright AFstz.
+ // Copyright AFstz.
 
 
 #include "Character/MageCharacterBase.h"
@@ -13,7 +13,12 @@ AMageCharacterBase::AMageCharacterBase()
 	
 }
 
-void AMageCharacterBase::BeginPlay()
+ UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
+ {
+	return AbilitySystemComponent;
+ }
+
+ void AMageCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
