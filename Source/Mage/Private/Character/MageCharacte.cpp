@@ -2,10 +2,11 @@
 
 
 #include "Character/MageCharacte.h"
-
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Player/MagePlayerController.h"
 #include "Player/MagePlayerState.h"
+#include "UI/HUD/MageHUD.h"
 
 AMageCharacte::AMageCharacte()
 {
@@ -36,7 +37,6 @@ void AMageCharacte::OnRep_PlayerState()
 
 	// Init Ability Actor Info in the Client.
 	InitAbilityActorInfo();
-	
 }
 
 void AMageCharacte::InitAbilityActorInfo()
@@ -46,4 +46,12 @@ void AMageCharacte::InitAbilityActorInfo()
 	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagePlayerState->GetAttributeSet();
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
+
+	if (AMagePlayerController* PlayerController = Cast<AMagePlayerController>(GetController()))
+	{
+		if (AMageHUD* MageHUD = Cast<AMageHUD>(PlayerController->GetHUD()))
+		{
+			MageHUD->InitOverlay(PlayerController, MagePlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
