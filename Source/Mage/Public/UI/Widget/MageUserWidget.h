@@ -22,5 +22,5 @@ public:
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent) // C++声明,蓝图实现
-	void WidgetControllerSet();
+	void WidgetControllerIsSet();
 };

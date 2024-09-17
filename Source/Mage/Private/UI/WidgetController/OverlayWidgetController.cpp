@@ -2,7 +2,7 @@
 
 
 #include "UI/WidgetController/OverlayWidgetController.h"
-
+#include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValue()
@@ -17,33 +17,53 @@ void UOverlayWidgetController::BroadcastInitialValue()
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	UMageAttributeSet* MageAttributeSet = CastChecked<UMageAttributeSet>(AttributeSet);
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate( // 根据输入的Attribute绑定回调函数
-		MageAttributeSet->GetHealthAttribute()).AddUObject(this, &ThisClass::HealthChanged);
+		MageAttributeSet->GetHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &ThisClass::MaxHealthChanged);
+		MageAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChanged.Broadcast(Data.NewValue);
+		}
+	);
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetManaAttribute()).AddUObject(this, &ThisClass::ManaChanged);
+		MageAttributeSet->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnManaChanged.Broadcast(Data.NewValue);
+		}
+	);
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetMaxManaAttribute()).AddUObject(this, &ThisClass::MaxManaChanged);
-	
-}
+		MageAttributeSet->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxManaChanged.Broadcast(Data.NewValue);
+		}
+	);
 
-void UOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data)
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::MaxHealthChanged(const FOnAttributeChangeData& Data)
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::ManaChanged(const FOnAttributeChangeData& Data)
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data)
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
+	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTagsDelegate.AddLambda(
+		[this](const FGameplayTagContainer& AssetTags)
+		{
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				// 获取 Message 标签
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				// MatchesTag : "A.1".MatchesTag("A") will return True, "A".MatchesTag("A.1") will return False
+				if (Tag.MatchesTag(MessageTag)) // 判断是否是Message Tag
+				{
+					FMessageWdigetData* TableRow = GetDataTableRowByTag<FMessageWdigetData>(MessageDataTable, Tag);
+					MessageWidgetDelegate.Broadcast(*TableRow); // 广播相匹配的对应表行
+				}
+			}
+		}
+	);
 }

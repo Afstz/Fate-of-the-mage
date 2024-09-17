@@ -39,7 +39,6 @@ void UMageAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
-	
 }
 
 void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -48,7 +47,15 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 	FEffectProperties EffectProps;
 	SetEffectProperties(Data, EffectProps);
-	
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
 }
 void UMageAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProps)
 {

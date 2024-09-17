@@ -24,4 +24,10 @@ AMageCharacterBase::AMageCharacterBase()
 	
 }
 
+ void AMageCharacterBase::InitAbilityActorInfo()
+ {
+ }
+
+
+
 

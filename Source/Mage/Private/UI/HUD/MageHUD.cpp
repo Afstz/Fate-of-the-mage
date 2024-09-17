@@ -26,7 +26,7 @@ void AMageHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySyst
 
 	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 	OverlayWidgetController = GetOverlayWidgetController(WidgetControllerParams);
-	OverlayWidget->SetWidgetController(OverlayWidgetController); // 通过递归绑定回调函数到Controller层委托
+	OverlayWidget->SetWidgetController(OverlayWidgetController); // 通过递归绑定回调函数到Controller层的委托
 	OverlayWidgetController->BroadcastInitialValue(); // 广播初始化HUD数据
 	OverlayWidget->AddToViewport();
 }

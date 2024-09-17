@@ -19,7 +19,13 @@ void AMageEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	check(AbilitySystemComponent);
+	InitAbilityActorInfo();
+}
+
+void AMageEnemy::InitAbilityActorInfo()
+{
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet();
 }
 
 

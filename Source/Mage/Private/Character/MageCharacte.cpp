@@ -3,6 +3,7 @@
 
 #include "Character/MageCharacte.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/MagePlayerController.h"
 #include "Player/MagePlayerState.h"
@@ -44,8 +45,9 @@ void AMageCharacte::InitAbilityActorInfo()
 	AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
 	check(MagePlayerState);
 	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
-	AttributeSet = MagePlayerState->GetAttributeSet();
+	AttributeSet = MagePlayerState->GetAttributeSet(); 
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
+	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet(); // 绑定效果应用回调
 
 	if (AMagePlayerController* PlayerController = Cast<AMagePlayerController>(GetController()))
 	{
