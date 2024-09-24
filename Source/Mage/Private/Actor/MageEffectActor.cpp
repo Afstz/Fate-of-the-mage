@@ -29,7 +29,7 @@ void AMageEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	// Effect实例化的句柄
 	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(EffectDefaultClass, ActorCurveLevel, EffectContextHandle);
 	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-
+	
 	// 判断持续时间是否是无限
 	bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
 	// 在是无限时间效果和需要在结束时清除掉时，将效果句柄添加到Map
@@ -72,10 +72,21 @@ void AMageEffectActor::OnEndOverlap(AActor* TargetActor)
 
 	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap) // 删除永久持续时间效果
 	{
-		TArray<FActiveGameplayEffectHandle> ActiveEffectArray; // 临时存放要删除的ActiveEffectHandles
 		UAbilitySystemComponent* TargetActorASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 		if (!IsValid(TargetActorASC)) return;
+
+		for (auto It = ActiveEffectHandles.CreateIterator(); It; ++It)
+		{
+			if (TargetActorASC == It.Value())
+			{
+				TargetActorASC->RemoveActiveGameplayEffect(It.Key(), 1);
+				It.RemoveCurrent();
+			}
+		}
+
+		// 第二种方法遍历
 		
+		/*TArray<FActiveGameplayEffectHandle> ActiveEffectArray; // 临时存放要删除的ActiveEffectHandles
 		for (TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*>& HandlePair : ActiveEffectHandles)
 		{
 			if (TargetActorASC == HandlePair.Value) // 删除对应玩家的效果
@@ -87,7 +98,7 @@ void AMageEffectActor::OnEndOverlap(AActor* TargetActor)
 		for (FActiveGameplayEffectHandle& ActiveEffect : ActiveEffectArray)
 		{
 			ActiveEffectHandles.Remove(ActiveEffect);
-		}
+		}*/
 	}
  }
 

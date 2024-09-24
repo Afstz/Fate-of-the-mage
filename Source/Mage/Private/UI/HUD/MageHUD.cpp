@@ -12,7 +12,7 @@ UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetCont
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(InWigetControllerParams);
-		OverlayWidgetController->BindCallbacksToDependencies();
+		OverlayWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
 	}
 	return OverlayWidgetController;
 }

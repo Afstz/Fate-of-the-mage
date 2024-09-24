@@ -40,6 +40,13 @@ void AMageCharacte::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AMageCharacte::GetCharacterLevel() const
+{
+	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
+	check(MagePlayerState);
+	return MagePlayerState->GetPlayerLevel();
+}
+
 void AMageCharacte::InitAbilityActorInfo()
 {
 	AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
@@ -56,4 +63,5 @@ void AMageCharacte::InitAbilityActorInfo()
 			MageHUD->InitOverlay(PlayerController, MagePlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	InitDefaultAttributes();
 }

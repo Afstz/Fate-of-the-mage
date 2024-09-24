@@ -3,7 +3,9 @@
 
 #include "Character/MageCharacterBase.h"
 
-AMageCharacterBase::AMageCharacterBase()
+#include "AbilitySystemComponent.h"
+
+ AMageCharacterBase::AMageCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -26,6 +28,24 @@ AMageCharacterBase::AMageCharacterBase()
 
  void AMageCharacterBase::InitAbilityActorInfo()
  {
+ }
+
+ void AMageCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect>& InitAttributeEffects, float Level)
+ {
+ 	check(IsValid(GetAbilitySystemComponent()));
+ 	check(InitAttributeEffects);
+ 	
+	FGameplayEffectContextHandle ContextHandle = GetAbilitySystemComponent()->MakeEffectContext();
+ 	ContextHandle.AddSourceObject(this);
+ 	FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(InitAttributeEffects, 1.f, ContextHandle);
+ 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+ }
+
+ void AMageCharacterBase::InitDefaultAttributes()
+ {
+ 	ApplyEffectToSelf(DefaultPrimaryEffects, 1.f);
+ 	ApplyEffectToSelf(DefaultSecondaryEffects, 1.f);
+ 	ApplyEffectToSelf(DefaultBaseEffects, 1.f);
  }
 
 

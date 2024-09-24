@@ -21,7 +21,13 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 
+	/** Combat Interface. */
+	FORCEINLINE virtual int32 GetCharacterLevel() const override { return Level; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Attribute")
+	int32 Level = 1;
 };
