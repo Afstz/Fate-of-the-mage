@@ -3,6 +3,7 @@
 
 #include "UI/HUD/MageHUD.h"
 #include "UI/Widget/MageUserWidget.h"
+#include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 
@@ -15,6 +16,18 @@ UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetCont
 		OverlayWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(
+	const FWidgetControllerParams& InWigetControllerParams)
+{
+	if (AttributeMenuWidgetController == nullptr) // 单例,没有则创建
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(InWigetControllerParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
+	}
+	return AttributeMenuWidgetController;
 }
 
 void AMageHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)

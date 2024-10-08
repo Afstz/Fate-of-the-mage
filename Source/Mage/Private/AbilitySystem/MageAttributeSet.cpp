@@ -5,11 +5,31 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
+#include "MageGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
 
 UMageAttributeSet::UMageAttributeSet()
 {
+	FMageGameplayTags MageGameplayTags = FMageGameplayTags::Get();
+
+	// Primary Attributes
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Strength, GetStrengthAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Resilience, GetResilienceAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Vigor, GetVigorAttribute());
+
+	//Secondary Attributes
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_Armor, GetArmorAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_ArmorPenetration, GetArmorPenetrationAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_BlockChance, GetBlockChanceAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticialHitChance, GetCriticalHitChanceAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticalHitDamage, GetCriticalHitDamageAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticalHitResistance, GetCriticalHitResistanceAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_HealthRegeneration, GetHealthRegenerationAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_ManaRegeneration, GetManaRegenerationAttribute());
+	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_MaxMana, GetMaxManaAttribute());
 	
 }
 

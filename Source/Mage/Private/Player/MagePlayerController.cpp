@@ -4,7 +4,9 @@
 #include "Player/MagePlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Blueprint/UserWidget.h"
 #include "Interface/EnemyInterface.h"
+#include "UI/Widget/MageUserWidget.h"
 
 AMagePlayerController::AMagePlayerController()
 {
@@ -88,6 +90,7 @@ void AMagePlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 	
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMagePlayerController::Move);
+	EnhancedInputComponent->BindAction(AttributeMenuAction, ETriggerEvent::Triggered, this, &AMagePlayerController::AttributeMenu);
 }
 
 void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
@@ -106,6 +109,28 @@ void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisValue.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisValue.X);
+	}
+}
+
+void AMagePlayerController::AttributeMenu(const FInputActionValue& InputAction)
+{
+	if (!IsOpenAttributeMenu)
+	{
+		AttributeMenuWidget = CreateWidget<UMageUserWidget>(GetWorld(), AttributeMenuWidgetClass);
+		if (AttributeMenuWidget)
+		{
+			AttributeMenuWidget->AddToViewport(1); // 防止其他UI覆盖
+			AttributeMenuWidget->SetPositionInViewport(FVector2D(200.f, 50.f));
+			IsOpenAttributeMenu = true;
+		}
+	}
+	else
+	{
+		if (AttributeMenuWidget)
+		{
+			AttributeMenuWidget->RemoveFromParent();
+			IsOpenAttributeMenu = false;
+		}
 	}
 }
 

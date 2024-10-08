@@ -58,7 +58,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				// 获取 Message 标签
 				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
 				// MatchesTag : "A.1".MatchesTag("A") will return True, "A".MatchesTag("A.1") will return False
-				if (Tag.MatchesTag(MessageTag)) // 判断是否是Message Tag
+				if (Tag.MatchesTag(MessageTag)) // 判断是否是Message 子Tag
 				{
 					FMessageWdigetData* TableRow = GetDataTableRowByTag<FMessageWdigetData>(MessageDataTable, Tag);
 					MessageWidgetDelegate.Broadcast(*TableRow); // 广播相匹配的对应表行

@@ -76,3 +76,4 @@ DerivedDataCache/*
 # My customization ignored file
 .vsconfig
 Mage.sln.DotSettings.user
+.idea/*

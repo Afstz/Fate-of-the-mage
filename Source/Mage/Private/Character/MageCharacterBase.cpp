@@ -2,7 +2,6 @@
 
 
 #include "Character/MageCharacterBase.h"
-
 #include "AbilitySystemComponent.h"
 
  AMageCharacterBase::AMageCharacterBase()

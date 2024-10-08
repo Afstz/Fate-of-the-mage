@@ -8,11 +8,11 @@
 
 UMMC_MaxHealth::UMMC_MaxHealth()
 {
-	VigorDef.AttributeToCapture = UMageAttributeSet::GetVigorAttribute();
-	VigorDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
+	VigorDef.AttributeToCapture = UMageAttributeSet::GetVigorAttribute(); // 要捕获的属性
+	VigorDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target; // 应用效果对象的属性值
 	VigorDef.bSnapshot = false;
 
-	RelevantAttributesToCapture.Add(VigorDef);
+	RelevantAttributesToCapture.Add(VigorDef); // 把要捕获的属性定义添加到数组里
 }
 
 float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
@@ -34,5 +34,5 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(Spec.GetContext().GetSourceObject());
 	int32 Level = CombatInterface->GetCharacterLevel();
 
-	 return (100 + Vigor * 2) + 10 * Level; // 基于 Vigor 和 Level
+	return (100 + Vigor * 2) + 10 * Level; // 基于 Vigor 和 Level
 }
