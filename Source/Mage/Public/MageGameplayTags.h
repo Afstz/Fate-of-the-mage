@@ -14,7 +14,7 @@ struct FMageGameplayTags
 {
 public:
     static FMageGameplayTags& Get() { return MageGameplayTags;}
-    static void InitNativeGameplayTags(); // 加载本地自定义的游戏标签
+    static void InitNativeGameplayTags(); // 初始化本地自定义的游戏标签
 	
 	/** Primary Attribute Gameplay Tags*/
 	FGameplayTag Attributes_Primary_Strength;
@@ -33,6 +33,14 @@ public:
 	FGameplayTag Attributes_Secondary_MaxHealth;
 	FGameplayTag Attributes_Secondary_ManaRegeneration;
 	FGameplayTag Attributes_Secondary_MaxMana;
+
+	/** Input Tags*/
+	FGameplayTag Input_LMB;
+	FGameplayTag Input_RMB;
+	FGameplayTag Input_1;
+	FGameplayTag Input_2;
+	FGameplayTag Input_3;
+	FGameplayTag Input_4;
 protected:
 	
 private:

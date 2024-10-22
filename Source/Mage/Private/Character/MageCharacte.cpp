@@ -17,7 +17,7 @@ AMageCharacte::AMageCharacte()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	// 关闭控制器来控制角色
+	// 禁止控制器影响角色和相机的旋转
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
@@ -27,9 +27,11 @@ AMageCharacte::AMageCharacte()
 void AMageCharacte::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
 	// Init Ability Actor Info in the Server.
 	InitAbilityActorInfo();
+	
+	AddCharacterAbilites(); // 在服务器赋予技能
+	
 }
 
 void AMageCharacte::OnRep_PlayerState()

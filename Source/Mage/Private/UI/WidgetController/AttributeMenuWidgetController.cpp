@@ -8,7 +8,6 @@
 void UAttributeMenuWidgetController::BroadcastInitialValue()
 {
 	UMageAttributeSet* AS = Cast<UMageAttributeSet>(AttributeSet);
-	check(AttributeDatas);
 
 	for (auto& Pair : AS->TagsForAttributeMap)
 	{
@@ -19,8 +18,7 @@ void UAttributeMenuWidgetController::BroadcastInitialValue()
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
 	UMageAttributeSet* AS = Cast<UMageAttributeSet>(AttributeSet);
-	check(AttributeDatas);
-
+	
 	for (auto& Pair : AS->TagsForAttributeMap)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value).AddLambda(
@@ -35,7 +33,8 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 void UAttributeMenuWidgetController::BroadcastAttributeData(const FGameplayTag& AttributeTag,
 	const FGameplayAttribute& Attribute) const
 {
-	FMageAttributeData AttributeData = AttributeDatas->FindAttributeDataForTag(AttributeTag);
-	AttributeData.AttributeValue = Attribute.GetNumericValue(AttributeSet);
-	AttributeMenuDataDelegate.Broadcast(AttributeData);
+	check(AttributeData);
+	FMageAttributeData FoundAttributeData = AttributeData->FindAttributeDataForTag(AttributeTag);
+	FoundAttributeData.AttributeValue = Attribute.GetNumericValue(AttributeSet);
+	AttributeMenuDataDelegate.Broadcast(FoundAttributeData);
 }

@@ -7,7 +7,7 @@ FMageAttributeData UAttributeData::FindAttributeDataForTag(const FGameplayTag& A
 {
 	for (const FMageAttributeData& Data : AttributesData)
 	{
-		if (Data.AttributeTag.MatchesTagExact(AttributeTag))
+		if (Data.AttributeTag.IsValid() && Data.AttributeTag.MatchesTagExact(AttributeTag))
 		{
 			return Data;
 		}

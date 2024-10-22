@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "MageCharacterBase.generated.h"
 
+class UMotionWarpingComponent;
+class UGameplayAbility;
 class UAttributeSet;
 class UGameplayEffect;
 
@@ -21,13 +23,16 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	/** Combat Interface */
+	virtual FVector GetLocationByWeaponSocket() const override;
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
@@ -41,5 +46,9 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultSecondaryEffects;
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect>& InitAttributeEffects, float Level);
 	void InitDefaultAttributes();
-	
+
+	void AddCharacterAbilites();
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
 };

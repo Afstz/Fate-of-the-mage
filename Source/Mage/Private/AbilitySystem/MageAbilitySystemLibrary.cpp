@@ -11,6 +11,7 @@
 
 UOverlayWidgetController* UMageAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
+	// 根据提供的世界上下文信息找到当前世界的全部PlayerController, 0 为本地控制的角色
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
 		if (AMageHUD* MageHUD = Cast<AMageHUD>(PC->GetHUD()))
@@ -22,11 +23,10 @@ UOverlayWidgetController* UMageAbilitySystemLibrary::GetOverlayWidgetController(
 			return MageHUD->GetOverlayWidgetController(WidgetControllerParams);
 		}
 	}
-	return nullptr;
+	return nullptr; 
 }
 
-UAttributeMenuWidgetController* UMageAbilitySystemLibrary::GetAttributeMenuWidgetController(
-	const UObject* WorldContextObject)
+UAttributeMenuWidgetController* UMageAbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{

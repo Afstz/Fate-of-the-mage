@@ -1,4 +1,4 @@
-// Copyright AFstz.
+ // Copyright AFstz.
 
 #pragma once
 
@@ -40,7 +40,7 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-/*
+/* 静态函数指针
 using AttributeFuncPtr = TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr;
 template<class T>
 using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
@@ -62,8 +62,8 @@ public:
 	// 仅在GameplayEffect使Attribute的 BaseValue 改变时触发。
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
-	// Attribute Menu
-	TMap<FGameplayTag, FGameplayAttribute> TagsForAttributeMap;
+	/** Attribute Menu */
+	TMap<FGameplayTag, FGameplayAttribute> TagsForAttributeMap; // 属性标签及对应的GetAttribute方法
 	
 	
 	/*

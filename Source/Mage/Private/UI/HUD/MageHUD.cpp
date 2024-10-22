@@ -18,8 +18,7 @@ UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
-UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(
-	const FWidgetControllerParams& InWigetControllerParams)
+UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& InWigetControllerParams)
 {
 	if (AttributeMenuWidgetController == nullptr) // 单例,没有则创建
 	{

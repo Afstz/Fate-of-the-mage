@@ -26,7 +26,7 @@ struct FMageAttributeData
 };
 
 /**
- * 
+ * 存储要查找的属性信息 用于查找然后暴露给蓝图UI层
  */
 UCLASS()
 class MAGE_API UAttributeData : public UDataAsset

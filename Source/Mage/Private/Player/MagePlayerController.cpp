@@ -2,15 +2,25 @@
 
 
 #include "Player/MagePlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "MageGameplayTags.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SplineComponent.h"
+#include "Input/MageInputComponent.h"
 #include "Interface/EnemyInterface.h"
 #include "UI/Widget/MageUserWidget.h"
 
 AMagePlayerController::AMagePlayerController()
 {
 	bReplicates = true;
+
+	Spline = CreateDefaultSubobject<USplineComponent>(TEXT("Spline Comp"));
 }
 
 void AMagePlayerController::BeginPlay()
@@ -36,47 +46,40 @@ void AMagePlayerController::BeginPlay()
 void AMagePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-	
 	CursorTrace();
+	AutoRunning();
 }
 
 void AMagePlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
-	LastActor = CurrentActor;
-	CurrentActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	if (LastActor == nullptr)
+	LastCursorActor = CurrentCursorActor;
+	CurrentCursorActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	
+	if (LastCursorActor != CurrentCursorActor)
 	{
-		if (CurrentActor == nullptr)
-		{
-			// Do nothing.
-		}
-		else
-		{
-			CurrentActor->HighlightActor();
-		}
+		if (CurrentCursorActor) CurrentCursorActor->HighlightActor();
+		if (LastCursorActor) LastCursorActor->UnHighlightActor();
 	}
-	else
+}
+
+void AMagePlayerController::AutoRunning()
+{
+	if (!bAutoRunning) return;
+	
+	if (APawn* ControlledPawn = GetPawn())
 	{
-		if (CurrentActor == nullptr)
+		FVector Splineloc = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		// 给定位置寻找离样条曲线最近的切线方向
+		FVector MoveDirection = Spline->FindDirectionClosestToWorldLocation(Splineloc, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(MoveDirection);
+
+		float Destination = (Splineloc - CachedDestination).Length(); // 离目的地的距离
+		if (Destination <= AutoRunAcceptanceRadius) // 到达阈值停止移动
 		{
-			LastActor->UnHighlightActor();
-		}
-		else
-		{
-			if (LastActor != CurrentActor)
-			{
-				LastActor->UnHighlightActor();
-				CurrentActor->HighlightActor();
-			}
-			else
-			{
-				// Do nothing.
-			}
+			bAutoRunning = false;
 		}
 	}
 }
@@ -87,14 +90,19 @@ void AMagePlayerController::SetupInputComponent()
 
 	// 尝试转换并断言
 	// InputComponent在Project settings - input中默认把类设置成UEnhancedInputComponent
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UMageInputComponent* MageEnhancedInputComponent = CastChecked<UMageInputComponent>(InputComponent);
 	
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMagePlayerController::Move);
-	EnhancedInputComponent->BindAction(AttributeMenuAction, ETriggerEvent::Triggered, this, &AMagePlayerController::AttributeMenu);
+	MageEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMagePlayerController::Move);
+	MageEnhancedInputComponent->BindAction(AttributeMenuAction, ETriggerEvent::Started, this, &AMagePlayerController::AttributeMenu);
+	MageEnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AMagePlayerController::ShiftKeyPressed);
+	MageEnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AMagePlayerController::ShiftKeyReleased);
+	
+	MageEnhancedInputComponent->BindAbilityActions(MageInputData, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagHeld, &ThisClass::AbilityInputTagReleased);
 }
 
 void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	bAutoRunning = false;
 	const FVector2D InputAxisValue = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation(); // 默认 0 0 0
 	// 只保留Yaw分量，其他分量设为0
@@ -102,7 +110,7 @@ void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 
 	// 将YawRotation转换成旋转矩阵，并从中提取X轴和Y轴方向向量
 	// 因为YawRotaion始终为 0 0 0 , 变成标准的基向量组成的4x4矩阵
-	// （UE默认的正方向为X轴）旋转矩阵前方向 X:1,0,0  右方向 Y:0,1,0
+	//（UE默认的正方向为X轴）旋转矩阵前方向 X:1,0,0  右方向 Y:0,1,0
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	if (APawn* ControlledPawn = GetPawn())
@@ -133,4 +141,100 @@ void AMagePlayerController::AttributeMenu(const FInputActionValue& InputAction)
 		}
 	}
 }
+
+void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	if (InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
+	{
+		bTargeting = CurrentCursorActor ? true : false;
+		bAutoRunning = false;
+		HoldingTime = 0.f; // 重置自动移动按住时间
+	}
+	
+}
+
+void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
+	{
+		if (GetMageAbilitySystemComponent())
+		{
+			GetMageAbilitySystemComponent()->AbilityInputHeld(InputTag);
+		}
+		return;
+	}
+
+	if (bTargeting || bShiftKeyPressed)
+	{
+		// 左键但是当前是敌人或者按住Shift,执行技能逻辑
+		
+		if (GetMageAbilitySystemComponent())
+		{
+			GetMageAbilitySystemComponent()->AbilityInputHeld(InputTag);
+		}
+
+	}
+	else
+	{
+		HoldingTime += GetWorld()->GetDeltaSeconds(); // 累加时间判断是否要自动移动
+		
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
+		
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			// 获取要移动目的地的方向
+			FVector MoveDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(MoveDirection);
+		}
+	}
+}
+
+void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	if (!InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
+	{
+		if (GetMageAbilitySystemComponent())
+		{
+			GetMageAbilitySystemComponent()->AbilityInputReleased(InputTag);
+		}
+		return;
+	}
+
+	if (GetMageAbilitySystemComponent()) // 每次释放按键都要执行Released
+	{
+		GetMageAbilitySystemComponent()->AbilityInputReleased(InputTag);
+	}
+
+	if (!bTargeting && !bShiftKeyPressed)
+	{
+		APawn* ControlledPawn = GetPawn();
+		if (HoldingTime <= ShortPressThreshold && ControlledPawn) // 小于短按阈值则进行自动移动
+		{
+			Spline->ClearSplinePoints(); // 清除样条线已有的点,重新计算
+			if (UNavigationPath* FoundPath = UNavigationSystemV1::FindPathToLocationSynchronously(
+				this, ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				for (const FVector& PathPoint : FoundPath->PathPoints)
+				{
+					Spline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World); // 添加已找到的路径
+					// DrawDebugSphere(GetWorld(), PathPoint, 8.f, 8, FColor::Orange, false, 5.f);
+				}
+				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
+				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];
+				bAutoRunning = true; // 开始自动移动
+			}
+		}
+	}
+}
+	
+
+UMageAbilitySystemComponent* AMagePlayerController::GetMageAbilitySystemComponent()
+{
+	if (MageASC == nullptr)
+	{
+		MageASC = Cast<UMageAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()));
+	}
+	return MageASC;
+}
+
 

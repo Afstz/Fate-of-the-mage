@@ -3,9 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/PlayerController.h"
 #include "MagePlayerController.generated.h"
 
+class USplineComponent;
+class UMageAbilitySystemComponent;
+class UMageInputData;
 class UMageUserWidget;
 class UInputMappingContext;
 class UInputAction;
@@ -47,8 +51,40 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMageUserWidget> AttributeMenuWidget;
 	void AttributeMenu(const FInputActionValue& InputAction);
-	
+	/** Shift Key Attack*/
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> ShiftAction;
+	FORCEINLINE void ShiftKeyPressed() { bShiftKeyPressed = true;}
+	FORCEINLINE void ShiftKeyReleased() { bShiftKeyPressed = false;}
+	bool bShiftKeyPressed = false;
+
+	/** Show Enemy Outline*/
 	void CursorTrace();
-	IEnemyInterface* LastActor;
-	IEnemyInterface* CurrentActor;
+	IEnemyInterface* LastCursorActor;
+	IEnemyInterface* CurrentCursorActor;
+	FHitResult CursorHit;
+
+	/** Ability */
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UMageInputData> MageInputData;
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+
+	/** Ability System Component*/
+	UPROPERTY()
+	TObjectPtr<UMageAbilitySystemComponent> MageASC;
+	UMageAbilitySystemComponent* GetMageAbilitySystemComponent();
+
+	/** Auto Running */
+	FVector CachedDestination = FVector::ZeroVector; // 导航目的地
+	float HoldingTime = 0.f; // 按住时间
+	float ShortPressThreshold = 0.25f; // 短按阈值
+	bool bTargeting = false; // 鼠标是否碰到敌人
+	bool bAutoRunning = false; // 自动跑步
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 30.f; // 停止跑步的范围
+	UPROPERTY()
+	TObjectPtr<USplineComponent> Spline;
+	void AutoRunning();
 };

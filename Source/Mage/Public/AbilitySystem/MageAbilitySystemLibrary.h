@@ -9,7 +9,7 @@
 class UAttributeMenuWidgetController;
 class UOverlayWidgetController;
 /**
- *  用于暴露给蓝图便捷函数的蓝图库
+ *  用于暴露给蓝图的便捷静态函数库
  */
 UCLASS()
 class MAGE_API UMageAbilitySystemLibrary : public UBlueprintFunctionLibrary

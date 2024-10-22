@@ -6,7 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "MageAbilitySystemComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsDelegate, const FGameplayTagContainer& /* Asset Tags */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsSignature, const FGameplayTagContainer& /* Asset Tags */);
 
 /**
  * 
@@ -18,8 +18,15 @@ class MAGE_API UMageAbilitySystemComponent : public UAbilitySystemComponent
 	
 public:
 	void AbilityActorInfoIsSet();
+	void AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilityClasses);
 
-	FEffectAssetTagsDelegate EffectAssetTagsDelegate;
+	FEffectAssetTagsSignature EffectAssetTagsDelegate;
+	
+	/** Ability */
+	void AbilityInputHeld(const FGameplayTag& InputTag);
+	void AbilityInputReleased(const FGameplayTag& InputTag);
+	
 protected:
-	void OnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+	UFUNCTION(Client, Reliable)
+	void ClientOnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 };

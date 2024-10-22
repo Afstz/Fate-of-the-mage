@@ -28,9 +28,9 @@ public:
 
 protected:
 	UPROPERTY(BlueprintAssignable)
-	FAttributeMenuDataSignatrue AttributeMenuDataDelegate;
+	FAttributeMenuDataSignatrue AttributeMenuDataDelegate; // AttributeRow绑定
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UAttributeData> AttributeDatas;
+	TObjectPtr<UAttributeData> AttributeData; // 存储着对应属性的信息，需要填充值
 private:
 	void BroadcastAttributeData(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const;
 };

@@ -18,8 +18,8 @@ UMageAttributeSet::UMageAttributeSet()
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute());
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Resilience, GetResilienceAttribute());
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Vigor, GetVigorAttribute());
-
-	//Secondary Attributes
+ 
+	// Secondary Attributes
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_Armor, GetArmorAttribute());
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_ArmorPenetration, GetArmorPenetrationAttribute());
 	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_BlockChance, GetBlockChanceAttribute());
@@ -82,6 +82,7 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		UE_LOG(LogTemp, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
 	}
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
