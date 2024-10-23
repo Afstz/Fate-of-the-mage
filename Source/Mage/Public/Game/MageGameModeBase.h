@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "MageGameModeBase.generated.h"
 
+class UCharacterClassData;
+
 /**
  * 
  */
@@ -14,4 +16,8 @@ class MAGE_API AMageGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
+	TObjectPtr<UCharacterClassData> CharacterClassData;
 };

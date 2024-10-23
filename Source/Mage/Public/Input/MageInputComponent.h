@@ -8,7 +8,7 @@
 #include "MageInputComponent.generated.h"
 
 /**
- * 
+ * 自定义的增强输入类，便于绑定玩法能力事件
  */
 UCLASS()
 class MAGE_API UMageInputComponent : public UEnhancedInputComponent

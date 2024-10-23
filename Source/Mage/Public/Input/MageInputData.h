@@ -23,7 +23,7 @@ struct FMageInputActionData
 };
 
 /**
- * 
+ *  存储技能动作映射与按键标签信息
  */
 UCLASS()
 class MAGE_API UMageInputData : public UDataAsset

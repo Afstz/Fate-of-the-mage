@@ -45,7 +45,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryEffects;
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect>& InitAttributeEffects, float Level);
-	void InitDefaultAttributes();
+	virtual void InitDefaultAttributes();
 
 	void AddCharacterAbilites();
 private:

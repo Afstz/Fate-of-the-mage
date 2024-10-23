@@ -3,6 +3,7 @@
 
 #include "Character/MageEnemy.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "Components/WidgetComponent.h"
 #include "Mage/Mage.h"
@@ -32,6 +33,11 @@ void AMageEnemy::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet();
 	InitDefaultAttributes();
+}
+
+void AMageEnemy::InitDefaultAttributes()
+{
+	UMageAbilitySystemLibrary::InitCharacterDefaultAttributes(this, GetAbilitySystemComponent(), CharacterClass, Level);
 }
 
 void AMageEnemy::InitHealthBar()
@@ -71,4 +77,3 @@ void AMageEnemy::UnHighlightActor()
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
 }
-

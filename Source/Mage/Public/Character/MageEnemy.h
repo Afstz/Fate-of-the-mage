@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterClassData.h"
 #include "Character/MageCharacterBase.h"
 #include "Interface/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
@@ -37,8 +38,11 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Attribute")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
 	int32 Level = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	virtual void InitDefaultAttributes() override;
 private:
 	/** Widget */
 	void InitHealthBar();
