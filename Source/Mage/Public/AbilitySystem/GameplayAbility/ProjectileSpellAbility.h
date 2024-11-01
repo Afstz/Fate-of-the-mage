@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
+#include "DamageGameplayAbility.h"
 #include "ProjectileSpellAbility.generated.h"
 
 class AMageProjectile;
@@ -11,7 +11,7 @@ class AMageProjectile;
  * 
  */
 UCLASS()
-class MAGE_API UProjectileSpellAbility : public UMageGameplayAbility
+class MAGE_API UProjectileSpellAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 public:
@@ -23,7 +23,5 @@ private:
 	TSubclassOf<AMageProjectile> ProjectileClass;
 	UFUNCTION(BlueprintCallable)
 	void SpawnProjectile(const FVector& ProjectileLocation);
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 };

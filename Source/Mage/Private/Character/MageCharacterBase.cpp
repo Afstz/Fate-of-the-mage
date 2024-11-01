@@ -33,6 +33,31 @@ FVector AMageCharacterBase::GetLocationByWeaponSocket() const
 	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }
 
+UAnimMontage* AMageCharacterBase::GetHitReactMontage_Implementation() const
+{
+	return HitReactMontage;
+}
+
+void AMageCharacterBase::Die()
+{
+	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	MultiHandleDeath();
+}
+
+void AMageCharacterBase::MultiHandleDeath_Implementation()
+{
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Weapon->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Dissolve();
+}
+
 void AMageCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,6 +66,24 @@ void AMageCharacterBase::BeginPlay()
 void AMageCharacterBase::InitAbilityActorInfo()
 {
 	// Override for child class
+}
+
+void AMageCharacterBase::Dissolve()
+{
+	TArray<UMaterialInstanceDynamic*> MaterialInstDynamics;
+	if (CharacterMaterialInst)
+	{
+		UMaterialInstanceDynamic* MaterialInstDynamic = UMaterialInstanceDynamic::Create(CharacterMaterialInst, this);
+		GetMesh()->SetMaterial(0, MaterialInstDynamic);
+		MaterialInstDynamics.Add(MaterialInstDynamic);
+	}
+	if (WeaponMaterialInst)
+	{
+		UMaterialInstanceDynamic* MaterialInstDynamic = UMaterialInstanceDynamic::Create(WeaponMaterialInst, this);
+		Weapon->SetMaterial(0, MaterialInstDynamic);
+		MaterialInstDynamics.Add(MaterialInstDynamic);
+	}
+	StartDissolveTimeLine(MaterialInstDynamics);
 }
 
 void AMageCharacterBase::AddCharacterAbilites()

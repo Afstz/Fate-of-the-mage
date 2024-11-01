@@ -9,7 +9,7 @@ void UAttributeMenuWidgetController::BroadcastInitialValue()
 {
 	UMageAttributeSet* AS = Cast<UMageAttributeSet>(AttributeSet);
 
-	for (auto& Pair : AS->TagsForAttributeMap)
+	for (auto& Pair : AS->TagsToAttributes)
 	{
 		BroadcastAttributeData(Pair.Key, Pair.Value);
 	}
@@ -19,7 +19,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
 	UMageAttributeSet* AS = Cast<UMageAttributeSet>(AttributeSet);
 	
-	for (auto& Pair : AS->TagsForAttributeMap)
+	for (auto& Pair : AS->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)

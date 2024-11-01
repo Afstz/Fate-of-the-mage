@@ -31,6 +31,7 @@ void AMageCharacte::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	
 	AddCharacterAbilites(); // 在服务器赋予技能
+	InitDefaultAttributes();
 	
 }
 
@@ -65,5 +66,4 @@ void AMageCharacte::InitAbilityActorInfo()
 			MageHUD->InitOverlay(PlayerController, MagePlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	InitDefaultAttributes();
 }

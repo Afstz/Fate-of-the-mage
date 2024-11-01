@@ -26,14 +26,25 @@ public:
 
 	/** Combat Interface. */
 	FORCEINLINE virtual int32 GetCharacterLevel() const override { return Level; }
+	virtual void Die() override;
 
 	/** Widget */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UWidgetComponent> HealthBar;
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature HealthChanged;
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature MaxHealthChanged;
+
+	/** HitReact */
+	void HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount);
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	bool bIsHit = false;
+	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 250.f;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float LifeSpan = 5.f;
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
@@ -46,4 +57,6 @@ protected:
 private:
 	/** Widget */
 	void InitHealthBar();
+	UFUNCTION(NetMulticast, Reliable)
+	void HiddenWidget();
 };

@@ -8,6 +8,8 @@
 #include "Components/WidgetComponent.h"
 #include "Mage/Mage.h"
 #include "UI/Widget/MageUserWidget.h"
+#include "MageGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AMageEnemy::AMageEnemy()
 {
@@ -19,20 +21,30 @@ AMageEnemy::AMageEnemy()
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComp"));
 	HealthBar->SetupAttachment(RootComponent);
 }
+
 void AMageEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	check(AbilitySystemComponent);
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	
 	InitAbilityActorInfo();
+	
 	InitHealthBar();
+
+	if (HasAuthority())
+	{
+		UMageAbilitySystemLibrary::GiveCharacterAbilities(this, AbilitySystemComponent);
+	}
 }
 
 void AMageEnemy::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet();
-	InitDefaultAttributes();
+	if (HasAuthority())
+	{
+		InitDefaultAttributes();
+	}
 }
 
 void AMageEnemy::InitDefaultAttributes()
@@ -60,8 +72,20 @@ void AMageEnemy::InitHealthBar()
 		);
 		HealthChanged.Broadcast(EnemeyAttributeSet->GetHealth());
 		MaxHealthChanged.Broadcast(EnemeyAttributeSet->GetMaxHealth());
+		
+		// 注册接收到指定Tag调用回调函数
+		AbilitySystemComponent->RegisterGameplayTagEvent(
+			FMageGameplayTags::Get().Effects_HitReact,
+			EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this, &ThisClass::HitReactCallBack);
+		
 	}
-	
+}
+
+void AMageEnemy::HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount)
+{
+	bIsHit = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bIsHit ? 0 : BaseWalkSpeed;
 }
 
 void AMageEnemy::HighlightActor()
@@ -76,4 +100,16 @@ void AMageEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AMageEnemy::HiddenWidget_Implementation()
+{
+	HealthBar->SetVisibility(false);
+}
+
+void AMageEnemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	HiddenWidget();
+	Super::Die();
 }

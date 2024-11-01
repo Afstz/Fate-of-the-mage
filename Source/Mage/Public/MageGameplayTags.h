@@ -34,13 +34,29 @@ public:
 	FGameplayTag Attributes_Secondary_ManaRegeneration;
 	FGameplayTag Attributes_Secondary_MaxMana;
 
-	/** Input Tags*/
+	FGameplayTag Attributes_Secondary_PhysicalResistence;
+	FGameplayTag Attributes_Secondary_MagicalResistence;
+	FGameplayTag Attributes_Secondary_FireResistence;
+	FGameplayTag Attributes_Secondary_LightningResistence;
+	
+	/** Input Tags */
 	FGameplayTag Input_LMB;
 	FGameplayTag Input_RMB;
 	FGameplayTag Input_1;
 	FGameplayTag Input_2;
 	FGameplayTag Input_3;
 	FGameplayTag Input_4;
+
+	/** GameplayEffect Tags */
+	FGameplayTag Effects_HitReact;
+
+	/** Damage Type Tags */
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistence; // 伤害属性对应伤害抗性
+	FGameplayTag Damage;
+	FGameplayTag Damage_Physical;
+	FGameplayTag Damage_Magical;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lightning;
 protected:
 	
 private:

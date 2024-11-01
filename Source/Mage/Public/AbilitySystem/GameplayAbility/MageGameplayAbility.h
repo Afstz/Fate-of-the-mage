@@ -7,7 +7,7 @@
 #include "MageGameplayAbility.generated.h"
 
 /**
- * 
+ *  自定义的玩法技能基类
  */
 UCLASS()
 class MAGE_API UMageGameplayAbility : public UGameplayAbility
@@ -16,5 +16,6 @@ class MAGE_API UMageGameplayAbility : public UGameplayAbility
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	FGameplayTag StartupTag;
+	FGameplayTag StartupInputTag;
+	
 };

@@ -4,7 +4,6 @@
 #include "Player/MagePlayerController.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "MageGameplayTags.h"
 #include "NavigationPath.h"
@@ -15,6 +14,8 @@
 #include "Input/MageInputComponent.h"
 #include "Interface/EnemyInterface.h"
 #include "UI/Widget/MageUserWidget.h"
+#include "GameFramework/Character.h"
+#include "UI/Widget/WidgetCompoent/DamageTextComponent.h"
 
 AMagePlayerController::AMagePlayerController()
 {
@@ -34,7 +35,6 @@ void AMagePlayerController::BeginPlay()
 		EnhancedSubSystem->AddMappingContext(MageInputContext, 0);
 	}
 	
-	
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 	FInputModeGameAndUI InputModeData;
@@ -48,6 +48,22 @@ void AMagePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	AutoRunning();
+}
+
+void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit)
+{
+	// IsValid可以判断指针是否为空还可以判断指针标记为代销毁(最近一帧可能被调用了销毁)
+	// DamageTextWidgetCompClass不用是因为只有空和不为空两种情况，因为我们在蓝图进行设置
+	if (IsValid(TargetCharacter) && DamageTextWidgetCompClass)
+	{
+		UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextWidgetCompClass);
+		DamageTextComponent->RegisterComponent(); // 动态的创建组件需要手动注册
+		// 附加到角色身上保证字体在人物位置上
+		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		// 从角色身上分离，保证在一个位置播放完成动画不随父物体移动
+		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageTextComponent->SetDamageText(DamageValue, bIsCriticalHit, bIsBlockHit);
+	}
 }
 
 void AMagePlayerController::CursorTrace()

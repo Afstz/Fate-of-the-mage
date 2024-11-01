@@ -2,25 +2,25 @@
 	{
 		"Name": "Attributes.Primary.Resilience",
 		"1": 4,
-		"30": 40,
+		"29.700001": 30,
 		"50": 40
 	},
 	{
 		"Name": "Attributes.Primary.Strength",
 		"1": 5,
-		"30": 63.4877,
+		"29.700001": 35,
 		"50": 50
 	},
 	{
 		"Name": "Attributes.Primary.Intelligence",
 		"1": 12,
-		"30": 40,
+		"29.700001": 80,
 		"50": 120
 	},
 	{
 		"Name": "Attributes.Primary.Vigor",
 		"1": 5,
-		"30": 40,
+		"29.700001": 40,
 		"50": 60
 	}
 ]

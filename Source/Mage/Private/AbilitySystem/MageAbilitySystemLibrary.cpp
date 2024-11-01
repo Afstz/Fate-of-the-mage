@@ -2,8 +2,8 @@
 
 
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
-
 #include "AbilitySystemComponent.h"
+#include "MageAbilityTypes.h"
 #include "Game/MageGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MagePlayerState.h"
@@ -46,31 +46,84 @@ UAttributeMenuWidgetController* UMageAbilitySystemLibrary::GetAttributeMenuWidge
 void UMageAbilitySystemLibrary::InitCharacterDefaultAttributes(const UObject* WorldContextObject,
 	UAbilitySystemComponent* ASC, ECharacterClass CharacterClass, int32 Level)
 {
-	// 通过GameMode找到角色的默认属性
-	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (MageGameModeBase == nullptr) return;
+	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject);
+	if (!CharacterClassData || !IsValid(ASC)) return;
 	
-	UCharacterClassData* CharacterClassData = MageGameModeBase->CharacterClassData;
-	const FCharacterClassDefaultInfo CharacterClassDefaultInfo = MageGameModeBase->CharacterClassData->FindCharacterClassInfo(CharacterClass);
+	AActor* AvatarActor = ASC->GetAvatarActor();
+	const FCharacterClassDefaultInfo CharacterClassDefaultInfo = CharacterClassData->FindCharacterClassInfo(CharacterClass);
 
 	// 初始化角色默认等级属性
 
 	// 设置主要属性
 	FGameplayEffectContextHandle PrimaryAttributeContextHandle = ASC->MakeEffectContext();
-	PrimaryAttributeContextHandle.AddSourceObject(WorldContextObject);
+	PrimaryAttributeContextHandle.AddSourceObject(AvatarActor);
 	FGameplayEffectSpecHandle PrimaryAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassDefaultInfo.DefaultPrimaryEffects, Level, PrimaryAttributeContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributeSpecHandle.Data.Get());
 
 	// 设置次要属性
 	FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
-	SecondaryAttributeContextHandle.AddSourceObject(WorldContextObject);
+	SecondaryAttributeContextHandle.AddSourceObject(AvatarActor);
 	FGameplayEffectSpecHandle SecondaryAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->DefaultSecondEffects, Level, SecondaryAttributeContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeSpecHandle.Data.Get());
 
 	// 设置生命值和法力值
 	FGameplayEffectContextHandle BaseAttributeContextHande = ASC->MakeEffectContext();
-	BaseAttributeContextHande.AddSourceObject(WorldContextObject);
+	BaseAttributeContextHande.AddSourceObject(AvatarActor);
 	FGameplayEffectSpecHandle BaseAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->DefaultBaseEffects, Level, BaseAttributeContextHande);
 	ASC->ApplyGameplayEffectSpecToSelf(*BaseAttributeSpecHandle.Data.Get());
 	
+}
+
+void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+{
+	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject); // 获取到Mode中的角色默认技能
+	if (!CharacterClassData || !IsValid(ASC)) return;
+	
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : CharacterClassData->DefaultAbilities)
+	{
+		const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+}
+
+UCharacterClassData* UMageAbilitySystemLibrary::GetCharacterClassData(const UObject* WorldContextObject)
+{
+	// 通过GameMode找到角色的默认属性
+	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (MageGameModeBase == nullptr) return nullptr;
+	return MageGameModeBase->CharacterClassData;
+}
+
+bool UMageAbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetIsCriticalHit();
+	}
+	return false;
+}
+
+bool UMageAbilitySystemLibrary::GetIsBlockHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetIsBlockHit();
+	}
+	return false;
+}
+
+void UMageAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsCriticalHit)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetIsCriticalHit(bIsCriticalHit);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetIsBlockHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsBlockHit)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+    {
+    	EffectContext->SetIsBlockHit(bIsBlockHit);
+    }
 }

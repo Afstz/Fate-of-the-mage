@@ -25,6 +25,10 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	/** Combat Interface */
 	virtual FVector GetLocationByWeaponSocket() const override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
+	virtual void Die() override;
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MultiHandleDeath();
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
@@ -38,6 +42,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+	/** Init Attribute */
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultBaseEffects;
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
@@ -47,8 +52,19 @@ protected:
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect>& InitAttributeEffects, float Level);
 	virtual void InitDefaultAttributes();
 
+	/** Dissolve Material*/
+	UPROPERTY(EditDefaultsOnly, Category = "Dissolve")
+	TObjectPtr<UMaterialInstance> CharacterMaterialInst;
+	UPROPERTY(EditDefaultsOnly, Category = "Dissolve")
+	TObjectPtr<UMaterialInstance> WeaponMaterialInst;
+	void Dissolve();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Dissolve")
+	void StartDissolveTimeLine(const TArray<UMaterialInstanceDynamic*>& MaterialInstDynamics);
+
 	void AddCharacterAbilites();
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

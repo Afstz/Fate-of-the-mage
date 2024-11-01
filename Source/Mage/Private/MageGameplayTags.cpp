@@ -52,6 +52,16 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.Attributes_Secondary_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.MaxMana"), FString("Maximum of max mana"));
 
+	MageGameplayTags.Attributes_Secondary_PhysicalResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Attributes.Secondary.PhysicalResistence"), FString("Reduces physical attack damage"));
+	MageGameplayTags.Attributes_Secondary_MagicalResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.MagicalResistence"), FString("Magical Damage Resistence"));
+	MageGameplayTags.Attributes_Secondary_FireResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.FireResistence"), FString("Fire Damage Resistence"));
+	MageGameplayTags.Attributes_Secondary_LightningResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.LightningResistence"), FString("Lightning Damage Resistence"));
+	
+
 	/** Input Tags*/
 	MageGameplayTags.Input_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.LMB"), FString("Left Mouse Button"));
@@ -65,4 +75,26 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Input.3"), FString("3 key"));
 	MageGameplayTags.Input_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.4"), FString("4 key"));
+
+	/** GameplayEffect Tags */
+	MageGameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Effects.HitReact"), FString("Hit React"));
+	
+	/** Damage Type Tags */
+	MageGameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage"), FString("Damage Tag"));
+	MageGameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Damage.Physical"), FString("Physical Damage Type"));
+	MageGameplayTags.Damage_Magical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Magical"), FString("Magical Damage Type"));
+	MageGameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Fire"), FString("Fire Damage Type"));
+	MageGameplayTags.Damage_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.Lightning"), FString("Lightning Damage Type"));
+
+	// 建立属性映射关系，便于计算
+	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Physical, MageGameplayTags.Attributes_Secondary_PhysicalResistence);
+	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Magical, MageGameplayTags.Attributes_Secondary_MagicalResistence);
+	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Fire, MageGameplayTags.Attributes_Secondary_FireResistence);
+	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Attributes_Secondary_LightningResistence);
 }

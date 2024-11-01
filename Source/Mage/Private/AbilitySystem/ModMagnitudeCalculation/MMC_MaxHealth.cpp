@@ -1,21 +1,20 @@
 // Copyright AFstz.
 
 
-#include "AbilitySystem/ModMagnitudeCalc/MMC_MaxMana.h"
-
+#include "AbilitySystem/ModMagnitudeCalculation/MMC_MaxHealth.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "Interface/CombatInterface.h"
 
-UMMC_MaxMana::UMMC_MaxMana()
+UMMC_MaxHealth::UMMC_MaxHealth()
 {
-	IntelligenceDef.AttributeToCapture = UMageAttributeSet::GetIntelligenceAttribute();
-	IntelligenceDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
-	IntelligenceDef.bSnapshot = false;
+	VigorDef.AttributeToCapture = UMageAttributeSet::GetVigorAttribute(); // 要捕获的属性
+	VigorDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target; // 应用效果对象的属性值
+	VigorDef.bSnapshot = false;
 
-	RelevantAttributesToCapture.Add(IntelligenceDef);
+	RelevantAttributesToCapture.Add(VigorDef); // 把要捕获的属性定义添加到数组里
 }
 
-float UMMC_MaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	// 收集 Spec 的 Source 和 Target 的Tags
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -27,12 +26,13 @@ float UMMC_MaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffectS
 	AggregatorParameters.SourceTags = SourceTags;
 	AggregatorParameters.TargetTags = TargetTags;
 
-	float Intelligence = 0.f;
-	GetCapturedAttributeMagnitude(IntelligenceDef, Spec, AggregatorParameters, Intelligence);
-	Intelligence = FMath::Max(Intelligence, 0.f);
+	
+	float Vigor = 0.f;
+	GetCapturedAttributeMagnitude(VigorDef, Spec, AggregatorParameters, Vigor); // 根据捕获的属性获取值
+	Vigor = FMath::Max(Vigor, 0.f); // 防止小于零
 
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(Spec.GetContext().GetSourceObject());
 	int32 Level = CombatInterface->GetCharacterLevel();
 
-	return (60 + Intelligence * 2) + 10 * Level; // 基于 Intelligence 和 Level
+	return (100 + Vigor * 2) + 10 * Level; // 基于 Vigor 和 Level
 }

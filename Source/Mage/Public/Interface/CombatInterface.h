@@ -24,7 +24,11 @@ class MAGE_API ICombatInterface
 public:
 	virtual int32 GetCharacterLevel() const;
 	virtual FVector GetLocationByWeaponSocket() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
+	UAnimMontage* GetHitReactMontage() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void FacingTarget(const FVector& TargetLocation);
+
+	virtual void Die() = 0;
 };

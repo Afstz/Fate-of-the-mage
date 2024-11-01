@@ -57,13 +57,13 @@ public:
 	UMageAttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	// 当Attribute的值被改变之前调用
+	// 当Attribute的CurrentValue被改变之前调用
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
-	// 仅在GameplayEffect使Attribute的 BaseValue 改变时触发。
+	// 仅在GameplayEffect使Attribute的 BaseValue 改变后触发。
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	/** Attribute Menu */
-	TMap<FGameplayTag, FGameplayAttribute> TagsForAttributeMap; // 属性标签及对应的GetAttribute方法
+	TMap<FGameplayTag, FGameplayAttribute> TagsToAttributes; // 属性标签及对应的GetAttribute方法
 	
 	
 	/*
@@ -139,6 +139,40 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UMageAttributeSet, MaxMana);
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalResistence, Category = "Player Attributes | Secondary")
+	FGameplayAttributeData PhysicalResistence;
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, PhysicalResistence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MagicalResistence, Category = "Player Attributes | Secondary")
+	FGameplayAttributeData MagicalResistence;
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, MagicalResistence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_FireResistence, Category = "Player Attributes | Secondary")
+	FGameplayAttributeData FireResistence;
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, FireResistence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_LightningResistence, Category = "Player Attributes | Secondary")
+	FGameplayAttributeData LightningResistence;
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, LightningResistence);
+
+	/*
+	 * Meta Attribute
+	 */
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player Attributes | Meta")
+	FGameplayAttributeData ReceivedDamage; // 处理传过来的伤害
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, ReceivedDamage);
+
+	/*
+	 * Other Function
+	 */
+	void ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue,
+		const bool bIsCriticalHit, const bool bIsBlockHit) const; // 显示对对方造成的伤害
+	
+	/*
+	 * OnRep Functions
+	 */
+	
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	UFUNCTION()
@@ -173,6 +207,14 @@ public:
 	void OnRep_ManaRegeneration(const FGameplayAttributeData& OldManaRegeneration) const;
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+	UFUNCTION()
+	void OnRep_PhysicalResistence(const FGameplayAttributeData& OldPhysicalResistence) const;
+	UFUNCTION()
+	void OnRep_MagicalResistence(const FGameplayAttributeData& OldMagicalResistence) const;
+	UFUNCTION()
+	void OnRep_FireResistence(const FGameplayAttributeData& OldFireResistence) const;
+	UFUNCTION()
+	void OnRep_LightningResistence(const FGameplayAttributeData& OldLightningResistence) const;
 	
 
 private:

@@ -3,9 +3,11 @@
 
 #include "AbilitySystem/GameplayAbility/ProjectileSpellAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Actor/MageProjectile.h"
 #include "Interface/CombatInterface.h"
+#include "MageGameplayTags.h"
 
 void UProjectileSpellAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                               const FGameplayAbilityActorInfo* ActorInfo,
@@ -13,8 +15,6 @@ void UProjectileSpellAbility::ActivateAbility(const FGameplayAbilitySpecHandle H
                                               const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	
 }
 
 void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
@@ -25,10 +25,10 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 	APawn* Instigator = Cast<APawn>(GetAvatarActorFromActorInfo());
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Instigator))
 	{
+		// 设置发射物位置和方向
 		FTransform SpawnTransform;
 		FVector SpawnLocation = CombatInterface->GetLocationByWeaponSocket();
 		FRotator SpawnRotation = (ProjectileLocation - SpawnLocation).Rotation();
-		SpawnRotation.Pitch = 0;
 		SpawnTransform.SetLocation(SpawnLocation);
 		SpawnTransform.SetRotation(SpawnRotation.Quaternion());
 		
@@ -40,9 +40,18 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 		);
 
+		// 设置游戏效果和伤害
 		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-		Projectile->EffectSpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), ASC->MakeEffectContext());
+		FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
+		const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
+
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledDamage); 
+		}
 		
+		Projectile->EffectSpecHandle = SpecHandle;
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MagePlayerController.generated.h"
 
+class UDamageTextComponent;
 class USplineComponent;
 class UMageAbilitySystemComponent;
 class UMageInputData;
@@ -26,6 +27,10 @@ class MAGE_API AMagePlayerController : public APlayerController
 
 public:
 	AMagePlayerController();
+
+	/** DamageFloatingText */
+	UFUNCTION(Client, Reliable)
+	void ShowDamageText(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +40,10 @@ protected:
 	/** Attribute Menu */
 	UPROPERTY(BlueprintReadWrite)
 	bool IsOpenAttributeMenu = false;
+
+	/** DamageFloatingText */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextWidgetCompClass;
 private:
 	/** Input */
 	UPROPERTY(EditAnywhere, Category="Input")

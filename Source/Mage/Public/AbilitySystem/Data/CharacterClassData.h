@@ -7,6 +7,7 @@
 #include "CharacterClassData.generated.h"
 
 
+class UGameplayAbility;
 class UGameplayEffect;
 
 UENUM(BlueprintType)
@@ -44,5 +45,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Shared Class Defaults")
 	TSubclassOf<UGameplayEffect> DefaultBaseEffects;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ability Defaults")
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
+	
 	FCharacterClassDefaultInfo FindCharacterClassInfo(const ECharacterClass CharacterClass);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	TObjectPtr<UCurveTable> DamageCoefficientTables;
 };

@@ -22,12 +22,12 @@ void UMageAbilitySystemComponent::ClientOnEffectApplied_Implementation(UAbilityS
 
 void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilityClasses)
 {
-	for (TSubclassOf<UGameplayAbility>& AbilityClass : AbilityClasses)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : AbilityClasses)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		if (UMageGameplayAbility* MageGameplayAbility = Cast<UMageGameplayAbility>(AbilitySpec.Ability))
 		{
-			AbilitySpec.DynamicAbilityTags.AddTag(MageGameplayAbility->StartupTag); // 把技能标签添加到动态标签容器中
+			AbilitySpec.DynamicAbilityTags.AddTag(MageGameplayAbility->StartupInputTag); // 把技能标签添加到动态标签容器中
 			GiveAbility(AbilitySpec); // 赋予技能但不执行
 		}
 	}

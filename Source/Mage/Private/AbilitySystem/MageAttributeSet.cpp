@@ -2,35 +2,41 @@
 
 
 #include "AbilitySystem/MageAttributeSet.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
 #include "MageGameplayTags.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
+#include "Interface/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/MagePlayerController.h"
 
 UMageAttributeSet::UMageAttributeSet()
 {
 	FMageGameplayTags MageGameplayTags = FMageGameplayTags::Get();
 
 	// Primary Attributes
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Strength, GetStrengthAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Resilience, GetResilienceAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Primary_Vigor, GetVigorAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Primary_Strength, GetStrengthAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Primary_Resilience, GetResilienceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Primary_Vigor, GetVigorAttribute());
  
 	// Secondary Attributes
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_Armor, GetArmorAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_ArmorPenetration, GetArmorPenetrationAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_BlockChance, GetBlockChanceAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticialHitChance, GetCriticalHitChanceAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticalHitDamage, GetCriticalHitDamageAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_CriticalHitResistance, GetCriticalHitResistanceAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_HealthRegeneration, GetHealthRegenerationAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_ManaRegeneration, GetManaRegenerationAttribute());
-	TagsForAttributeMap.Add(MageGameplayTags.Attributes_Secondary_MaxMana, GetMaxManaAttribute());
-	
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_Armor, GetArmorAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_ArmorPenetration, GetArmorPenetrationAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_BlockChance, GetBlockChanceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_CriticialHitChance, GetCriticalHitChanceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_CriticalHitDamage, GetCriticalHitDamageAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_CriticalHitResistance, GetCriticalHitResistanceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_HealthRegeneration, GetHealthRegenerationAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_ManaRegeneration, GetManaRegenerationAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_MaxMana, GetMaxManaAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_PhysicalResistence, GetPhysicalResistenceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_MagicalResistence, GetMagicalResistenceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_FireResistence, GetFireResistenceAttribute());
+	TagsToAttributes.Add(MageGameplayTags.Attributes_Secondary_LightningResistence, GetLightningResistenceAttribute());
 }
 
 void UMageAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -56,12 +62,16 @@ void UMageAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, PhysicalResistence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, MagicalResistence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, FireResistence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMageAttributeSet, LightningResistence, COND_None, REPNOTIFY_Always);
 }
 
 void UMageAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
-
+	
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
@@ -75,7 +85,7 @@ void UMageAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-
+	
 	FEffectProperties EffectProps;
 	SetEffectProperties(Data, EffectProps);
 
@@ -87,6 +97,35 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
+	if (Data.EvaluatedData.Attribute == GetReceivedDamageAttribute())
+	{
+		const float LocalDamage = GetReceivedDamage();
+		SetReceivedDamage(0.f);
+		if (LocalDamage >= 0.f)
+		{
+			float NewHealth = GetHealth() - LocalDamage;
+			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+			bool bIsDie = GetHealth() <= 0.f;
+
+			if (bIsDie)
+			{
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProps.TargetAvatarActor))
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				FGameplayTagContainer TagContainer;
+				TagContainer.AddTag(FMageGameplayTags::Get().Effects_HitReact);
+				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
+			}
+
+			const bool bIsCriticalHit = UMageAbilitySystemLibrary::GetIsCriticalHit(EffectProps.SourceEffectContextHandle);
+			const bool bIsBlockHit = UMageAbilitySystemLibrary::GetIsBlockHit(EffectProps.SourceEffectContextHandle);
+			ShowCharacterDamageText(EffectProps, LocalDamage, bIsCriticalHit, bIsBlockHit);
+		}
 	}
 }
 void UMageAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProps)
@@ -112,6 +151,17 @@ void UMageAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		EffectProps.TargetCharacter = Cast<ACharacter>(EffectProps.TargetAvatarActor);
 		EffectProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		EffectProps.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(EffectProps.TargetAvatarActor);
+	}
+}
+
+void UMageAttributeSet::ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit) const 
+{
+	if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter) // 对别人造成伤害才显示浮动伤害文本
+	{
+		if (AMagePlayerController* MagePC = Cast<AMagePlayerController>(EffectProperties.SourceController))
+		{
+			MagePC->ShowDamageText(EffectProperties.TargetCharacter, DamageValue, bIsCriticalHit, bIsBlockHit);
+		}
 	}
 }
 
@@ -192,4 +242,24 @@ void UMageAttributeSet::OnRep_ManaRegeneration(const FGameplayAttributeData& Old
 void UMageAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMageAttributeSet, MaxMana, OldMaxMana);
+}
+
+void UMageAttributeSet::OnRep_PhysicalResistence(const FGameplayAttributeData& OldPhysicalResistence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMageAttributeSet, PhysicalResistence, OldPhysicalResistence);
+}
+
+void UMageAttributeSet::OnRep_MagicalResistence(const FGameplayAttributeData& OldMagicalResistence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMageAttributeSet, MagicalResistence, OldMagicalResistence);
+}
+
+void UMageAttributeSet::OnRep_FireResistence(const FGameplayAttributeData& OldFireResistence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMageAttributeSet, FireResistence, OldFireResistence);
+}
+
+void UMageAttributeSet::OnRep_LightningResistence(const FGameplayAttributeData& OldLightningResistence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMageAttributeSet, LightningResistence, OldLightningResistence);
 }
