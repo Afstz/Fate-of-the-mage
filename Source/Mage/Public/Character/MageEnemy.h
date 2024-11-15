@@ -9,6 +9,8 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "MageEnemy.generated.h"
 
+class AMageAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -19,6 +21,7 @@ class MAGE_API AMageEnemy : public AMageCharacterBase, public IEnemyInterface
 	GENERATED_BODY()
 public:
 	AMageEnemy();
+	virtual void PossessedBy(AController* NewController) override;
 
 	/** Enemy Hightlight Interface. */
 	virtual void HighlightActor() override;
@@ -54,9 +57,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	virtual void InitDefaultAttributes() override;
+	/** AI */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+	UPROPERTY()
+	TObjectPtr<AMageAIController> MageAIController;
 private:
 	/** Widget */
 	void InitHealthBar();
 	UFUNCTION(NetMulticast, Reliable)
-	void HiddenWidget();
+	void MultiHiddenWidget();
 };

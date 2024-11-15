@@ -5,7 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 
-UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDtatUnderMouse(UGameplayAbility* OwningAbility)
+UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
 	UTargetDataUnderMouse* TargetData = NewAbilityTask<UTargetDataUnderMouse>(OwningAbility);
 	return TargetData;
@@ -27,7 +27,7 @@ void UTargetDataUnderMouse::Activate()
 	{
 		FGameplayAbilitySpecHandle AbilitySpecHandle = GetAbilitySpecHandle();
 		FPredictionKey PredictionKey = GetActivationPredictionKey();
-		AbilitySystemComponent->AbilityTargetDataSetDelegate(AbilitySpecHandle, PredictionKey).AddUObject(this, &ThisClass::TargetDataReplicatedCallBack);
+		AbilitySystemComponent->AbilityTargetDataSetDelegate(AbilitySpecHandle, PredictionKey).AddUObject(this, &ThisClass::ReplicatedTargetDataCallBack);
 		// 判断客户端是否已经发来数据并缓存,有则广播数据,没有就等待数据
 		const bool bTargetDataIsSet = AbilitySystemComponent->CallReplicatedTargetDataDelegatesIfSet(AbilitySpecHandle, PredictionKey);
 		if (!bTargetDataIsSet)
@@ -66,12 +66,12 @@ void UTargetDataUnderMouse::SendMouseTargetData()
 	}
 }
 
-void UTargetDataUnderMouse::TargetDataReplicatedCallBack(const FGameplayAbilityTargetDataHandle& TargetDataHandle, FGameplayTag ApplicationTag)
+void UTargetDataUnderMouse::ReplicatedTargetDataCallBack(const FGameplayAbilityTargetDataHandle& TargetDataHandle, FGameplayTag ApplicationTag)
 {
 	// 服务器已经接收到数据，清除缓存的数据并通知客户端已经接收
 	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
 	
-	if (ShouldBroadcastAbilityTaskDelegates()) // 广播客户端发来是数据
+	if (ShouldBroadcastAbilityTaskDelegates()) // 广播客户端发来的数据
 	{
 		MouseTargetValidData.Broadcast(TargetDataHandle);
 	}

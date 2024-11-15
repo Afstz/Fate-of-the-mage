@@ -50,6 +50,11 @@ protected:
 	void OnEndOverlap(AActor* TargetActor); // 离开重叠时执行自己设计的逻辑
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	bool bApplyEffectToEnemy = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	bool bDestroyOnEffectApplication = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	TSubclassOf<UGameplayEffect> InstantEffectClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
 	EEffectApplicationPolicy InstantEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;

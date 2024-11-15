@@ -82,11 +82,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	// 通过标签获取SetByCaller设置的伤害值同时计算抗性伤害
 	float TotalDamage = 0.f;
-	for (const auto& Pair : FMageGameplayTags::Get().DamageTypesToResistence)
+	for (const auto& [DamageType, DamageTypeResistence] : FMageGameplayTags::Get().DamageTypesToResistence)
 	{
-		const FGameplayTag DamageType = Pair.Key; // 伤害类型
-		const FGameplayTag DamageTypeResistence = Pair.Value; // 属性抗性
-		
 		checkf(DamageTypesToDef.Contains(DamageTypeResistence), TEXT("Not Find [%s] in DamageTypesToDef"), *DamageTypeResistence.ToString());
 		const FGameplayEffectAttributeCaptureDefinition ResistenceDef = DamageTypesToDef[DamageTypeResistence];
 		float ResistancePercentage = 0.f; // 当前敌方属性抗性

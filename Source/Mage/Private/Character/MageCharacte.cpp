@@ -28,6 +28,7 @@ void AMageCharacte::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	// Init Ability Actor Info in the Server.
+
 	InitAbilityActorInfo();
 	
 	AddCharacterAbilites(); // 在服务器赋予技能

@@ -9,6 +9,9 @@
 #include "Mage/Mage.h"
 #include "UI/Widget/MageUserWidget.h"
 #include "MageGameplayTags.h"
+#include "AI/MageAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AMageEnemy::AMageEnemy()
@@ -20,6 +23,23 @@ AMageEnemy::AMageEnemy()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComp"));
 	HealthBar->SetupAttachment(RootComponent);
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+}
+
+void AMageEnemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	
+	MageAIController = Cast<AMageAIController>(NewController);
+	// AIController会自带一个BBComp,需要手动初始化它
+	MageAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	MageAIController->RunBehaviorTree(BehaviorTree);
+	MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+	MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("MeleeCharacter"), CharacterClass == ECharacterClass::Warrior);
 }
 
 void AMageEnemy::BeginPlay()
@@ -86,6 +106,7 @@ void AMageEnemy::HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount
 {
 	bIsHit = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bIsHit ? 0 : BaseWalkSpeed;
+	MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bIsHit);
 }
 
 void AMageEnemy::HighlightActor()
@@ -102,7 +123,7 @@ void AMageEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
-void AMageEnemy::HiddenWidget_Implementation()
+void AMageEnemy::MultiHiddenWidget_Implementation()
 {
 	HealthBar->SetVisibility(false);
 }
@@ -110,6 +131,6 @@ void AMageEnemy::HiddenWidget_Implementation()
 void AMageEnemy::Die()
 {
 	SetLifeSpan(LifeSpan);
-	HiddenWidget();
+	MultiHiddenWidget();
 	Super::Die();
 }

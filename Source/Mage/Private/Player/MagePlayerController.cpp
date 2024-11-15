@@ -194,10 +194,10 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		HoldingTime += GetWorld()->GetDeltaSeconds(); // 累加时间判断是否要自动移动
 		
-		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
-		
 		if (APawn* ControlledPawn = GetPawn())
 		{
+			// 没有获取到目的地就原地不动
+			CachedDestination = CursorHit.bBlockingHit ? CursorHit.ImpactPoint : ControlledPawn->GetActorLocation();
 			// 获取要移动目的地的方向
 			FVector MoveDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 			ControlledPawn->AddMovementInput(MoveDirection);
@@ -227,13 +227,14 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		if (HoldingTime <= ShortPressThreshold && ControlledPawn) // 小于短按阈值则进行自动移动
 		{
 			Spline->ClearSplinePoints(); // 清除样条线已有的点,重新计算
-			if (UNavigationPath* FoundPath = UNavigationSystemV1::FindPathToLocationSynchronously(
-				this, ControlledPawn->GetActorLocation(), CachedDestination))
+			UNavigationPath* FoundPath = UNavigationSystemV1::FindPathToLocationSynchronously(
+				this, ControlledPawn->GetActorLocation(), CachedDestination);
+			if (FoundPath && FoundPath->PathPoints.Num() > 0)
 			{
 				for (const FVector& PathPoint : FoundPath->PathPoints)
 				{
 					Spline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World); // 添加已找到的路径
-					// DrawDebugSphere(GetWorld(), PathPoint, 8.f, 8, FColor::Orange, false, 5.f);
+					DrawDebugSphere(GetWorld(), PathPoint, 8.f, 8, FColor::Orange, false, 5.f);
 				}
 				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
 				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];

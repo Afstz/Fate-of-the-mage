@@ -20,6 +20,8 @@ void AMageEffectActor::BeginPlay()
 
 void AMageEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> EffectDefaultClass)
 {
+	if (!bApplyEffectToEnemy && TargetActor->ActorHasTag(FName("Enemy"))) return;
+		
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	if (TargetASC == nullptr) return;
 	check(EffectDefaultClass);
@@ -37,10 +39,17 @@ void AMageEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
+	
+	if (bDestroyOnEffectApplication) // 不是永久效果就摧毁
+	{
+		Destroy();
+	}
 }
 
 void AMageEffectActor::OnBeginOverlap(AActor* TargetActor)
 {
+	if (!bApplyEffectToEnemy && TargetActor->ActorHasTag(FName("Enemy"))) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnBeginOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantEffectClass);
@@ -57,6 +66,8 @@ void AMageEffectActor::OnBeginOverlap(AActor* TargetActor)
 
 void AMageEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if (!bApplyEffectToEnemy && TargetActor->ActorHasTag(FName("Enemy"))) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantEffectClass);
