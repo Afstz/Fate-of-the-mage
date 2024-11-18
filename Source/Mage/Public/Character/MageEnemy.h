@@ -26,6 +26,10 @@ public:
 	/** Enemy Hightlight Interface. */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	virtual AActor* GetFacingTarget_Implementation() const override;
+	virtual void SetFacingTarget_Implementation(AActor* InFacingTarget) override;
+	virtual FVector GetSocketLocationByTaggedMontage_Implementation(const FTaggedMontage& TaggedMontage) const override;
+	virtual TArray<FTaggedMontage> GetTaggedMontage_Implementation() const override;
 
 	/** Combat Interface. */
 	FORCEINLINE virtual int32 GetCharacterLevel() const override { return Level; }
@@ -43,7 +47,7 @@ public:
 	void HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount);
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bIsHit = false;
-	UPROPERTY(BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 250.f;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
@@ -62,6 +66,14 @@ protected:
 	TObjectPtr<UBehaviorTree> BehaviorTree;
 	UPROPERTY()
 	TObjectPtr<AMageAIController> MageAIController;
+
+	/** Motion Warping*/
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AActor> FacingTarget;
+	
+	/** Montage */
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
+	TArray<FTaggedMontage> AttackMontages; // 存储着蒙太奇动画标签结构体
 private:
 	/** Widget */
 	void InitHealthBar();

@@ -3,6 +3,7 @@
 
 #include "Character/MageCharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Mage/Mage.h"
@@ -27,7 +28,7 @@ UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-FVector AMageCharacterBase::GetLocationByWeaponSocket() const
+FVector AMageCharacterBase::GetLocationByWeaponSocket_Implementation() const
 {
 	check(Weapon);
 	return Weapon->GetSocketLocation(WeaponTipSocketName);
@@ -44,6 +45,16 @@ void AMageCharacterBase::Die()
 	MultiHandleDeath();
 }
 
+bool AMageCharacterBase::IsDead_Implementation() const
+{
+	return bDead;
+}
+
+AActor* AMageCharacterBase::GetAvatarActor_Implementation()
+{
+	return this;
+}
+
 void AMageCharacterBase::MultiHandleDeath_Implementation()
 {
 	Weapon->SetSimulatePhysics(true);
@@ -56,6 +67,8 @@ void AMageCharacterBase::MultiHandleDeath_Implementation()
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
+	
+	bDead = true;
 }
 
 void AMageCharacterBase::BeginPlay()

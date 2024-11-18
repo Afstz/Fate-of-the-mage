@@ -234,7 +234,7 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				for (const FVector& PathPoint : FoundPath->PathPoints)
 				{
 					Spline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World); // 添加已找到的路径
-					DrawDebugSphere(GetWorld(), PathPoint, 8.f, 8, FColor::Orange, false, 5.f);
+					//DrawDebugSphere(GetWorld(), PathPoint, 8.f, 8, FColor::Orange, false, 5.f);
 				}
 				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
 				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];

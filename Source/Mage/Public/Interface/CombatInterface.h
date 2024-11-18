@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -23,12 +24,17 @@ class MAGE_API ICombatInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual int32 GetCharacterLevel() const;
-	virtual FVector GetLocationByWeaponSocket() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
+	FVector GetLocationByWeaponSocket() const;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
 	UAnimMontage* GetHitReactMontage() const;
-
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void FacingTarget(const FVector& TargetLocation);
-
+	void UpdateFacingTarget(const FVector& TargetLocation);
+	
 	virtual void Die() = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool IsDead() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetAvatarActor();
 };

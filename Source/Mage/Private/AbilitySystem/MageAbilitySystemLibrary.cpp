@@ -4,7 +4,9 @@
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "MageAbilityTypes.h"
+#include "Engine/OverlapResult.h"
 #include "Game/MageGameModeBase.h"
+#include "Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MagePlayerState.h"
 #include "UI/HUD/MageHUD.h"
@@ -74,15 +76,26 @@ void UMageAbilitySystemLibrary::InitCharacterDefaultAttributes(const UObject* Wo
 	
 }
 
-void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject); // 获取到Mode中的角色默认技能
 	if (!CharacterClassData || !IsValid(ASC)) return;
 	
-	for (const TSubclassOf<UGameplayAbility>& AbilityClass : CharacterClassData->DefaultAbilities)
+	for (const TSubclassOf<UGameplayAbility>& CommonAbility : CharacterClassData->CommonAbilities)
 	{
-		const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(CommonAbility, 1);
 		ASC->GiveAbility(AbilitySpec);
+	}
+
+	const FCharacterClassDefaultInfo& ClassDefaultInfo = CharacterClassData->FindCharacterClassInfo(CharacterClass);
+
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+	{
+		for (const TSubclassOf<UGameplayAbility>& DefaultAbility : ClassDefaultInfo.CharacterDefaultAbilites)
+		{
+			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(DefaultAbility, CombatInterface->GetCharacterLevel());
+			ASC->GiveAbility(AbilitySpec);
+		}
 	}
 }
 
@@ -126,4 +139,37 @@ void UMageAbilitySystemLibrary::SetIsBlockHit(FGameplayEffectContextHandle& Effe
     {
     	EffectContext->SetIsBlockHit(bIsBlockHit);
     }
+}
+
+void UMageAbilitySystemLibrary::GetAlivePlayerInSphereRadius(const UObject* WorldContextObject,
+	TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& InActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
+{
+	FCollisionQueryParams SphereParams; // 碰撞查询的相关参数
+	SphereParams.AddIgnoredActors(InActorsToIgnore); // 要忽略的Actor
+	
+	// 查询场景中我们击中了什么
+	TArray<FOverlapResult> Overlaps;
+	if (UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
+	{
+		// 获取与球体碰撞的动态物体
+		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(SphereRadius), SphereParams);
+		for (FOverlapResult& OverlapResult : Overlaps)
+		{
+			bool bIsImplementCombatInterface = OverlapResult.GetActor()->Implements<UCombatInterface>();
+			// 实现了接口并且目标没有死亡
+			if (bIsImplementCombatInterface && !ICombatInterface::Execute_IsDead(OverlapResult.GetActor()))
+			{
+				OutOverlappingActors.AddUnique(OverlapResult.GetActor());
+			}
+		}
+	}
+	
+}
+
+bool UMageAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
+{
+	bool IsPlayerFriend = FirstActor->ActorHasTag("Player") && SecondActor->ActorHasTag("Player");
+	bool IsEnemyFriend = FirstActor->ActorHasTag("Enemy") && SecondActor->ActorHasTag("Enemy");
+	bool bIsFriend = IsPlayerFriend || IsEnemyFriend; // 是否是友方
+	return !bIsFriend;
 }

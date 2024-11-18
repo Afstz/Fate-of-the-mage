@@ -14,7 +14,10 @@ class MAGE_API UDamageGameplayAbility : public UMageGameplayAbility
 {
 	GENERATED_BODY()
 public:
-	
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void CauseDamage(AActor* TargetActor);
+
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 

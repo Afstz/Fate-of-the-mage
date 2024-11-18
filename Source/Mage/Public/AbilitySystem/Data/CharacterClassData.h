@@ -25,6 +25,8 @@ struct FCharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> DefaultPrimaryEffects; // 自定义的初始属性
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<UGameplayAbility>> CharacterDefaultAbilites;
 };
 
 /**
@@ -46,7 +48,7 @@ public:
 	TSubclassOf<UGameplayEffect> DefaultBaseEffects;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Defaults")
-	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 	
 	FCharacterClassDefaultInfo FindCharacterClassInfo(const ECharacterClass CharacterClass);
 

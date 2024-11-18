@@ -57,6 +57,14 @@ public:
 	FGameplayTag Damage_Magical;
 	FGameplayTag Damage_Fire;
 	FGameplayTag Damage_Lightning;
+
+	/** Abilites */
+	FGameplayTag Attack;
+
+	/** Montage */
+	FGameplayTag Montage_Attack_Weapon;
+	FGameplayTag Montage_Attack_LeftHand;
+	FGameplayTag Montage_Attack_RightHand;
 protected:
 	
 private:

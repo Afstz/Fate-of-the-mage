@@ -97,4 +97,16 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Magical, MageGameplayTags.Attributes_Secondary_MagicalResistence);
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Fire, MageGameplayTags.Attributes_Secondary_FireResistence);
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Attributes_Secondary_LightningResistence);
+
+	/** Abilites */
+	MageGameplayTags.Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilites.Attack"), FString("Attack Gameplay Tag"));
+
+	/** Montage */
+	MageGameplayTags.Montage_Attack_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.Weapon"), FString("Weapon Montage"));
+	MageGameplayTags.Montage_Attack_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.LeftHand"), FString("LeftHand Montage"));
+	MageGameplayTags.Montage_Attack_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Montage.Attack.RightHand"), FString("RightHand Montage"));
 }

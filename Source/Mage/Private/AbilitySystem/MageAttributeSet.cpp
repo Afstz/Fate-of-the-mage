@@ -106,6 +106,7 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		{
 			float NewHealth = GetHealth() - LocalDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+			UE_LOG(LogTemp, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
 			bool bIsDie = GetHealth() <= 0.f;
 
 			if (bIsDie)
@@ -160,6 +161,13 @@ void UMageAttributeSet::ShowCharacterDamageText(const FEffectProperties& EffectP
 	{
 		if (AMagePlayerController* MagePC = Cast<AMagePlayerController>(EffectProperties.SourceController))
 		{
+			// 自己对造成敌人伤害
+			MagePC->ShowDamageText(EffectProperties.TargetCharacter, DamageValue, bIsCriticalHit, bIsBlockHit);
+			return;
+		}
+		if (AMagePlayerController* MagePC = Cast<AMagePlayerController>(EffectProperties.TargetController))
+		{
+			// 敌人对自己造成伤害
 			MagePC->ShowDamageText(EffectProperties.TargetCharacter, DamageValue, bIsCriticalHit, bIsBlockHit);
 		}
 	}

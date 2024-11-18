@@ -12,7 +12,8 @@ void UBTService_FindNearstPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, ui
 
 	APawn* OwningPawn = AIOwner->GetPawn();
 
-	const FName TargetTag = OwningPawn->ActorHasTag(FName("Enemy")) ? FName("Player") : FName("Enemy");
+	// 判断Player是因为如果有宠物AI就攻击敌方
+	const FName TargetTag = OwningPawn->ActorHasTag(FName("Enemy")) ? FName("Player") : FName("Enemy"); 
 
 	TArray<AActor*> TargetActors;
 	UGameplayStatics::GetAllActorsWithTag(OwningPawn, TargetTag, TargetActors);

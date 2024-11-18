@@ -23,10 +23,14 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	
 	/** Combat Interface */
-	virtual FVector GetLocationByWeaponSocket() const override;
+	virtual FVector GetLocationByWeaponSocket_Implementation() const override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
 	virtual void Die() override;
+	virtual bool IsDead_Implementation() const override;
+	virtual AActor* GetAvatarActor_Implementation() override;
+	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath();
 protected:
@@ -41,6 +45,8 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	bool bDead = false; // 角色是否死亡
 
 	/** Init Attribute */
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
@@ -62,6 +68,8 @@ protected:
 	void StartDissolveTimeLine(const TArray<UMaterialInstanceDynamic*>& MaterialInstDynamics);
 
 	void AddCharacterAbilites();
+
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;

@@ -53,7 +53,7 @@ void AMageEnemy::BeginPlay()
 
 	if (HasAuthority())
 	{
-		UMageAbilitySystemLibrary::GiveCharacterAbilities(this, AbilitySystemComponent);
+		UMageAbilitySystemLibrary::GiveCharacterAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 }
 
@@ -106,7 +106,11 @@ void AMageEnemy::HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount
 {
 	bIsHit = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bIsHit ? 0 : BaseWalkSpeed;
-	MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bIsHit);
+	
+	if (MageAIController) // 因为客户端上没有AIController所以需要判断
+	{
+		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bIsHit);
+	}
 }
 
 void AMageEnemy::HighlightActor()
@@ -121,6 +125,38 @@ void AMageEnemy::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+AActor* AMageEnemy::GetFacingTarget_Implementation() const
+{
+	return FacingTarget;
+}
+
+void AMageEnemy::SetFacingTarget_Implementation(AActor* InFacingTarget)
+{
+	FacingTarget = InFacingTarget;
+}
+
+FVector AMageEnemy::GetSocketLocationByTaggedMontage_Implementation(const FTaggedMontage& TaggedMontage) const
+{
+	// 通过传进来的结构体判断属于那种类型的攻击，根据类型播放蒙太奇动画并接收指定标签事件
+	
+	if (TaggedMontage.MontageEventTag.MatchesTagExact(FMageGameplayTags::Get().Montage_Attack_Weapon))
+	{
+		// 武器类型
+		check(Weapon);
+		return Weapon->GetSocketLocation(TaggedMontage.CombatSocketName);
+	}
+	else
+	{
+		// 无武器
+		return GetMesh()->GetSocketLocation(TaggedMontage.CombatSocketName);
+	}
+}
+
+TArray<FTaggedMontage> AMageEnemy::GetTaggedMontage_Implementation() const
+{
+	return AttackMontages;
 }
 
 void AMageEnemy::MultiHiddenWidget_Implementation()
