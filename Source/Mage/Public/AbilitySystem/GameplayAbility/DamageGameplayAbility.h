@@ -6,6 +6,7 @@
 #include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
 #include "DamageGameplayAbility.generated.h"
 
+struct FTaggedMontage;
 /**
  *  伤害玩法技能类
  */
@@ -23,4 +24,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+
+	// AI
+	UFUNCTION(BlueprintPure, Category = "Mechanics")
+	FTaggedMontage GetTaggedMontageByArray(const TArray<FTaggedMontage>& TaggedMontages) const; 
 };

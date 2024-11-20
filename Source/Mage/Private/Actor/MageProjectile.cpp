@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -53,6 +54,9 @@ void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	// 防止击中自己
 	if (GetInstigator() == OtherActor) return;
+	// 防止击中队友
+	if (!UMageAbilitySystemLibrary::IsNotFriend(GetInstigator(), OtherActor)) return;
+	
 	
 	if (HasAuthority())
 	{

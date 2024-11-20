@@ -47,7 +47,7 @@ public:
 	void SetFacingTarget(AActor* InFacingTarget);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FVector GetSocketLocationByTaggedMontage(const FTaggedMontage& TaggedMontage) const; // 通过结构体获取插槽位置
+	FVector GetSocketLocationByStruct(const FTaggedMontage& TaggedMontage) const; // 通过结构体获取插槽位置
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	TArray<FTaggedMontage> GetTaggedMontage() const; // 获取设置的结构体
+	TArray<FTaggedMontage> GetTaggedMontage() const; // 获取设置的标记的蒙太奇结构体数组
 };

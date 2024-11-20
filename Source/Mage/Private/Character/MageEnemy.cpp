@@ -137,7 +137,7 @@ void AMageEnemy::SetFacingTarget_Implementation(AActor* InFacingTarget)
 	FacingTarget = InFacingTarget;
 }
 
-FVector AMageEnemy::GetSocketLocationByTaggedMontage_Implementation(const FTaggedMontage& TaggedMontage) const
+FVector AMageEnemy::GetSocketLocationByStruct_Implementation(const FTaggedMontage& TaggedMontage) const
 {
 	// 通过传进来的结构体判断属于那种类型的攻击，根据类型播放蒙太奇动画并接收指定标签事件
 	

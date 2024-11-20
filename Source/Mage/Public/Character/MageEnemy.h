@@ -28,7 +28,7 @@ public:
 	virtual void UnHighlightActor() override;
 	virtual AActor* GetFacingTarget_Implementation() const override;
 	virtual void SetFacingTarget_Implementation(AActor* InFacingTarget) override;
-	virtual FVector GetSocketLocationByTaggedMontage_Implementation(const FTaggedMontage& TaggedMontage) const override;
+	virtual FVector GetSocketLocationByStruct_Implementation(const FTaggedMontage& TaggedMontage) const override;
 	virtual TArray<FTaggedMontage> GetTaggedMontage_Implementation() const override;
 
 	/** Combat Interface. */
