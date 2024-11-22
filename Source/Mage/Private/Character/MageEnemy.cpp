@@ -166,6 +166,10 @@ void AMageEnemy::MultiHiddenWidget_Implementation()
 
 void AMageEnemy::Die()
 {
+	if (MageAIController)
+	{
+		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
+	}
 	SetLifeSpan(LifeSpan);
 	MultiHiddenWidget();
 	Super::Die();
