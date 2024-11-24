@@ -104,12 +104,12 @@ void AMageEnemy::InitHealthBar()
 
 void AMageEnemy::HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount)
 {
-	bIsHit = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bIsHit ? 0 : BaseWalkSpeed;
+	bHitReact = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReact ? 0 : BaseWalkSpeed;
 	
 	if (MageAIController) // 因为客户端上没有AIController所以需要判断
 	{
-		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bIsHit);
+		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsHitReacting"), bHitReact);
 	}
 }
 
@@ -141,7 +141,7 @@ FVector AMageEnemy::GetSocketLocationByStruct_Implementation(const FTaggedMontag
 {
 	// 通过传进来的结构体判断属于那种类型的攻击，根据类型播放蒙太奇动画并接收指定标签事件
 	
-	if (TaggedMontage.MontageEventTag.MatchesTagExact(FMageGameplayTags::Get().Montage_Attack_Weapon))
+	if (TaggedMontage.CombatSocketTag.MatchesTagExact(FMageGameplayTags::Get().CombatSocket_Weapon))
 	{
 		// 武器类型
 		check(Weapon);
@@ -159,6 +159,18 @@ TArray<FTaggedMontage> AMageEnemy::GetTaggedMontage_Implementation() const
 	return AttackMontages;
 }
 
+FTaggedMontage AMageEnemy::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for (FTaggedMontage& TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageEventTag.MatchesTagExact(MontageTag))
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
+}
+
 void AMageEnemy::MultiHiddenWidget_Implementation()
 {
 	HealthBar->SetVisibility(false);
@@ -168,7 +180,7 @@ void AMageEnemy::Die()
 {
 	if (MageAIController)
 	{
-		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsDead"), true);
+		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	}
 	SetLifeSpan(LifeSpan);
 	MultiHiddenWidget();

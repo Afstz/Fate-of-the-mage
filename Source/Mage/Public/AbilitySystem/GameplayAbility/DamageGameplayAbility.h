@@ -27,5 +27,5 @@ protected:
 
 	// AI
 	UFUNCTION(BlueprintPure, Category = "Mechanics")
-	FTaggedMontage GetTaggedMontageByArray(const TArray<FTaggedMontage>& TaggedMontages) const; 
+	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const; 
 };

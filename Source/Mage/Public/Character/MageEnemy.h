@@ -23,13 +23,14 @@ public:
 	AMageEnemy();
 	virtual void PossessedBy(AController* NewController) override;
 
-	/** Enemy Hightlight Interface. */
+	/** Enemy Interface. */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 	virtual AActor* GetFacingTarget_Implementation() const override;
 	virtual void SetFacingTarget_Implementation(AActor* InFacingTarget) override;
 	virtual FVector GetSocketLocationByStruct_Implementation(const FTaggedMontage& TaggedMontage) const override;
 	virtual TArray<FTaggedMontage> GetTaggedMontage_Implementation() const override;
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 
 	/** Combat Interface. */
 	FORCEINLINE virtual int32 GetCharacterLevel() const override { return Level; }
@@ -46,7 +47,7 @@ public:
 	/** HitReact */
 	void HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount);
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
-	bool bIsHit = false;
+	bool bHitReact = false;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float BaseWalkSpeed = 250.f;
 

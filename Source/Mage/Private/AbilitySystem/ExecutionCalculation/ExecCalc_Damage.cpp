@@ -118,20 +118,20 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// 己方爆率减去敌方抗性
 	float EffectiveCriticalHit = SourceCriticalHitChance - TargetCriticalHitRes * CriticalHitResistanceCoeff;
-	const bool bIsCriticalHit = EffectiveCriticalHit >= FMath::RandRange(1 , 100); // 判断是否暴击
-	TotalDamage = bIsCriticalHit ? TotalDamage * 2.f + SourceCriticalHitDamage : TotalDamage; // 暴击成功双倍并加上爆伤
+	const bool bCriticalHit = EffectiveCriticalHit >= FMath::RandRange(1 , 100); // 判断是否暴击
+	TotalDamage = bCriticalHit ? TotalDamage * 2.f + SourceCriticalHitDamage : TotalDamage; // 暴击成功双倍并加上爆伤
 
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
-	UMageAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bIsCriticalHit); // 设置上下文
+	UMageAbilitySystemLibrary::SetCriticalHit(EffectContextHandle, bCriticalHit); // 设置上下文
 	
 	// 2. 计算敌方是否格挡
 	float TargetBlockChance = 0.f; // 敌方格挡几率
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(FDamageStatics().BlockChanceDef, AggregatorParameters, TargetBlockChance);
 	TargetBlockChance = FMath::Clamp<float>(TargetBlockChance, 0.f, 100.f);
-	const bool bIsBlocked = TargetBlockChance >= FMath::RandRange(1, 100); // 判断是否格挡
-	TotalDamage = bIsBlocked ? TotalDamage / 2.f : TotalDamage; // 格挡成功伤害减半
+	const bool bBlocked = TargetBlockChance >= FMath::RandRange(1, 100); // 判断是否格挡
+	TotalDamage = bBlocked ? TotalDamage / 2.f : TotalDamage; // 格挡成功伤害减半
 	
-	UMageAbilitySystemLibrary::SetIsBlockHit(EffectContextHandle, bIsBlocked); // 设置上下文
+	UMageAbilitySystemLibrary::SetBlockHit(EffectContextHandle, bBlocked); // 设置上下文
 
 	// 3. 计算敌方护甲和己方护甲穿透
 	float TargetArmor = 0.f; // 敌方护甲

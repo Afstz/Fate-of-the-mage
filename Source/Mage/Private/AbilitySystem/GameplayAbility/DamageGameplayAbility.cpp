@@ -19,7 +19,7 @@ void UDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor)->ApplyGameplayEffectSpecToSelf(*DamageSpecHandle.Data.Get());
 }
 
-FTaggedMontage UDamageGameplayAbility::GetTaggedMontageByArray(const TArray<FTaggedMontage>& TaggedMontages) const
+FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
 {
 	if (TaggedMontages.Num() > 0)
 	{

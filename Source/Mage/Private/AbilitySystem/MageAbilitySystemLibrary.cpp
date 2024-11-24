@@ -107,37 +107,37 @@ UCharacterClassData* UMageAbilitySystemLibrary::GetCharacterClassData(const UObj
 	return MageGameModeBase->CharacterClassData;
 }
 
-bool UMageAbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+bool UMageAbilitySystemLibrary::GetCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
-		return EffectContext->GetIsCriticalHit();
+		return EffectContext->GetCriticalHit();
 	}
 	return false;
 }
 
-bool UMageAbilitySystemLibrary::GetIsBlockHit(const FGameplayEffectContextHandle& EffectContextHandle)
+bool UMageAbilitySystemLibrary::GetBlockHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
-		return EffectContext->GetIsBlockHit();
+		return EffectContext->GetBlockHit();
 	}
 	return false;
 }
 
-void UMageAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsCriticalHit)
+void UMageAbilitySystemLibrary::SetCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsCriticalHit)
 {
 	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
-		EffectContext->SetIsCriticalHit(bIsCriticalHit);
+		EffectContext->SetCriticalHit(bIsCriticalHit);
 	}
 }
 
-void UMageAbilitySystemLibrary::SetIsBlockHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsBlockHit)
+void UMageAbilitySystemLibrary::SetBlockHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsBlockHit)
 {
 	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
     {
-    	EffectContext->SetIsBlockHit(bIsBlockHit);
+    	EffectContext->SetBlockHit(bIsBlockHit);
     }
 }
 
@@ -168,8 +168,8 @@ void UMageAbilitySystemLibrary::GetAlivePlayerInSphereRadius(const UObject* Worl
 
 bool UMageAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
 {
-	bool IsPlayerFriend = FirstActor->ActorHasTag("Player") && SecondActor->ActorHasTag("Player");
-	bool IsEnemyFriend = FirstActor->ActorHasTag("Enemy") && SecondActor->ActorHasTag("Enemy");
-	bool bIsFriend = IsPlayerFriend || IsEnemyFriend; // 是否是友方
-	return !bIsFriend;
+	bool bPlayerFriend = FirstActor->ActorHasTag("Player") && SecondActor->ActorHasTag("Player");
+	bool bEnemyFriend = FirstActor->ActorHasTag("Enemy") && SecondActor->ActorHasTag("Enemy");
+	bool bFriend = bPlayerFriend || bEnemyFriend; // 是否是友方
+	return !bFriend;
 }

@@ -18,8 +18,14 @@ struct FTaggedMontage // 蒙太奇与对应的事件标签和武器插槽数据
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag MontageEventTag; // 蒙太奇事件标签
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag CombatSocketTag; // 战斗插槽标签
+	
 	UPROPERTY(EditDefaultsOnly)
 	FName CombatSocketName; // 插槽名字
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USoundBase* ImpactSound;
 };
 
 // This class does not need to be modified.
@@ -50,4 +56,6 @@ public:
 	FVector GetSocketLocationByStruct(const FTaggedMontage& TaggedMontage) const; // 通过结构体获取插槽位置
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	TArray<FTaggedMontage> GetTaggedMontage() const; // 获取设置的标记的蒙太奇结构体数组
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
 };

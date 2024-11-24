@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "MageCharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UMotionWarpingComponent;
 class UGameplayAbility;
 class UAttributeSet;
@@ -30,6 +31,7 @@ public:
 	virtual void Die() override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath();
@@ -37,16 +39,23 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<USkeletalMeshComponent> Weapon;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	FName WeaponTipSocketName;
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+	/** Combat */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<USkeletalMeshComponent> Weapon;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponTipSocketName;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UNiagaraSystem> BloodEffect;
 	bool bDead = false; // 角色是否死亡
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<USoundBase> DeathSound;
 
 	/** Init Attribute */
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
@@ -73,6 +82,4 @@ protected:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<UAnimMontage> HitReactMontage;
 };

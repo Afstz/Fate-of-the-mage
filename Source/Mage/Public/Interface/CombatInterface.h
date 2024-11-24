@@ -7,6 +7,7 @@
 #include "CombatInterface.generated.h"
 
 
+class UNiagaraSystem;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -30,6 +31,8 @@ public:
 	UAnimMontage* GetHitReactMontage() const;
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void UpdateFacingTarget(const FVector& TargetLocation);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UNiagaraSystem* GetBloodEffect();
 	
 	virtual void Die() = 0;
 

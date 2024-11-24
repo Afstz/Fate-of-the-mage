@@ -34,11 +34,11 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 6;
 		}
-		if (bIsCriticalHit)
+		if (bCriticalHit)
 		{
 			RepBits |= 1 << 7;
 		}
-		if (bIsBlockHit)
+		if (bBlockHit)
 		{
 			RepBits |= 1 << 8;
 		}
@@ -90,11 +90,11 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	}
 	if (RepBits & (1 << 7))
 	{
-		Ar << bIsCriticalHit;
+		Ar << bCriticalHit;
 	}
 	if (RepBits & (1 << 8))
 	{
-		Ar << bIsBlockHit;
+		Ar << bBlockHit;
 	}
 
 	//如果是反序列化时，需要调用对ASC进行初始化

@@ -6,6 +6,7 @@
 #include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Mage/Mage.h"
 
 AMageCharacterBase::AMageCharacterBase()
@@ -55,8 +56,15 @@ AActor* AMageCharacterBase::GetAvatarActor_Implementation()
 	return this;
 }
 
+UNiagaraSystem* AMageCharacterBase::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
+}
+
 void AMageCharacterBase::MultiHandleDeath_Implementation()
 {
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Weapon->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);

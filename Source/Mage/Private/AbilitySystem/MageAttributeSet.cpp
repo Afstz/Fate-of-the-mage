@@ -123,8 +123,8 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 
-			const bool bIsCriticalHit = UMageAbilitySystemLibrary::GetIsCriticalHit(EffectProps.SourceEffectContextHandle);
-			const bool bIsBlockHit = UMageAbilitySystemLibrary::GetIsBlockHit(EffectProps.SourceEffectContextHandle);
+			const bool bIsCriticalHit = UMageAbilitySystemLibrary::GetCriticalHit(EffectProps.SourceEffectContextHandle);
+			const bool bIsBlockHit = UMageAbilitySystemLibrary::GetBlockHit(EffectProps.SourceEffectContextHandle);
 			ShowCharacterDamageText(EffectProps, LocalDamage, bIsCriticalHit, bIsBlockHit);
 		}
 	}

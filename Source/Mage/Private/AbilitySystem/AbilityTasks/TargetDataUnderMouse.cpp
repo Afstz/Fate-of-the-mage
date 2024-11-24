@@ -18,8 +18,8 @@ UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGamepl
  */
 void UTargetDataUnderMouse::Activate()
 {
-	bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
-	if (bIsLocallyControlled) // 判断是否为本地角色
+	bool bLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
+	if (bLocallyControlled) // 判断是否为本地角色
 	{
 		SendMouseTargetData();
 	}

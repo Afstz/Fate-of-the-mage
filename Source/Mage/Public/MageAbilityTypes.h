@@ -15,10 +15,10 @@ struct FMageGameplayEffectContext : public FGameplayEffectContext
 
 public:
 
-	bool GetIsCriticalHit() const { return bIsCriticalHit; }
-	bool GetIsBlockHit() const { return bIsBlockHit; }
-	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
-	void SetIsBlockHit(bool bInIsBlockHit) { bIsBlockHit = bInIsBlockHit; }
+	bool GetCriticalHit() const { return bCriticalHit; }
+	bool GetBlockHit() const { return bBlockHit; }
+	void SetCriticalHit(bool bInIsCriticalHit) { bCriticalHit = bInIsCriticalHit; }
+	void SetBlockHit(bool bInIsBlockHit) { bBlockHit = bInIsBlockHit; }
 	
 	/**
 	 * 自定义序列化，子类必须重写此函数
@@ -50,10 +50,10 @@ public:
 protected:
 
 	UPROPERTY()
-	bool bIsCriticalHit = false; // 暴击
+	bool bCriticalHit = false; // 暴击
 
 	UPROPERTY()
-	bool bIsBlockHit = false; // 格挡
+	bool bBlockHit = false; // 格挡
 };
 
 // 一些C++结构的信息是不能通过模板探测出来的，就需要我们手动标记提供了。
