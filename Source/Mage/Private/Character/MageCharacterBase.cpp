@@ -32,7 +32,14 @@ UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
 FVector AMageCharacterBase::GetLocationByWeaponSocket_Implementation() const
 {
 	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	// 如果在武器上找不到插槽就到网格体上找
+	FVector WeaponSocketLocation = Weapon->GetSocketLocation(WeaponTipSocketName); // 查找不到返回组件世界位置
+	FVector WeaponComponentLocation = Weapon->GetComponentLocation();
+	if (WeaponSocketLocation == WeaponComponentLocation)
+	{
+		return GetMesh()->GetSocketLocation(WeaponTipSocketName);
+	}
+	return WeaponSocketLocation;
 }
 
 UAnimMontage* AMageCharacterBase::GetHitReactMontage_Implementation() const

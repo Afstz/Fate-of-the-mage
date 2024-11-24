@@ -118,4 +118,6 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("CombatSocket.LeftHand"), FString("LeftHand Socket"));
 	MageGameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("CombatSocket.RightHand"), FString("RightHand Socket"));
+	MageGameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("CombatSocket.Tail"), FString("Tail Socket"));
 }

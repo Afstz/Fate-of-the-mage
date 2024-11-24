@@ -19,13 +19,13 @@ struct FTaggedMontage // 蒙太奇与对应的事件标签和武器插槽数据
 	FGameplayTag MontageEventTag; // 蒙太奇事件标签
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FGameplayTag CombatSocketTag; // 战斗插槽标签
+	FGameplayTag CombatSocketTag; // 战斗攻击方式标签
 	
 	UPROPERTY(EditDefaultsOnly)
-	FName CombatSocketName; // 插槽名字
+	FName CombatSocketName; // 触发伤害的骨骼插槽
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* ImpactSound;
+	USoundBase* ImpactSound; // 击中音效
 };
 
 // This class does not need to be modified.

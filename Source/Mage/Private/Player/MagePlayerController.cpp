@@ -180,11 +180,10 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 	
-	bTargeting = CurrentCursorActor ? true : false; // 防止鼠标移开敌人还会继续释放技能
 	if (bTargeting || bShiftKeyPressed)
 	{
 		// 左键但是当前是敌人或者按住Shift,执行技能逻辑
-		
+		bTargeting = CurrentCursorActor ? true : false; // 防止鼠标移开敌人还会继续释放技能
 		if (GetMageAbilitySystemComponent())
 		{
 			GetMageAbilitySystemComponent()->AbilityInputHeld(InputTag);
