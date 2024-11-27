@@ -3,7 +3,6 @@
 
 #include "Character/MageCharacterBase.h"
 #include "AbilitySystemComponent.h"
-#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,14 +31,12 @@ UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
 FVector AMageCharacterBase::GetLocationByWeaponSocket_Implementation() const
 {
 	check(Weapon);
-	// 如果在武器上找不到插槽就到网格体上找
-	FVector WeaponSocketLocation = Weapon->GetSocketLocation(WeaponTipSocketName); // 查找不到返回组件世界位置
-	FVector WeaponComponentLocation = Weapon->GetComponentLocation();
-	if (WeaponSocketLocation == WeaponComponentLocation)
+	// 如果没有武器就在身上找
+	if (!Weapon->GetSkeletalMeshAsset())
 	{
 		return GetMesh()->GetSocketLocation(WeaponTipSocketName);
 	}
-	return WeaponSocketLocation;
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
 }
 
 UAnimMontage* AMageCharacterBase::GetHitReactMontage_Implementation() const
@@ -66,6 +63,16 @@ AActor* AMageCharacterBase::GetAvatarActor_Implementation()
 UNiagaraSystem* AMageCharacterBase::GetBloodEffect_Implementation()
 {
 	return BloodEffect;
+}
+
+int32 AMageCharacterBase::GetMinionCount_Implementation() const
+{
+	return MinionCount;
+}
+
+void AMageCharacterBase::AddMinionCount_Implementation(const int32 InMinionCount)
+{
+	MinionCount += InMinionCount;
 }
 
 void AMageCharacterBase::MultiHandleDeath_Implementation()

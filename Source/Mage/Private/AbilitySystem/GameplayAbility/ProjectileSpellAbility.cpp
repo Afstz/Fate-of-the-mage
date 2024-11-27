@@ -2,12 +2,10 @@
 
 
 #include "AbilitySystem/GameplayAbility/ProjectileSpellAbility.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Actor/MageProjectile.h"
 #include "Interface/CombatInterface.h"
-#include "MageGameplayTags.h"
 
 void UProjectileSpellAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                               const FGameplayAbilityActorInfo* ActorInfo,
@@ -27,6 +25,7 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 	FTransform SpawnTransform;
 	FVector SpawnLocation = ICombatInterface::Execute_GetLocationByWeaponSocket(Instigator);
 	FRotator SpawnRotation = (ProjectileLocation - SpawnLocation).Rotation();
+
 	SpawnTransform.SetLocation(SpawnLocation);
 	SpawnTransform.SetRotation(SpawnRotation.Quaternion());
 		

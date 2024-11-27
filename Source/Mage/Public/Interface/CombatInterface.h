@@ -30,9 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
 	UAnimMontage* GetHitReactMontage() const;
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void UpdateFacingTarget(const FVector& TargetLocation);
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	UNiagaraSystem* GetBloodEffect();
+	void UpdateFacingTarget(const FVector& TargetLocation); // 更新要面向的目标的位置
 	
 	virtual void Die() = 0;
 
@@ -40,4 +38,10 @@ public:
 	bool IsDead() const;
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AActor* GetAvatarActor();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UNiagaraSystem* GetBloodEffect();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	int32 GetMinionCount() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void AddMinionCount(const int32 InMinionCount);
 };

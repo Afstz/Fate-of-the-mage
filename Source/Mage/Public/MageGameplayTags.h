@@ -59,8 +59,9 @@ public:
 	FGameplayTag Damage_Lightning;
 
 	/** Abilites */
-	FGameplayTag Attack;
-
+	FGameplayTag Abilites_Attack;
+	FGameplayTag Abilites_Summon;
+	
 	/** Montage */
 	FGameplayTag Montage_Attack_1;
 	FGameplayTag Montage_Attack_2;

@@ -32,6 +32,8 @@ public:
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
+	virtual int32 GetMinionCount_Implementation() const override;
+	virtual void AddMinionCount_Implementation(const int32 InMinionCount) override;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath();
@@ -79,6 +81,9 @@ protected:
 	void AddCharacterAbilites();
 
 
+	/** Minion */
+	UPROPERTY(EditAnywhere, Category = "Minion")
+	int32 MinionCount = 0;
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
