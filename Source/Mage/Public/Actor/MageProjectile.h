@@ -25,17 +25,21 @@ public:
 	FGameplayEffectSpecHandle EffectSpecHandle;
 protected:
 	virtual void BeginPlay() override;
-	void PlayImpactEffect();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> Sphere;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float EnableCollisionDelay = 0.f;
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Projectile")
+	void DelayEnableCollision(); // 延迟启用碰撞
+	
+	void PlayImpactEffect();
+	
 	UFUNCTION()
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 private:
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> Sphere;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TObjectPtr<UNiagaraSystem> ImpactNiagara;
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")

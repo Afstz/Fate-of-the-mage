@@ -69,6 +69,8 @@ void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	}
 }
 
+
+
 void AMageProjectile::PlayImpactEffect()
 {
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactNiagara, GetActorLocation());
