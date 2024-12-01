@@ -3,7 +3,9 @@
 
 #include "Input/MageInputData.h"
 
-const UInputAction* UMageInputData::FindInputActionForTag(const FGameplayTag& FindInputTag)
+#include "Mage/MageLogChannels.h"
+
+const UInputAction* UMageInputData::FindInputActionForTag(const FGameplayTag& FindInputTag, bool bWarnIfNotFound)
 {
 	for (const FMageInputActionData& InputData : AbilityInputActions)
 	{
@@ -12,6 +14,10 @@ const UInputAction* UMageInputData::FindInputActionForTag(const FGameplayTag& Fi
 			return  InputData.InputAction;
 		}
 	}
-	UE_LOG(LogTemp, Error, TEXT("Not Find Tag:[%s] from [%s]"), *FindInputTag.ToString(), *GetNameSafe(this));
+
+	if (bWarnIfNotFound)
+	{
+		UE_LOG(MageLog, Error, TEXT("Not Find Tag:[%s] from [%s]"), *FindInputTag.ToString(), *GetNameSafe(this));
+	}
 	return  nullptr;
 }

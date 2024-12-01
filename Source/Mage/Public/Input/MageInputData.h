@@ -32,7 +32,7 @@ class MAGE_API UMageInputData : public UDataAsset
 	
 public:
 
-	const UInputAction* FindInputActionForTag(const FGameplayTag& FindInputTag);
+	const UInputAction* FindInputActionForTag(const FGameplayTag& FindInputTag, bool bWarnIfNotFound = true);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FMageInputActionData> AbilityInputActions;

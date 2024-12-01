@@ -6,6 +6,7 @@
 #include "UI/WidgetController/MageWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+class UAbilityData;
 class UMageUserWidget;
 
 USTRUCT(BlueprintType)
@@ -50,12 +51,15 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS | Attributes")
 	FOnAttributeChangedSignature OnMaxManaChanged;
 	
-	UPROPERTY(BlueprintAssignable, Category = "GAS | Data")
+	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
 	FMessageWidgetSignature MessageWidgetDelegate;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
 	TObjectPtr<UDataTable> MessageDataTable;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
+	TObjectPtr<UAbilityData> AbilityData;
+	
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
 };

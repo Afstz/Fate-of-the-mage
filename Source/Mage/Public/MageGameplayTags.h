@@ -42,10 +42,10 @@ public:
 	/** Input Tags */
 	FGameplayTag Input_LMB;
 	FGameplayTag Input_RMB;
-	FGameplayTag Input_1;
-	FGameplayTag Input_2;
-	FGameplayTag Input_3;
-	FGameplayTag Input_4;
+	FGameplayTag Input_Q;
+	FGameplayTag Input_E;
+	FGameplayTag Input_R;
+	FGameplayTag Input_T;
 
 	/** GameplayEffect Tags */
 	FGameplayTag Effects_HitReact;
@@ -59,8 +59,9 @@ public:
 	FGameplayTag Damage_Lightning;
 
 	/** Abilites */
-	FGameplayTag Abilites_Attack;
-	FGameplayTag Abilites_Summon;
+	FGameplayTag Abilities_Attack;
+	FGameplayTag Abilities_Summon;
+	FGameplayTag Abilities_Fire_FireBall;
 	
 	/** Montage */
 	FGameplayTag Montage_Attack_1;

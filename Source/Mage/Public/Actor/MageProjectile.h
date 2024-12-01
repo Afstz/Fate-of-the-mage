@@ -29,7 +29,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	float EnableCollisionDelay = 0.f;
+	float DelayCollisionTime = 0.f;
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Projectile")
 	void DelayEnableCollision(); // 延迟启用碰撞
 	

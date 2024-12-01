@@ -33,7 +33,7 @@ class MAGE_API UAttributeData : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	FMageAttributeData FindAttributeDataForTag(const FGameplayTag& AttributeTag) const;
+	FMageAttributeData FindAttributeDataForTag(const FGameplayTag& AttributeTag, bool bWarnIfNotFound = true) const;
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FMageAttributeData> AttributesData;

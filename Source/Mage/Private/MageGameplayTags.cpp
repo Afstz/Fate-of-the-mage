@@ -67,14 +67,14 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Input.LMB"), FString("Left Mouse Button"));
 	MageGameplayTags.Input_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.RMB"), FString("Right Mouse Button"));
-	MageGameplayTags.Input_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Input.1"), FString("1 key"));
-	MageGameplayTags.Input_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Input.2"), FString("2 key"));
-	MageGameplayTags.Input_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Input.3"), FString("3 key"));
-	MageGameplayTags.Input_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Input.4"), FString("4 key"));
+	MageGameplayTags.Input_Q = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Q"), FString("Q key"));
+	MageGameplayTags.Input_E = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.E"), FString("E key"));
+	MageGameplayTags.Input_R = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.R"), FString("R key"));
+	MageGameplayTags.Input_T = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.T"), FString("T key"));
 
 	/** GameplayEffect Tags */
 	MageGameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -99,10 +99,12 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Attributes_Secondary_LightningResistence);
 
 	/** Abilites */
-	MageGameplayTags.Abilites_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Abilites.Attack"), FString("Attack Ability Gameplay Tag"));
-	MageGameplayTags.Abilites_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Abilites.Summon"), FString("Summon Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Attack"), FString("Attack Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Summon"), FString("Summon Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Fire.FireBall"), FString("FireBall Ability Gameplay Tag"));
 
 	/** Montage */
 	MageGameplayTags.Montage_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
