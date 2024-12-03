@@ -2,8 +2,7 @@
 
 
 #include "AbilitySystem/Data/AttributeData.h"
-
-#include "Mage/MageLogChannels.h"
+#include "Mage/LogMageChannels.h"
 
 FMageAttributeData UAttributeData::FindAttributeDataForTag(const FGameplayTag& AttributeTag, bool bWarnIfNotFound) const
 {
@@ -17,7 +16,7 @@ FMageAttributeData UAttributeData::FindAttributeDataForTag(const FGameplayTag& A
 
 	if (bWarnIfNotFound)
 	{
-		UE_LOG(MageLog, Error, TEXT("Not Find [%s] from [%s]"), *AttributeTag.ToString(), *GetNameSafe(this));
+		UE_LOG(LogMage, Error, TEXT("Not Find [%s] from [%s]"), *AttributeTag.ToString(), *GetNameSafe(this));
 	}
 	return FMageAttributeData();
 }

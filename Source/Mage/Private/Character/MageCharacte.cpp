@@ -31,9 +31,8 @@ void AMageCharacte::PossessedBy(AController* NewController)
 
 	InitAbilityActorInfo();
 	
-	AddCharacterAbilites(); // 在服务器赋予技能
 	InitDefaultAttributes();
-	
+	AddCharacterAbilites(); // 在服务器赋予技能
 }
 
 void AMageCharacte::OnRep_PlayerState()

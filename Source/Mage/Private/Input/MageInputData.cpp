@@ -2,8 +2,7 @@
 
 
 #include "Input/MageInputData.h"
-
-#include "Mage/MageLogChannels.h"
+#include "Mage/LogMageChannels.h"
 
 const UInputAction* UMageInputData::FindInputActionForTag(const FGameplayTag& FindInputTag, bool bWarnIfNotFound)
 {
@@ -11,13 +10,13 @@ const UInputAction* UMageInputData::FindInputActionForTag(const FGameplayTag& Fi
 	{
 		if (InputData.InputGameplayTag.IsValid() && InputData.InputGameplayTag.MatchesTagExact(FindInputTag))
 		{
-			return  InputData.InputAction;
+			return InputData.InputAction;
 		}
 	}
 
 	if (bWarnIfNotFound)
 	{
-		UE_LOG(MageLog, Error, TEXT("Not Find Tag:[%s] from [%s]"), *FindInputTag.ToString(), *GetNameSafe(this));
+		UE_LOG(LogMage, Error, TEXT("Not Find Tag:[%s] from [%s]"), *FindInputTag.ToString(), *GetNameSafe(this));
 	}
 	return  nullptr;
 }

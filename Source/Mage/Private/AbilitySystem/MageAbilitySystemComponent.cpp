@@ -2,9 +2,9 @@
 
 
 #include "AbilitySystem/MageAbilitySystemComponent.h"
-
 #include "MageGameplayTags.h"
 #include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
+#include "Mage/LogMageChannels.h"
 
 void UMageAbilitySystemComponent::AbilityActorInfoIsSet()
 {
@@ -31,7 +31,9 @@ void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGamep
 			GiveAbility(AbilitySpec); // 赋予技能但不执行
 		}
 	}
-	
+	// 初始化技能完毕，给控制层发数据
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast(this);
 }
 
 void UMageAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
@@ -61,5 +63,57 @@ void UMageAbilitySystemComponent::AbilityInputReleased(const FGameplayTag& Gamep
 		{
 			AbilitySpecInputReleased(AbilitySpec);
 		}
+	}
+}
+
+void UMageAbilitySystemComponent::ForeachAbilitiesExecute(const FForeachAbilitiesSignature& ForeachDelegate)
+{
+	// 用于在我们遍历能力时，阻止我们从能力系统组件中移除能力(加锁,保证线程安全)
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
+	
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (!ForeachDelegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogMage, Error, TEXT("Failed to execute on [%hs] function"), __FUNCTION__);
+		}
+	}
+}
+
+FGameplayTag UMageAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	if (AbilitySpec.Ability)
+	{
+		for (const FGameplayTag& AbilityTag : AbilitySpec.Ability->AbilityTags)
+		{
+			if (AbilityTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities"))))
+			{
+				return AbilityTag;
+			}
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayTag UMageAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (const FGameplayTag& Tag : AbilitySpec.DynamicAbilityTags) // DynamicAbilityTags存储着StartupInputTag
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
+		{
+			return Tag;
+		}
+	}
+	return FGameplayTag();
+}
+
+void UMageAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+	// 技能在服务器上赋予所以得手动同步一下
+	if (!bStartupAbilitiesGiven)
+	{
+		bStartupAbilitiesGiven = true;
+		AbilitiesGivenDelegate.Broadcast(this);
 	}
 }

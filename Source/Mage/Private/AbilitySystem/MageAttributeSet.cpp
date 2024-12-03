@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "..\..\LogMageChannels.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/MagePlayerController.h"
 
@@ -105,7 +106,7 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		{
 			float NewHealth = GetHealth() - LocalDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-			UE_LOG(LogTemp, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
+			UE_LOG(LogMage, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
 			bool bIsDie = GetHealth() <= 0.f;
 
 			if (bIsDie)

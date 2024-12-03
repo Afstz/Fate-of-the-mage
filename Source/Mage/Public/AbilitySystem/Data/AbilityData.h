@@ -14,10 +14,10 @@ struct FMageAbilityData
 	GENERATED_BODY()
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag AbilityTag = FGameplayTag();
+	FGameplayTag AbilityTag = FGameplayTag(); // 技能标签
 
 	UPROPERTY(BlueprintReadWrite)
-	FGameplayTag AbilityInputTag = FGameplayTag();
+	FGameplayTag AbilityInputTag = FGameplayTag(); // 技能输入标签
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<const UTexture2D> IconTexture = nullptr; // 技能图标
@@ -34,7 +34,7 @@ class MAGE_API UAbilityData : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	FMageAbilityData FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound);
+	FMageAbilityData FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound = true);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

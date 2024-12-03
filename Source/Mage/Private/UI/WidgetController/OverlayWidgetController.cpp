@@ -4,6 +4,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"
+#include "AbilitySystem/Data/AbilityData.h"
 
 void UOverlayWidgetController::BroadcastInitialValue()
 {
@@ -50,7 +51,18 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		}
 	);
 
-	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTagsDelegate.AddLambda(
+	if (UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if (MageASC->bStartupAbilitiesGiven) // 技能初始化完毕就直接执行否则绑定委托
+		{
+			OnInitializeStartupAbilities(MageASC);
+		}
+		else
+		{
+			MageASC->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::OnInitializeStartupAbilities);
+		}
+		
+		MageASC->EffectAssetTagsDelegate.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			for (const FGameplayTag& Tag : AssetTags)
@@ -64,6 +76,21 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 					MessageWidgetDelegate.Broadcast(*TableRow); // 广播相匹配的对应表行
 				}
 			}
-		}
-	);
+		});
+	}
+}
+
+void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemComponent* MageASC)
+{
+	if (!MageASC->bStartupAbilitiesGiven) return;
+
+	FForeachAbilitiesSignature ForeachDelegate; // 单播委托
+	ForeachDelegate.BindLambda([this, MageASC](const FGameplayAbilitySpec& AbilitySpec)
+	{
+		FMageAbilityData FoundData = AbilityData->FindAbilityDataForTag(MageASC->GetAbilityTagFromSpec(AbilitySpec));
+		FoundData.AbilityInputTag = MageASC->GetInputTagFromSpec(AbilitySpec); // 获取到技能的输入标签
+		AbilityDataDelegate.Broadcast(FoundData);
+	});
+	// 遍历技能并执行委托回调
+	MageASC->ForeachAbilitiesExecute(ForeachDelegate);
 }

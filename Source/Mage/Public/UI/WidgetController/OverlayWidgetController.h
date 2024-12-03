@@ -6,6 +6,8 @@
 #include "UI/WidgetController/MageWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+struct FMageAbilityData;
+class UMageAbilitySystemComponent;
 class UAbilityData;
 class UMageUserWidget;
 
@@ -30,7 +32,7 @@ struct FMessageWdigetData : public FTableRowBase
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetSignature, const FMessageWdigetData&, MessageWdigetData);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FMageAbilityData& , Data);
 /**
  * 
  */
@@ -53,15 +55,19 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
 	FMessageWidgetSignature MessageWidgetDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
+	FAbilityDataSignature AbilityDataDelegate;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
-	TObjectPtr<UDataTable> MessageDataTable;
+	TObjectPtr<UDataTable> MessageDataTable; // 拾取消息配置信息
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
-	TObjectPtr<UAbilityData> AbilityData;
+	TObjectPtr<UAbilityData> AbilityData; // 技能配置信息
 	
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
+
+	void OnInitializeStartupAbilities(UMageAbilitySystemComponent* MageASC);
 };
 
 template <typename T>
