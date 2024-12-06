@@ -9,7 +9,7 @@
 class UMageAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsSignature, const FGameplayTagContainer& /* Asset Tags */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGivenSignature, UMageAbilitySystemComponent*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGivenSignature, UMageAbilitySystemComponent*); // 技能初始化委托
 DECLARE_DELEGATE_OneParam(FForeachAbilitiesSignature, const FGameplayAbilitySpec&); // 遍历技能单播委托
 /**
  * 
@@ -30,7 +30,7 @@ public:
 	void AbilityInputReleased(const FGameplayTag& InputTag);
 
 	/** Abilities Data */
-	bool bStartupAbilitiesGiven = false; // 用于记录当前是否被初始化完成
+	bool bStartupAbilitiesGiven = false; // 用于记录当前技能是否初始化完成
 	FAbilitiesGivenSignature AbilitiesGivenDelegate; // 技能赋予完毕回调委托
 	void ForeachAbilitiesExecute(const FForeachAbilitiesSignature& ForeachAbilities); // 遍历执行技能回调委托
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);

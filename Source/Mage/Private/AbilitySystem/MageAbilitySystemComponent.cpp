@@ -1,9 +1,9 @@
 // Copyright AFstz.
 
-
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "MageGameplayTags.h"
 #include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
+#include "Interface/CombatInterface.h"
 #include "Mage/LogMageChannels.h"
 
 void UMageAbilitySystemComponent::AbilityActorInfoIsSet()
@@ -24,7 +24,7 @@ void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGamep
 {
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : AbilityClasses)
 	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 10);
 		if (UMageGameplayAbility* MageGameplayAbility = Cast<UMageGameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilitySpec.DynamicAbilityTags.AddTag(MageGameplayAbility->StartupInputTag); // 把技能标签添加到动态标签容器中

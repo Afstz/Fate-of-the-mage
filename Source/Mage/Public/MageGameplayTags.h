@@ -62,6 +62,9 @@ public:
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_Fire_FireBall;
+
+	/** Cooldown */
+	FGameplayTag Cooldown_Fire_FireBall;
 	
 	/** Montage */
 	FGameplayTag Montage_Attack_1;

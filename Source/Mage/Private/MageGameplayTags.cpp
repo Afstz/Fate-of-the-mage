@@ -106,6 +106,10 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Fire.FireBall"), FString("FireBall Ability Gameplay Tag"));
 
+	/** Cooldown */
+	MageGameplayTags.Cooldown_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.FireBall"), FString("FireBall Cooldown Tag"));
+
 	/** Montage */
 	MageGameplayTags.Montage_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Montage.Attack.1"), FString("Attack Montage Tag 1"));

@@ -18,6 +18,9 @@ struct FMageAbilityData
 
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag AbilityInputTag = FGameplayTag(); // 技能输入标签
+	
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	FGameplayTag AbilityCooldownTag = FGameplayTag(); // 技能冷却标签
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<const UTexture2D> IconTexture = nullptr; // 技能图标
