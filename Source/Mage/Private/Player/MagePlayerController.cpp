@@ -182,14 +182,13 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	
 	if (bTargeting || bShiftKeyPressed)
 	{
-		// 左键但是当前是敌人或者按住Shift,执行技能逻辑
-		bTargeting = CurrentCursorActor ? true : false; // 防止鼠标移开敌人还会继续释放技能
+		// 左键鼠标指向敌人或者按住Shift,执行技能逻辑
 		if (GetMageAbilitySystemComponent())
 		{
 			GetMageAbilitySystemComponent()->AbilityInputHeld(InputTag);
 		}
 	}
-	else
+	else // 长按移动
 	{
 		HoldingTime += GetWorld()->GetDeltaSeconds(); // 累加时间判断是否要自动移动
 		

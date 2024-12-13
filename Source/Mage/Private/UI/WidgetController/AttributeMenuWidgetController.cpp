@@ -30,8 +30,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	}
 }
 
-void UAttributeMenuWidgetController::BroadcastAttributeData(const FGameplayTag& AttributeTag,
-	const FGameplayAttribute& Attribute) const
+void UAttributeMenuWidgetController::BroadcastAttributeData(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const
 {
 	check(AttributeData);
 	FMageAttributeData FoundAttributeData = AttributeData->FindAttributeDataForTag(AttributeTag);

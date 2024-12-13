@@ -75,6 +75,11 @@ void AMageCharacterBase::AddMinionCount_Implementation(const int32 InMinionCount
 	MinionCount += InMinionCount;
 }
 
+ECharacterClass AMageCharacterBase::GetCharacterClass_Implementation() const
+{
+	return CharacterClass;
+}
+
 void AMageCharacterBase::MultiHandleDeath_Implementation()
 {
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
@@ -126,7 +131,8 @@ void AMageCharacterBase::AddCharacterAbilites()
 	if (!HasAuthority()) return; // 只能技能只能在服务器被赋予
 
 	UMageAbilitySystemComponent* MageASC = CastChecked<UMageAbilitySystemComponent>(GetAbilitySystemComponent());
-	MageASC->AddCharacterAbilites(StartupAbilites);
+	MageASC->AddCharacterAbilites(StartupAbilites); // 主动技能
+	MageASC->AddCharacterPassiveAbilites(StartupPassiveAbilites); // 被动技能
 }
 
 void AMageCharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect>& InitAttributeEffects, float Level)

@@ -65,9 +65,18 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
 	AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
-	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatar);
-	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
 
+	int32 SourceAvatarLevel = 1; 
+	if (SourceAvatar->Implements<UCombatInterface>())
+	{
+		SourceAvatarLevel = ICombatInterface::Execute_GetCharacterLevel(SourceAvatar);
+	}
+	int32 TargetAvatarLevel = 1;
+	if (TargetAvatar->Implements<UCombatInterface>())
+	{
+		TargetAvatarLevel = ICombatInterface::Execute_GetCharacterLevel(TargetAvatar);
+	}
+	
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	
 	FAggregatorEvaluateParameters AggregatorParameters;
@@ -114,7 +123,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TargetCriticalHitRes = FMath::Max(0.f, TargetCriticalHitRes);
 	
 	const FRealCurve* CriticalHitResistanceCurve = DamageCoefficientTable->FindCurve(FName("CriticalHitResistance"), FString());
-	const float CriticalHitResistanceCoeff = CriticalHitResistanceCurve->Eval(TargetCombatInterface->GetCharacterLevel());
+	const float CriticalHitResistanceCoeff = CriticalHitResistanceCurve->Eval(TargetAvatarLevel);
 
 	// 己方爆率减去敌方抗性
 	float EffectiveCriticalHit = SourceCriticalHitChance - TargetCriticalHitRes * CriticalHitResistanceCoeff;
@@ -142,12 +151,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	SourceArmorPenetration = FMath::Max(0, SourceArmorPenetration);
 	
 	const FRealCurve* ArmorPenetrationCurve = DamageCoefficientTable->FindCurve(FName("ArmorPenetration"), FString());
-	const float ArmorPenetrationCoeff = ArmorPenetrationCurve->Eval(SourceCombatInterface->GetCharacterLevel());
+	const float ArmorPenetrationCoeff = ArmorPenetrationCurve->Eval(SourceAvatarLevel);
 	// 根据己方护甲穿透忽略一定百分比的护甲, 护甲穿透按一定的比率有效降低敌方护甲。
 	const float EffectiveTargetArmor = TargetArmor * (100 - SourceArmorPenetration * ArmorPenetrationCoeff) / 100;
 	
 	const FRealCurve* ArmorCurve = DamageCoefficientTable->FindCurve(FName("EffectiveArmor"), FString());
-	const float EffectiveArmorCoeff = ArmorCurve->Eval(TargetCombatInterface->GetCharacterLevel());
+	const float EffectiveArmorCoeff = ArmorCurve->Eval(TargetAvatarLevel);
 	// 根据敌方护甲忽略一定百分比的伤害, 敌方护甲按一定的比率有效降低伤害。
 	TotalDamage *= (100 - EffectiveTargetArmor * EffectiveArmorCoeff) / 100;
 

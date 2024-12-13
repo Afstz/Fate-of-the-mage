@@ -33,7 +33,7 @@ public:
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 
 	/** Combat Interface. */
-	FORCEINLINE virtual int32 GetCharacterLevel() const override { return Level; }
+	FORCEINLINE virtual int32 GetCharacterLevel_Implementation() const override { return Level; }
 	virtual void Die() override;
 
 	/** Widget */
@@ -59,8 +59,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
 	int32 Level = 1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
-	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	
 	virtual void InitDefaultAttributes() override;
 	/** AI */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")

@@ -60,7 +60,10 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Attributes.Secondary.FireResistence"), FString("Fire Damage Resistence"));
 	MageGameplayTags.Attributes_Secondary_LightningResistence = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.LightningResistence"), FString("Lightning Damage Resistence"));
-	
+
+	/** Meta Attribute */
+	MageGameplayTags.Attributes_Meta_ReceivedXP = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Meta.ReceivedXP"), FString("ReceivedXP Meta Attribute Tag"));
 
 	/** Input Tags*/
 	MageGameplayTags.Input_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(

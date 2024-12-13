@@ -12,17 +12,16 @@ void UMageAbilitySystemComponent::AbilityActorInfoIsSet()
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::ClientOnEffectApplied);
 }
 
-void UMageAbilitySystemComponent::ClientOnEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
-                                                  const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
+void UMageAbilitySystemComponent::ClientOnEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer GameplayTagContainer;
 	EffectSpec.GetAllAssetTags(GameplayTagContainer);
 	EffectAssetTagsDelegate.Broadcast(GameplayTagContainer);
 }
 
-void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilityClasses)
+void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilitiesClass)
 {
-	for (const TSubclassOf<UGameplayAbility>& AbilityClass : AbilityClasses)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : AbilitiesClass)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 10);
 		if (UMageGameplayAbility* MageGameplayAbility = Cast<UMageGameplayAbility>(AbilitySpec.Ability))
@@ -34,6 +33,15 @@ void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGamep
 	// 初始化技能完毕，给控制层发数据
 	bStartupAbilitiesGiven = true;
 	AbilitiesGivenDelegate.Broadcast(this);
+}
+
+void UMageAbilitySystemComponent::AddCharacterPassiveAbilites(TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilityClasses)
+{
+	for (const TSubclassOf<UGameplayAbility>& PassiveAbility : PassiveAbilityClasses)
+	{
+		FGameplayAbilitySpec PassiveAbilitySpec = FGameplayAbilitySpec(PassiveAbility);
+		GiveAbilityAndActivateOnce(PassiveAbilitySpec);
+	}
 }
 
 void UMageAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)

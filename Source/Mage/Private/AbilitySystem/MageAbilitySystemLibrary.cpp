@@ -88,15 +88,17 @@ void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldConte
 	}
 
 	const FCharacterClassDefaultInfo& ClassDefaultInfo = CharacterClassData->FindCharacterClassInfo(CharacterClass);
-
-	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ASC->GetAvatarActor()))
+	
+	for (const TSubclassOf<UGameplayAbility>& DefaultAbility : ClassDefaultInfo.CharacterDefaultAbilites)
 	{
-		for (const TSubclassOf<UGameplayAbility>& DefaultAbility : ClassDefaultInfo.CharacterDefaultAbilites)
+		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
 		{
-			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(DefaultAbility, CombatInterface->GetCharacterLevel());
+			int Level = ICombatInterface::Execute_GetCharacterLevel(ASC->GetAvatarActor());
+			const FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(DefaultAbility, Level);
 			ASC->GiveAbility(AbilitySpec);
 		}
 	}
+	
 }
 
 UCharacterClassData* UMageAbilitySystemLibrary::GetCharacterClassData(const UObject* WorldContextObject)
@@ -105,6 +107,17 @@ UCharacterClassData* UMageAbilitySystemLibrary::GetCharacterClassData(const UObj
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (MageGameModeBase == nullptr) return nullptr;
 	return MageGameModeBase->CharacterClassData;
+}
+
+int32 UMageAbilitySystemLibrary::GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level)
+{
+	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject);
+	if (!CharacterClassData) return 0;
+	
+	const FCharacterClassDefaultInfo CharacterClassDefaultInfo = CharacterClassData->FindCharacterClassInfo(CharacterClass);
+	const int32 XPReward = CharacterClassDefaultInfo.XPRewardTable.GetValueAtLevel(Level);
+	
+	return XPReward;
 }
 
 bool UMageAbilitySystemLibrary::GetCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)

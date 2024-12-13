@@ -9,7 +9,6 @@
 struct FMageAttributeData;
 class UAttributeData;
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeMenuDataSignatrue, const FMageAttributeData&, AttributeData);
 
 /**

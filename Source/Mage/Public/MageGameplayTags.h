@@ -38,6 +38,9 @@ public:
 	FGameplayTag Attributes_Secondary_MagicalResistence;
 	FGameplayTag Attributes_Secondary_FireResistence;
 	FGameplayTag Attributes_Secondary_LightningResistence;
+
+	/** Meta Attribute */
+	FGameplayTag Attributes_Meta_ReceivedXP;
 	
 	/** Input Tags */
 	FGameplayTag Input_LMB;

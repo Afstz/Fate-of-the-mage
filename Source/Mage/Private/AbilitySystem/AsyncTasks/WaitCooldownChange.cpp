@@ -60,7 +60,7 @@ void UWaitCooldownChange::OnActiveEffectAdded(UAbilitySystemComponent* TargetASC
 	{
 		// 创建一个查询对象, 找到所有对应拥有赋予标签的GE
 		FGameplayEffectQuery EffectQuery = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTag.GetSingleTagContainer());
-		// 根据查询到的Duration GEs得到所有的剩余时间
+		// 得到查询到的所有包含这个冷却标签的所有GE的剩余时间
 		TArray<float> RemainingTimes = ASC->GetActiveEffectsTimeRemaining(EffectQuery);
 		if (RemainingTimes.Num() > 0)
 		{

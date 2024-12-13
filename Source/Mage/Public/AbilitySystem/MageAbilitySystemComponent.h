@@ -21,7 +21,8 @@ class MAGE_API UMageAbilitySystemComponent : public UAbilitySystemComponent
 	
 public:
 	void AbilityActorInfoIsSet();
-	void AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilityClasses);
+	void AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilitiesClass);
+	void AddCharacterPassiveAbilites(TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilitiesClass);
 
 	FEffectAssetTagsSignature EffectAssetTagsDelegate;
 	

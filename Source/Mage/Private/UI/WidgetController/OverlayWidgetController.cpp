@@ -5,6 +5,8 @@
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "AbilitySystem/Data/AbilityData.h"
+#include "AbilitySystem/Data/LevelUpData.h"
+#include "Player/MagePlayerState.h"
 
 void UOverlayWidgetController::BroadcastInitialValue()
 {
@@ -78,6 +80,14 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		});
 	}
+
+	AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
+	MagePS->XPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
+	MagePS->LevelChangedDelegate.AddLambda(
+		[this](int32 NewLevel)
+		{
+			OnLevelChangedDelegate.Broadcast(NewLevel);
+		});
 }
 
 void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemComponent* MageASC)
@@ -93,4 +103,26 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemCo
 	});
 	// 遍历技能并执行委托回调
 	MageASC->ForeachAbilitiesExecute(ForeachDelegate);
+}
+
+void UOverlayWidgetController::OnXPChanged(const int32 NewXP) const
+{
+	const AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
+	const ULevelUpData* LevelUpData = MagePS->LevelUpData;
+	checkf(LevelUpData, TEXT("Not Find LevelUpData In PlayerState."))
+	
+	int32 CurrentLevel = LevelUpData->FindLevelForXP(NewXP);
+	int32 MaxLevel = LevelUpData->LevelUpDatas.Num();
+
+	if (CurrentLevel <= MaxLevel && CurrentLevel > 0)
+	{
+		int32 CurrLevelUpRequirement = LevelUpData->LevelUpDatas[CurrentLevel].LevelUpRequirement;
+		int32 PreLevelUpRequirement = LevelUpData->LevelUpDatas[CurrentLevel - 1].LevelUpRequirement;
+		
+		int32 DeltaLevelUpRequirement = CurrLevelUpRequirement - PreLevelUpRequirement; // 当前等级经验区间
+		int32 XPForThisLevel = NewXP - PreLevelUpRequirement; // 当前区间已有的经验
+		float LevelUpPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelUpRequirement);
+
+		OnXPPercentChangedDelegate.Broadcast(LevelUpPercent);
+	}
 }

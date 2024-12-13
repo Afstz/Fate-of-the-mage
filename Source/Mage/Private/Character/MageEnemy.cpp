@@ -186,3 +186,5 @@ void AMageEnemy::Die()
 	MultiHiddenWidget();
 	Super::Die();
 }
+
+

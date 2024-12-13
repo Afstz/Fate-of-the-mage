@@ -8,8 +8,8 @@
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interface/CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
-#include "..\..\LogMageChannels.h"
+#include "Interface/PlayerInterface.h"
+#include "Mage/LogMageChannels.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/MagePlayerController.h"
 
@@ -72,7 +72,7 @@ void UMageAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 void UMageAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
-	
+
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
@@ -107,14 +107,15 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			float NewHealth = GetHealth() - LocalDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 			UE_LOG(LogMage, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
-			bool bIsDie = GetHealth() <= 0.f;
+			bool bDie = GetHealth() <= 0.f;
 
-			if (bIsDie)
+			if (bDie)
 			{
 				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(EffectProps.TargetAvatarActor))
 				{
 					CombatInterface->Die();
 				}
+				SendXPRewardEvent(EffectProps);
 			}
 			else
 			{
@@ -126,6 +127,36 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const bool bIsCriticalHit = UMageAbilitySystemLibrary::GetCriticalHit(EffectProps.SourceEffectContextHandle);
 			const bool bIsBlockHit = UMageAbilitySystemLibrary::GetBlockHit(EffectProps.SourceEffectContextHandle);
 			ShowCharacterDamageText(EffectProps, LocalDamage, bIsCriticalHit, bIsBlockHit);
+		}
+	}
+	if (Data.EvaluatedData.Attribute == GetReceivedXPAttribute())
+	{
+		float LocalReceivedXP = GetReceivedXP();
+		SetReceivedXP(0.f);
+		if (EffectProps.SourceCharacter->Implements<UPlayerInterface>() && EffectProps.SourceCharacter->Implements<UCombatInterface>())
+		{
+			const int32 CurrentLevel = ICombatInterface::Execute_GetCharacterLevel(EffectProps.SourceCharacter);
+			const int32 CurrentXP = IPlayerInterface::Execute_GetXP(EffectProps.SourceCharacter);
+			// LocalReceivedXP + CurrentXP是在原有的总经验值基础上计算等级
+			int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(EffectProps.SourceCharacter, LocalReceivedXP + CurrentXP);
+			int32 LevelUpCount = NewLevel - CurrentLevel; // 总升级数
+
+			if (LevelUpCount > 0) // 有升级就执行升级的逻辑
+			{
+				int32 AttributePoint = IPlayerInterface::Execute_GetAttributePoint(EffectProps.SourceCharacter, NewLevel);
+				int32 SkillPoint = IPlayerInterface::Execute_GetSkillPoint(EffectProps.SourceCharacter, NewLevel);
+
+				IPlayerInterface::Execute_AddToAttributePoint(EffectProps.SourceCharacter, AttributePoint * LevelUpCount);
+				IPlayerInterface::Execute_AddToSkillPoint(EffectProps.SourceCharacter, SkillPoint * LevelUpCount);
+				IPlayerInterface::Execute_AddToLevel(EffectProps.SourceCharacter, LevelUpCount);
+				
+				SetHealth(GetMaxHealth());
+				SetMana(GetMaxMana());
+				
+				IPlayerInterface::Execute_LevelUp(EffectProps.SourceCharacter);
+			}
+			
+			IPlayerInterface::Execute_AddToXP(EffectProps.SourceCharacter, LocalReceivedXP); // 向玩家添加经验
 		}
 	}
 }
@@ -170,6 +201,26 @@ void UMageAttributeSet::ShowCharacterDamageText(const FEffectProperties& EffectP
 			// 敌人对自己造成伤害
 			MagePC->ShowDamageText(EffectProperties.TargetCharacter, DamageValue, bIsCriticalHit, bIsBlockHit);
 		}
+	}
+}
+
+void UMageAttributeSet::SendXPRewardEvent(FEffectProperties& EffectProperties)
+{
+	if (EffectProperties.TargetCharacter->Implements<UCombatInterface>())
+	{
+		// 根据敌人等级和类型获取经验
+		const int32 TargetCharacterLevel = ICombatInterface::Execute_GetCharacterLevel(EffectProperties.TargetCharacter);
+		const ECharacterClass CharacterClass = ICombatInterface::Execute_GetCharacterClass(EffectProperties.TargetCharacter);
+		int32 XPReward = UMageAbilitySystemLibrary::GetXPRewardForClassAndLevel(EffectProperties.TargetCharacter, CharacterClass, TargetCharacterLevel);
+
+		const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();
+		FGameplayTag EventTag = MageGameplayTags.Attributes_Meta_ReceivedXP; // 要发送的事件Tag
+	
+		FGameplayEventData Payload;
+		Payload.EventTag = EventTag;
+		Payload.EventMagnitude = XPReward;
+		// 向玩家发送事件
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(EffectProperties.SourceCharacter, EventTag, Payload);
 	}
 }
 

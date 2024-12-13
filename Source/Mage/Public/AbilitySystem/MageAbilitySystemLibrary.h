@@ -53,4 +53,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
+
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | XP")
+	static int32 GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
 };

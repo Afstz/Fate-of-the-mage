@@ -34,6 +34,7 @@ public:
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	virtual int32 GetMinionCount_Implementation() const override;
 	virtual void AddMinionCount_Implementation(const int32 InMinionCount) override;
+	virtual ECharacterClass GetCharacterClass_Implementation() const override;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath();
@@ -58,6 +59,8 @@ protected:
 	bool bDead = false; // 角色是否死亡
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USoundBase> DeathSound;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	/** Init Attribute */
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
@@ -79,12 +82,13 @@ protected:
 	void StartDissolveTimeLine(const TArray<UMaterialInstanceDynamic*>& MaterialInstDynamics);
 
 	void AddCharacterAbilites();
-
-
+	
 	/** Minion */
 	UPROPERTY(EditAnywhere, Category = "Minion")
 	int32 MinionCount = 0;
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
+	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilites;
 };

@@ -162,12 +162,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Player Attributes | Meta")
 	FGameplayAttributeData ReceivedDamage; // 处理传过来的伤害
 	ATTRIBUTE_ACCESSORS(UMageAttributeSet, ReceivedDamage);
-
-	/*
-	 * Other Function
-	 */
-	void ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue,
-		const bool bIsCriticalHit, const bool bIsBlockHit) const; // 显示对对方造成的伤害
+	UPROPERTY(BlueprintReadOnly, Category = "Player Attributes | Meta")
+	FGameplayAttributeData ReceivedXP;
+	ATTRIBUTE_ACCESSORS(UMageAttributeSet, ReceivedXP);
 	
 	/*
 	 * OnRep Functions
@@ -218,5 +215,11 @@ public:
 	
 
 private:
+	/*
+	 * Other Function
+	 */
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties);
+	void ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue,
+		const bool bIsCriticalHit, const bool bIsBlockHit) const; // 显示对对方造成的伤害
+	void SendXPRewardEvent(FEffectProperties& EffectProperties);
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterClassData.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
@@ -24,24 +25,27 @@ class MAGE_API ICombatInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual int32 GetCharacterLevel() const;
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
+	int32 GetCharacterLevel() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	FVector GetLocationByWeaponSocket() const;
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	UAnimMontage* GetHitReactMontage() const;
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat Interface")
 	void UpdateFacingTarget(const FVector& TargetLocation); // 更新要面向的目标的位置
 	
 	virtual void Die() = 0;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	bool IsDead() const;
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	AActor* GetAvatarActor();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	UNiagaraSystem* GetBloodEffect();
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	int32 GetMinionCount() const;
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	void AddMinionCount(const int32 InMinionCount);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
+	ECharacterClass GetCharacterClass() const;
 };

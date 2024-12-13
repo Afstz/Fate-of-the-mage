@@ -8,6 +8,4 @@
 FGameplayEffectContext* UMageAbilitySystemGlobals::AllocGameplayEffectContext() const
 {
 	return new FMageGameplayEffectContext();
-
-	
 }

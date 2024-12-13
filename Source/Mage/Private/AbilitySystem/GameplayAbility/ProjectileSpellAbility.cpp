@@ -23,7 +23,7 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 	APawn* Instigator = Cast<APawn>(GetAvatarActorFromActorInfo());
 	// 设置发射物位置和方向
 	FTransform SpawnTransform;
-	FVector SpawnLocation = ICombatInterface::Execute_GetLocationByWeaponSocket(Instigator);
+	FVector SpawnLocation = ICombatInterface::Execute_GetLocationByWeaponSocket(Instigator); // NativeEvent必须用静态函数
 	FRotator SpawnRotation = (ProjectileLocation - SpawnLocation).Rotation();
 
 	SpawnTransform.SetLocation(SpawnLocation);
