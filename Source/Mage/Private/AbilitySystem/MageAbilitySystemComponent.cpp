@@ -1,9 +1,12 @@
 // Copyright AFstz.
 
 #include "AbilitySystem/MageAbilitySystemComponent.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "MageGameplayTags.h"
 #include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
 #include "Interface/CombatInterface.h"
+#include "Interface/PlayerInterface.h"
 #include "Mage/LogMageChannels.h"
 
 void UMageAbilitySystemComponent::AbilityActorInfoIsSet()
@@ -113,6 +116,35 @@ FGameplayTag UMageAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbi
 		}
 	}
 	return FGameplayTag();
+}
+
+void UMageAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if (IPlayerInterface::Execute_GetAttributePoint(GetAvatarActor()) > 0) // 防止发送垃圾数据
+		{
+			ServerUpgradeAttribute(AttributeTag); // 保证在服务器对属性进行操作
+		}
+	}
+}
+
+void UMageAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	if (GetAvatarActor()->Implements<UPlayerInterface>())
+	{
+		if (IPlayerInterface::Execute_GetAttributePoint(GetAvatarActor()) > 0) // 服务器再次进行验证
+		{
+			FGameplayEventData Payload;
+			Payload.EventTag = AttributeTag;
+			Payload.EventMagnitude = 1.f;
+	
+			// 向自身发送事件，通过被动事件监听技能接收并给属性加点
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
+			
+			IPlayerInterface::Execute_AddToAttributePoint(GetAvatarActor(), -1);
+		}
+	}
 }
 
 void UMageAbilitySystemComponent::OnRep_ActivateAbilities()

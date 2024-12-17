@@ -30,6 +30,14 @@ protected:
 	FAttributeMenuDataSignatrue AttributeMenuDataDelegate; // AttributeRow绑定
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAttributeData> AttributeData; // 存储着对应属性的信息
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStatChangedSignature OnAttributePointChangedDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStatChangedSignature OnSkillPointChangedDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag); // 根据标签提升对应属性
 private:
 	void BroadcastAttributeData(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const;
 };

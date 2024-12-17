@@ -61,6 +61,7 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	// 仅在GameplayEffect使Attribute的 BaseValue 改变后触发。
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 
 	/** Attribute Menu */
 	TMap<FGameplayTag, FGameplayAttribute> TagsToAttributes; // 属性标签及对应的GetAttribute方法
@@ -213,7 +214,7 @@ public:
 	UFUNCTION()
 	void OnRep_LightningResistence(const FGameplayAttributeData& OldLightningResistence) const;
 	
-
+	
 private:
 	/*
 	 * Other Function
@@ -222,4 +223,8 @@ private:
 	void ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue,
 		const bool bIsCriticalHit, const bool bIsBlockHit) const; // 显示对对方造成的伤害
 	void SendXPRewardEvent(FEffectProperties& EffectProperties);
+
+	/** Level */
+	bool bFillInHealth = false; 
+	bool bFillInMana = false;
 };

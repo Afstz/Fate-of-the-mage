@@ -30,8 +30,10 @@ public:
 	virtual void LevelUp_Implementation() override;
 	virtual int32 FindLevelForXP_Implementation(const int32 InXP) override;
 	virtual int32 GetXP_Implementation() const override;
-	virtual int32 GetAttributePoint_Implementation(const int32 InLevel) const override;
-	virtual int32 GetSkillPoint_Implementation(const int32 InLevel) const override;
+	virtual int32 GetAttributePointReward_Implementation(const int32 InLevel) const override;
+	virtual int32 GetSkillPointReward_Implementation(const int32 InLevel) const override;
+	virtual int32 GetAttributePoint_Implementation() const override;
+	virtual int32 GetSkillPoint_Implementation() const override;
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void AddToLevel_Implementation(int32 InLevel) override;
 	virtual void AddToAttributePoint_Implementation(int32 InAttributePoint) override;

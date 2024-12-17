@@ -22,6 +22,8 @@ void AMagePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(AMagePlayerState, Level);
 	DOREPLIFETIME(AMagePlayerState, XP);
+	DOREPLIFETIME(AMagePlayerState, AttributePoints);
+	DOREPLIFETIME(AMagePlayerState, SkillPoints);
 }
 
 UAbilitySystemComponent* AMagePlayerState::GetAbilitySystemComponent() const
@@ -53,12 +55,35 @@ void AMagePlayerState::AddToXP(const int32 InXP)
 	XPChangedDelegate.Broadcast(XP);
 }
 
+void AMagePlayerState::AddToAttributePoints(const int32 InAttributePoints)
+{
+	AttributePoints += InAttributePoints;
+	AttributePointChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AMagePlayerState::AddToSkillPoints(const int32 InSkillPoints)
+{
+	SkillPoints += InSkillPoints;
+	SkillPointChangedDelegate.Broadcast(SkillPoints);
+}
+
 void AMagePlayerState::OnRep_Level(int32 OldLevel)
 {
+	// 客户端同步
 	LevelChangedDelegate.Broadcast(Level);
 }
 
 void AMagePlayerState::Onrep_XP(int32 OldXP)
 {
 	XPChangedDelegate.Broadcast(XP);
+}
+
+void AMagePlayerState::OnRep_AttributePoints(int32 OldAttributePoints)
+{
+	AttributePointChangedDelegate.Broadcast(AttributePoints);
+}
+
+void AMagePlayerState::OnRep_SkillPoints(int32 OldSkillPoints)
+{
+	SkillPointChangedDelegate.Broadcast(SkillPoints);
 }

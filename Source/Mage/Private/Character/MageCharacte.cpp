@@ -73,18 +73,32 @@ int32 AMageCharacte::GetXP_Implementation() const
 	return MagePlayerState->GetPlayerXP();
 }
 
-int32 AMageCharacte::GetAttributePoint_Implementation(const int32 InLevel) const
+int32 AMageCharacte::GetAttributePointReward_Implementation(const int32 InLevel) const
 {
 	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
 	check(MagePlayerState);
 	return MagePlayerState->LevelUpData->LevelUpDatas[InLevel].AttributePointReward;
 }
 
-int32 AMageCharacte::GetSkillPoint_Implementation(const int32 InLevel) const
+int32 AMageCharacte::GetSkillPointReward_Implementation(const int32 InLevel) const
 {
 	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
 	check(MagePlayerState);
 	return MagePlayerState->LevelUpData->LevelUpDatas[InLevel].SkillPointReward;
+}
+
+int32 AMageCharacte::GetAttributePoint_Implementation() const
+{
+	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
+	check(MagePlayerState);
+	return MagePlayerState->GetAttributePoints();
+}
+
+int32 AMageCharacte::GetSkillPoint_Implementation() const
+{
+	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
+	check(MagePlayerState);
+	return MagePlayerState->GetSkillPoints();
 }
 
 void AMageCharacte::AddToXP_Implementation(int32 InXP)
@@ -105,14 +119,14 @@ void AMageCharacte::AddToAttributePoint_Implementation(int32 InAttributePoint)
 {
 	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
 	check(MagePlayerState);
-	// To add the Attribute Point
+	MagePlayerState->AddToAttributePoints(InAttributePoint);
 }
 
 void AMageCharacte::AddToSkillPoint_Implementation(int32 InSkillPoint)
 {
 	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
 	check(MagePlayerState);
-	// To add the Skill Point
+	MagePlayerState->AddToSkillPoints(InSkillPoint);
 }
 
 void AMageCharacte::LevelUp_Implementation()

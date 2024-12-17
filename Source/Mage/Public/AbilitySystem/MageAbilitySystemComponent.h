@@ -36,6 +36,10 @@ public:
 	void ForeachAbilitiesExecute(const FForeachAbilitiesSignature& ForeachAbilities); // 遍历执行技能回调委托
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	/** Attribute */
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+	UFUNCTION(Server, Reliable)
+	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
 protected:
 	virtual void OnRep_ActivateAbilities() override;
 	UFUNCTION(Client, Reliable)

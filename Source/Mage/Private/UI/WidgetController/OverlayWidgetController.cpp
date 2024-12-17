@@ -19,6 +19,7 @@ void UOverlayWidgetController::BroadcastInitialValue()
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
+	// AttributeSet 回调函数绑定
 	UMageAttributeSet* MageAttributeSet = CastChecked<UMageAttributeSet>(AttributeSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate( // 根据输入的Attribute绑定回调函数
@@ -80,7 +81,8 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		});
 	}
-
+	
+	// PlayerState 回调函数绑定
 	AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
 	MagePS->XPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
 	MagePS->LevelChangedDelegate.AddLambda(
@@ -97,7 +99,7 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemCo
 	FForeachAbilitiesSignature ForeachDelegate; // 单播委托
 	ForeachDelegate.BindLambda([this, MageASC](const FGameplayAbilitySpec& AbilitySpec)
 	{
-		FMageAbilityData FoundData = AbilityData->FindAbilityDataForTag(MageASC->GetAbilityTagFromSpec(AbilitySpec));
+		FMageAbilityData FoundData = AbilityData->FindAbilityDataForTag(MageASC->GetAbilityTagFromSpec(AbilitySpec), false);
 		FoundData.AbilityInputTag = MageASC->GetInputTagFromSpec(AbilitySpec); // 获取到技能的输入标签
 		AbilityDataDelegate.Broadcast(FoundData);
 	});
@@ -107,6 +109,8 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemCo
 
 void UOverlayWidgetController::OnXPChanged(const int32 NewXP) const
 {
+	// 计算当前经验值在升级区间的百分比
+	
 	const AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
 	const ULevelUpData* LevelUpData = MagePS->LevelUpData;
 	checkf(LevelUpData, TEXT("Not Find LevelUpData In PlayerState."))

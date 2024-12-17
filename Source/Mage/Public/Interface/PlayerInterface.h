@@ -30,9 +30,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetXP() const;
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetAttributePoint(const int32 InLevel) const;
+	int32 GetAttributePointReward(const int32 InLevel) const;
 	UFUNCTION(BlueprintNativeEvent)
-	int32 GetSkillPoint(const int32 InLevel) const;
+	int32 GetSkillPointReward(const int32 InLevel) const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePoint() const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSkillPoint() const;
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void AddToXP(int32 InXP);

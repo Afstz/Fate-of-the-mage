@@ -88,7 +88,7 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	Super::PostGameplayEffectExecute(Data);
 	
 	FEffectProperties EffectProps;
-	SetEffectProperties(Data, EffectProps);
+	SetEffectProperties(Data, EffectProps);;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -106,7 +106,6 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		{
 			float NewHealth = GetHealth() - LocalDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-			UE_LOG(LogMage, Warning, TEXT("Applied On: [%s],Health: [%f]"),*EffectProps.TargetCharacter->GetName(), GetHealth());
 			bool bDie = GetHealth() <= 0.f;
 
 			if (bDie)
@@ -143,23 +142,23 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 			if (LevelUpCount > 0) // 有升级就执行升级的逻辑
 			{
-				int32 AttributePoint = IPlayerInterface::Execute_GetAttributePoint(EffectProps.SourceCharacter, NewLevel);
-				int32 SkillPoint = IPlayerInterface::Execute_GetSkillPoint(EffectProps.SourceCharacter, NewLevel);
+				int32 AttributePoint = IPlayerInterface::Execute_GetAttributePointReward(EffectProps.SourceCharacter, NewLevel);
+				int32 SkillPoint = IPlayerInterface::Execute_GetSkillPointReward(EffectProps.SourceCharacter, NewLevel);
 
 				IPlayerInterface::Execute_AddToAttributePoint(EffectProps.SourceCharacter, AttributePoint * LevelUpCount);
 				IPlayerInterface::Execute_AddToSkillPoint(EffectProps.SourceCharacter, SkillPoint * LevelUpCount);
 				IPlayerInterface::Execute_AddToLevel(EffectProps.SourceCharacter, LevelUpCount);
 				
-				SetHealth(GetMaxHealth());
-				SetMana(GetMaxMana());
+				bFillInHealth = true; // 延迟填充，因为等级升级后最大值会重新进行MMC计算
+				bFillInMana = true;
 				
 				IPlayerInterface::Execute_LevelUp(EffectProps.SourceCharacter);
 			}
-			
 			IPlayerInterface::Execute_AddToXP(EffectProps.SourceCharacter, LocalReceivedXP); // 向玩家添加经验
 		}
 	}
 }
+
 void UMageAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProps)
 {
 	// Source 是效果的来源 Target 是效果的目标
@@ -183,6 +182,22 @@ void UMageAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		EffectProps.TargetCharacter = Cast<ACharacter>(EffectProps.TargetAvatarActor);
 		EffectProps.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		EffectProps.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(EffectProps.TargetAvatarActor);
+	}
+}
+
+void UMageAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	if (Attribute == GetMaxHealthAttribute() && bFillInHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bFillInHealth = false;
+	}
+	if (Attribute == GetMaxManaAttribute() && bFillInMana)
+	{
+		SetMana(GetMaxMana());
+		bFillInMana = false;
 	}
 }
 
