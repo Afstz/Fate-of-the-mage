@@ -104,6 +104,7 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemCo
 		AbilityDataDelegate.Broadcast(FoundData);
 	});
 	// 遍历技能并执行委托回调
+	// 你说（嚼嚼嚼）这个（嚼嚼嚼）行不行（嚼嚼嚼）啊...
 	MageASC->ForeachAbilitiesExecute(ForeachDelegate);
 }
 

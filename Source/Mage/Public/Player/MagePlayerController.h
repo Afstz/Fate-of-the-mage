@@ -37,9 +37,15 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float DeltaTime) override;
 	
-	/** Attribute Menu */
-	UPROPERTY(BlueprintReadWrite)
-	bool IsOpenAttributeMenu = false;
+	/** Menu */
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE UMageUserWidget* GetAttributeMenuWidget() { return AttributeMenuWidget; }
+	UFUNCTION(BlueprintCallable)
+	void SetAttributeMenuWidget(UMageUserWidget* InAttributeMenu);
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE UMageUserWidget* GetSkillMenuWidget() { return SkillMenuWidget; }
+	UFUNCTION(BlueprintCallable)
+	void SetSkillMenuWidget(UMageUserWidget* InSkillMenu);
 
 	/** DamageFloatingText */
 	UPROPERTY(EditDefaultsOnly)
@@ -50,7 +56,7 @@ private:
 	TObjectPtr<UInputMappingContext> MageInputContext;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
-	void Move(const FInputActionValue& InputAction);
+	void Move(const FInputActionValue& InputActionValue);
 	
 	/** Attribute Menu */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -59,7 +65,15 @@ private:
 	TSubclassOf<UMageUserWidget> AttributeMenuWidgetClass;
 	UPROPERTY()
 	TObjectPtr<UMageUserWidget> AttributeMenuWidget;
-	void AttributeMenu(const FInputActionValue& InputAction);
+	void AttributeMenu(const FInputActionValue& InputActionValues);
+	/** Skill Menu*/
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> SkillMenuAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Menu")
+	TSubclassOf<UMageUserWidget> SkillMenuWidgetClass;
+	UPROPERTY()
+	TObjectPtr<UMageUserWidget> SkillMenuWidget;
+	void SkillMenu(const FInputActionValue& InputActionValue);
 	/** Shift Key Attack*/
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> ShiftAction;

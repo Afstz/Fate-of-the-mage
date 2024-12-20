@@ -2,7 +2,6 @@
 
 
 #include "Player/MagePlayerController.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "MageGameplayTags.h"
@@ -10,6 +9,7 @@
 #include "NavigationSystem.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/SplineComponent.h"
 #include "Input/MageInputComponent.h"
 #include "Interface/EnemyInterface.h"
@@ -49,7 +49,6 @@ void AMagePlayerController::PlayerTick(float DeltaTime)
 	CursorTrace();
 	AutoRunning();
 }
-
 void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit)
 {
 	// IsValid可以判断指针是否为空还可以判断指针标记为代销毁(最近一帧可能被调用了销毁)
@@ -103,13 +102,13 @@ void AMagePlayerController::AutoRunning()
 void AMagePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-
-	// 尝试转换并断言
+	
 	// InputComponent在Project settings - input中默认把类设置成UEnhancedInputComponent
 	UMageInputComponent* MageEnhancedInputComponent = CastChecked<UMageInputComponent>(InputComponent);
 	
 	MageEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMagePlayerController::Move);
 	MageEnhancedInputComponent->BindAction(AttributeMenuAction, ETriggerEvent::Started, this, &AMagePlayerController::AttributeMenu);
+	MageEnhancedInputComponent->BindAction(SkillMenuAction, ETriggerEvent::Started, this, &AMagePlayerController::SkillMenu);
 	MageEnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AMagePlayerController::ShiftKeyPressed);
 	MageEnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AMagePlayerController::ShiftKeyReleased);
 	
@@ -136,16 +135,15 @@ void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 	}
 }
 
-void AMagePlayerController::AttributeMenu(const FInputActionValue& InputAction)
+void AMagePlayerController::AttributeMenu(const FInputActionValue& InputActionValue)
 {
-	if (!IsOpenAttributeMenu)
+	if (!IsValid(AttributeMenuWidget))
 	{
 		AttributeMenuWidget = CreateWidget<UMageUserWidget>(GetWorld(), AttributeMenuWidgetClass);
 		if (AttributeMenuWidget)
 		{
 			AttributeMenuWidget->AddToViewport(1); // 防止其他UI覆盖
-			AttributeMenuWidget->SetPositionInViewport(FVector2D(200.f, 50.f));
-			IsOpenAttributeMenu = true;
+			AttributeMenuWidget->SetPositionInViewport(FVector2D(0, 20.f));
 		}
 	}
 	else
@@ -153,9 +151,42 @@ void AMagePlayerController::AttributeMenu(const FInputActionValue& InputAction)
 		if (AttributeMenuWidget)
 		{
 			AttributeMenuWidget->RemoveFromParent();
-			IsOpenAttributeMenu = false;
+			AttributeMenuWidget = nullptr;
 		}
 	}
+}
+
+void AMagePlayerController::SetAttributeMenuWidget(UMageUserWidget* InAttributeMenu)
+{
+	AttributeMenuWidget = InAttributeMenu;
+}
+
+void AMagePlayerController::SkillMenu(const FInputActionValue& InputActionValue)
+{
+	if (!IsValid(SkillMenuWidget))
+	{
+		SkillMenuWidget = CreateWidget<UMageUserWidget>(GetWorld(), SkillMenuWidgetClass);
+		if (SkillMenuWidget)
+		{
+			float ViewPortWidth = UWidgetLayoutLibrary::GetViewportSize(this).X;
+			float FinalPositionX = ViewPortWidth - (810.f - 35.f);
+			SkillMenuWidget->SetPositionInViewport(FVector2D(FinalPositionX, 20.f));
+			SkillMenuWidget->AddToViewport(1); // 防止其他UI覆盖
+		}
+	}
+	else
+	{
+		if (SkillMenuWidget)
+		{
+			SkillMenuWidget->RemoveFromParent();
+			SkillMenuWidget = nullptr;
+		}
+	}
+}
+
+void AMagePlayerController::SetSkillMenuWidget(UMageUserWidget* InSkillMenu)
+{
+	SkillMenuWidget = InSkillMenu;
 }
 
 void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
