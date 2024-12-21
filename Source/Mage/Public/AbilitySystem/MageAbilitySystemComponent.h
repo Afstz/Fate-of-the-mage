@@ -9,8 +9,10 @@
 class UMageAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsSignature, const FGameplayTagContainer& /* Asset Tags */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGivenSignature, UMageAbilitySystemComponent*); // 技能初始化委托
+DECLARE_MULTICAST_DELEGATE(FAbilitiesGivenSignature); // 技能初始化委托
 DECLARE_DELEGATE_OneParam(FForeachAbilitiesSignature, const FGameplayAbilitySpec&); // 遍历技能单播委托
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityStatusChanged, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/);
 /**
  * 
  */
@@ -34,8 +36,18 @@ public:
 	bool bStartupAbilitiesGiven = false; // 用于记录当前技能是否初始化完成
 	FAbilitiesGivenSignature AbilitiesGivenDelegate; // 技能赋予完毕回调委托
 	void ForeachAbilitiesExecute(const FForeachAbilitiesSignature& ForeachAbilities); // 遍历执行技能回调委托
+	
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	static FGameplayTag GetStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+
+	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
+	
+	FAbilityStatusChanged AbilityStatusChanged;
+	void UpdateAbilityStatuses(const int32 InPlayerLevel);
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag);
+	
 	/** Attribute */
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 	UFUNCTION(Server, Reliable)
@@ -46,3 +58,4 @@ protected:
 	void ClientOnEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 	
 };
+

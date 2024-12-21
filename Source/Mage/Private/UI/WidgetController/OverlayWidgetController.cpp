@@ -10,20 +10,18 @@
 
 void UOverlayWidgetController::BroadcastInitialValue()
 {
-	UMageAttributeSet* MageAttributeSet = CastChecked<UMageAttributeSet>(AttributeSet);
-	OnHealthChanged.Broadcast(MageAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(MageAttributeSet->GetMaxHealth());
-	OnManaChanged.Broadcast(MageAttributeSet->GetMana());
-	OnMaxManaChanged.Broadcast(MageAttributeSet->GetMaxMana());
+	OnHealthChanged.Broadcast(GetMageAS()->GetHealth());
+	OnMaxHealthChanged.Broadcast(GetMageAS()->GetMaxHealth());
+	OnManaChanged.Broadcast(GetMageAS()->GetMana());
+	OnMaxManaChanged.Broadcast(GetMageAS()->GetMaxMana());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	// AttributeSet 回调函数绑定
-	UMageAttributeSet* MageAttributeSet = CastChecked<UMageAttributeSet>(AttributeSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate( // 根据输入的Attribute绑定回调函数
-		MageAttributeSet->GetHealthAttribute()).AddLambda(
+		GetMageAS()->GetHealthAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnHealthChanged.Broadcast(Data.NewValue);
@@ -31,7 +29,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		GetMageAS()->GetMaxHealthAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
@@ -39,7 +37,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetManaAttribute()).AddLambda(
+		GetMageAS()->GetManaAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnManaChanged.Broadcast(Data.NewValue);
@@ -47,25 +45,25 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		MageAttributeSet->GetMaxManaAttribute()).AddLambda(
+		GetMageAS()->GetMaxManaAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
 			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
 
-	if (UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(AbilitySystemComponent))
+	if (GetMageASC())
 	{
-		if (MageASC->bStartupAbilitiesGiven) // 技能初始化完毕就直接执行否则绑定委托
+		if (GetMageASC()->bStartupAbilitiesGiven) // 技能初始化完毕就直接执行否则绑定委托
 		{
-			OnInitializeStartupAbilities(MageASC);
+			BroadcastAbilityData();
 		}
 		else
 		{
-			MageASC->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::OnInitializeStartupAbilities);
+			GetMageASC()->AbilitiesGivenDelegate.AddUObject(this, &ThisClass::BroadcastAbilityData);
 		}
 		
-		MageASC->EffectAssetTagsDelegate.AddLambda(
+		GetMageASC()->EffectAssetTagsDelegate.AddLambda(
 		[this](const FGameplayTagContainer& AssetTags)
 		{
 			for (const FGameplayTag& Tag : AssetTags)
@@ -83,37 +81,19 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	}
 	
 	// PlayerState 回调函数绑定
-	AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
-	MagePS->XPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
-	MagePS->LevelChangedDelegate.AddLambda(
+	GetMagePS()->XPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
+	GetMagePS()->LevelChangedDelegate.AddLambda(
 		[this](int32 NewLevel)
 		{
 			OnLevelChangedDelegate.Broadcast(NewLevel);
 		});
 }
 
-void UOverlayWidgetController::OnInitializeStartupAbilities(UMageAbilitySystemComponent* MageASC)
-{
-	if (!MageASC->bStartupAbilitiesGiven) return;
-
-	FForeachAbilitiesSignature ForeachDelegate; // 单播委托
-	ForeachDelegate.BindLambda([this, MageASC](const FGameplayAbilitySpec& AbilitySpec)
-	{
-		FMageAbilityData FoundData = AbilityData->FindAbilityDataForTag(MageASC->GetAbilityTagFromSpec(AbilitySpec), false);
-		FoundData.AbilityInputTag = MageASC->GetInputTagFromSpec(AbilitySpec); // 获取到技能的输入标签
-		AbilityDataDelegate.Broadcast(FoundData);
-	});
-	// 遍历技能并执行委托回调
-	// 你说（嚼嚼嚼）这个（嚼嚼嚼）行不行（嚼嚼嚼）啊...
-	MageASC->ForeachAbilitiesExecute(ForeachDelegate);
-}
-
-void UOverlayWidgetController::OnXPChanged(const int32 NewXP) const
+void UOverlayWidgetController::OnXPChanged(const int32 NewXP)
 {
 	// 计算当前经验值在升级区间的百分比
 	
-	const AMagePlayerState* MagePS = CastChecked<AMagePlayerState>(PlayerState);
-	const ULevelUpData* LevelUpData = MagePS->LevelUpData;
+	const ULevelUpData* LevelUpData = GetMagePS()->LevelUpData;
 	checkf(LevelUpData, TEXT("Not Find LevelUpData In PlayerState."))
 	
 	int32 CurrentLevel = LevelUpData->FindLevelForXP(NewXP);

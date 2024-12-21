@@ -20,9 +20,7 @@ class MAGE_API UAttributeMenuWidgetController : public UMageWidgetController
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValue() override;
-	UFUNCTION(BlueprintCallable)
 	virtual void BindCallbacksToDependencies() override;
 
 protected:
@@ -33,8 +31,6 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStatChangedSignature OnAttributePointChangedDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerStatChangedSignature OnSkillPointChangedDelegate;
 
 	UFUNCTION(BlueprintCallable)
 	void UpgradeAttribute(const FGameplayTag& AttributeTag); // 根据标签提升对应属性

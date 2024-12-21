@@ -5,28 +5,40 @@
 #include "UI/Widget/MageUserWidget.h"
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "UI/WidgetController/SkillMenuWidgetController.h"
 
 
-UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetControllerParams& InWigetControllerParams)
+UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
 {
 	if (OverlayWidgetController == nullptr) // 单例,没有则创建
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetWidgetControllerParams(InWigetControllerParams);
+		OverlayWidgetController->SetWidgetControllerParams(InWidgetControllerParams);
 		OverlayWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
 	}
 	return OverlayWidgetController;
 }
 
-UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& InWigetControllerParams)
+UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
 {
 	if (AttributeMenuWidgetController == nullptr) // 单例,没有则创建
 	{
 		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
-		AttributeMenuWidgetController->SetWidgetControllerParams(InWigetControllerParams);
+		AttributeMenuWidgetController->SetWidgetControllerParams(InWidgetControllerParams);
 		AttributeMenuWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
 	}
 	return AttributeMenuWidgetController;
+}
+
+USkillMenuWidgetController* AMageHUD::GetSkillMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
+{
+	if (SkillMenuWidgetController == nullptr) // 单例,没有则创建
+    {
+    	SkillMenuWidgetController = NewObject<USkillMenuWidgetController>(this, SkillMenuWidgetControllerClass);
+    	SkillMenuWidgetController->SetWidgetControllerParams(InWidgetControllerParams);
+    	SkillMenuWidgetController->BindCallbacksToDependencies(); // 向数据层绑定回调函数传递给UI层
+    }
+    return SkillMenuWidgetController;
 }
 
 void AMageHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)

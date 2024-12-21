@@ -8,6 +8,10 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MageAbilitySystemLibrary.generated.h"
 
+class UAbilityData;
+class USkillMenuWidgetController;
+class AMageHUD;
+struct FWidgetControllerParams;
 class UAbilitySystemComponent;
 class UAttributeMenuWidgetController;
 class UOverlayWidgetController;
@@ -20,11 +24,17 @@ class MAGE_API UMageAbilitySystemLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController")
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AMageHUD*& OutMageHUD);
+	
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
 	
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController")
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
+	static USkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | CharacterClassDefaults")
 	static void InitCharacterDefaultAttributes(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass, int32 Level);
@@ -34,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | CharacterClassDefaults")
 	static UCharacterClassData* GetCharacterClassData(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | AbilityData")
+	static UAbilityData* GetAbilityData(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayEffects")
 	static bool GetCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);

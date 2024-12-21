@@ -4,8 +4,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "MageGameplayTags.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AbilityData.h"
 #include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
-#include "Interface/CombatInterface.h"
 #include "Interface/PlayerInterface.h"
 #include "Mage/LogMageChannels.h"
 
@@ -30,12 +31,13 @@ void UMageAbilitySystemComponent::AddCharacterAbilites(TArray<TSubclassOf<UGamep
 		if (UMageGameplayAbility* MageGameplayAbility = Cast<UMageGameplayAbility>(AbilitySpec.Ability))
 		{
 			AbilitySpec.DynamicAbilityTags.AddTag(MageGameplayAbility->StartupInputTag); // 把技能标签添加到动态标签容器中
+			AbilitySpec.DynamicAbilityTags.AddTag(FMageGameplayTags::Get().Abilities_Status_Equipped);
 			GiveAbility(AbilitySpec); // 赋予技能但不执行
 		}
 	}
 	// 初始化技能完毕，给控制层发数据
 	bStartupAbilitiesGiven = true;
-	AbilitiesGivenDelegate.Broadcast(this);
+	AbilitiesGivenDelegate.Broadcast();
 }
 
 void UMageAbilitySystemComponent::AddCharacterPassiveAbilites(TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilityClasses)
@@ -108,14 +110,66 @@ FGameplayTag UMageAbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayA
 
 FGameplayTag UMageAbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
 {
-	for (const FGameplayTag& Tag : AbilitySpec.DynamicAbilityTags) // DynamicAbilityTags存储着StartupInputTag
+	for (const FGameplayTag& InputTag : AbilitySpec.DynamicAbilityTags) // DynamicAbilityTags存储着StartupInputTag
 	{
-		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
+		if (InputTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Input"))))
 		{
-			return Tag;
+			return InputTag;
 		}
 	}
 	return FGameplayTag();
+}
+
+FGameplayTag UMageAbilitySystemComponent::GetStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec)
+{
+	for (const FGameplayTag& StatusTag : AbilitySpec.DynamicAbilityTags)
+	{
+		if (StatusTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Status"))))
+		{
+			return StatusTag;
+		}
+	}
+	return FGameplayTag();
+}
+
+FGameplayAbilitySpec* UMageAbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+{
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		for (const FGameplayTag& Tag : AbilitySpec.Ability->AbilityTags)
+		{
+			if (AbilityTag.MatchesTagExact(Tag))
+			{
+				return &AbilitySpec;
+			}
+		}
+	}
+	return nullptr;
+}
+
+void UMageAbilitySystemComponent::UpdateAbilityStatuses(const int32 InPlayerLevel)
+{
+	UAbilityData* AbilityData = UMageAbilitySystemLibrary::GetAbilityData(this);
+	for (const FMageAbilityData& Data : AbilityData->AbilitiesData) // 寻找符合等级的技能
+	{
+		if (!Data.AbilityTag.IsValid()) continue;
+		if (Data.AbilityLevelRequirement > InPlayerLevel) continue;
+		if (GetSpecFromAbilityTag(Data.AbilityTag) == nullptr) // 没有赋予这个技能
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Data.AbilityClass, 1.f);
+			AbilitySpec.DynamicAbilityTags.AddTag(FMageGameplayTags::Get().Abilities_Status_Eligible);
+			GiveAbility(AbilitySpec);
+			MarkAbilitySpecDirty(AbilitySpec); // 无需等待下次更新，直接复制到客户端
+			ClientUpdateAbilityStatus(Data.AbilityTag, FMageGameplayTags::Get().Abilities_Status_Eligible);
+		}
+	}
+}
+
+void UMageAbilitySystemComponent::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+{
+	AbilityStatusChanged.Broadcast(AbilityTag, StatusTag); // 同步技能状态
 }
 
 void UMageAbilitySystemComponent::UpgradeAttribute(const FGameplayTag& AttributeTag)
@@ -154,6 +208,6 @@ void UMageAbilitySystemComponent::OnRep_ActivateAbilities()
 	if (!bStartupAbilitiesGiven)
 	{
 		bStartupAbilitiesGiven = true;
-		AbilitiesGivenDelegate.Broadcast(this);
+		AbilitiesGivenDelegate.Broadcast();
 	}
 }

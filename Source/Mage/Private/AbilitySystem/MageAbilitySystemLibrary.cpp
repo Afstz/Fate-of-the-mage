@@ -12,41 +12,63 @@
 #include "UI/HUD/MageHUD.h"
 #include "UI/WidgetController/MageWidgetController.h"
 
-UOverlayWidgetController* UMageAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
+bool UMageAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AMageHUD*& OutMageHUD)
 {
 	// 根据提供的世界上下文信息找到当前世界的全部PlayerController, 0 为本地控制的角色
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
 	{
-		if (AMageHUD* MageHUD = Cast<AMageHUD>(PC->GetHUD()))
+		OutMageHUD = Cast<AMageHUD>(PC->GetHUD());
+		if (OutMageHUD)
 		{
 			AMagePlayerState* PS = PC->GetPlayerState<AMagePlayerState>();
 			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
 			UAttributeSet* AS = PS->GetAttributeSet();
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
-			return MageHUD->GetOverlayWidgetController(WidgetControllerParams);
+
+			OutWCParams.PlayerController = PC;
+			OutWCParams.PlayerState = PS;
+			OutWCParams.AbilitySystemComponent = ASC;
+			OutWCParams.AttributeSet = AS;
+			return true;
 		}
+	}
+	return false;
+}
+
+UOverlayWidgetController* UMageAbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WidgetControllerParams;
+	AMageHUD* MageHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, MageHUD))
+	{
+		return MageHUD->GetOverlayWidgetController(WidgetControllerParams);
 	}
 	return nullptr; 
 }
 
 UAttributeMenuWidgetController* UMageAbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	if (APlayerController* PC = UGameplayStatics::GetPlayerController(WorldContextObject, 0))
+	FWidgetControllerParams WidgetControllerParams;
+	AMageHUD* MageHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, MageHUD))
 	{
-		if (AMageHUD* MageHUD = Cast<AMageHUD>(PC->GetHUD()))
-		{
-			AMagePlayerState* PS = PC->GetPlayerState<AMagePlayerState>();
-			UAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
-			UAttributeSet* AS = PS->GetAttributeSet();
-			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
-			return MageHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
-		}
+		return MageHUD->GetAttributeMenuWidgetController(WidgetControllerParams);
 	}
-	return nullptr;
+	return nullptr; 
+}
+
+USkillMenuWidgetController* UMageAbilitySystemLibrary::GetSkillMenuWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WidgetControllerParams;
+	AMageHUD* MageHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WidgetControllerParams, MageHUD))
+	{
+		return MageHUD->GetSkillMenuWidgetController(WidgetControllerParams);
+	}
+	return nullptr; 
 }
 
 void UMageAbilitySystemLibrary::InitCharacterDefaultAttributes(const UObject* WorldContextObject,
-	UAbilitySystemComponent* ASC, ECharacterClass CharacterClass, int32 Level)
+                                                               UAbilitySystemComponent* ASC, ECharacterClass CharacterClass, int32 Level)
 {
 	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject);
 	if (!CharacterClassData || !IsValid(ASC)) return;
@@ -107,6 +129,13 @@ UCharacterClassData* UMageAbilitySystemLibrary::GetCharacterClassData(const UObj
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (MageGameModeBase == nullptr) return nullptr;
 	return MageGameModeBase->CharacterClassData;
+}
+
+UAbilityData* UMageAbilitySystemLibrary::GetAbilityData(const UObject* WorldContextObject)
+{
+	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (MageGameModeBase == nullptr) return nullptr;
+	return MageGameModeBase->AbilityData;
 }
 
 int32 UMageAbilitySystemLibrary::GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level)

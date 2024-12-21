@@ -6,10 +6,16 @@
 #include "AbilitySystemComponent.h"
 #include "MageWidgetController.generated.h"
 
+class UAbilityData;
+class UMageAttributeSet;
+class UMageAbilitySystemComponent;
+class AMagePlayerState;
+class AMagePlayerController;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FMageAbilityData& , Data);
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -29,7 +35,6 @@ struct FWidgetControllerParams
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
 };
 
-
 /**
  * 
  */
@@ -42,10 +47,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& InWidgetControllerParams);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValue();
+	UFUNCTION(BlueprintCallable)
 	virtual void BindCallbacksToDependencies();
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
+	FAbilityDataSignature AbilityDataDelegate;
 protected:
-	
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<APlayerController> PlayerController;
 
@@ -57,4 +66,25 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<AMagePlayerController> MagePlayerController;
+
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<AMagePlayerState> MagePlayerState;
+
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UMageAbilitySystemComponent> MageAbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")
+	TObjectPtr<UMageAttributeSet> MageAttributeSet;
+
+	AMagePlayerController* GetMagePC();
+	AMagePlayerState* GetMagePS();
+	UMageAbilitySystemComponent* GetMageASC();
+	UMageAttributeSet* GetMageAS();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
+	TObjectPtr<UAbilityData> AbilityData; // 技能配置信息
+	void BroadcastAbilityData();
 };

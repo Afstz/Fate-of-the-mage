@@ -9,26 +9,22 @@
 
 void UAttributeMenuWidgetController::BroadcastInitialValue()
 {
-	// AttributeSet 
-	UMageAttributeSet* AS = Cast<UMageAttributeSet>(AttributeSet);
-
-	for (auto& Pair : AS->TagsToAttributes)
+	// AttributeSet
+	
+	for (auto& Pair : GetMageAS()->TagsToAttributes)
 	{
 		BroadcastAttributeData(Pair.Key, Pair.Value);
 	}
 	
 	// PlayerState
-	AMagePlayerState* PS = CastChecked<AMagePlayerState>(PlayerState);
-	OnAttributePointChangedDelegate.Broadcast(PS->GetAttributePoints());
-	OnSkillPointChangedDelegate.Broadcast(PS->GetSkillPoints());
+	OnAttributePointChangedDelegate.Broadcast(GetMagePS()->GetAttributePoints());
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
 	// AttributeSet 
-	UMageAttributeSet* AS = CastChecked<UMageAttributeSet>(AttributeSet);
-	
-	for (auto& Pair : AS->TagsToAttributes)
+	check(AttributeData);
+	for (auto& Pair : GetMageAS()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
@@ -39,22 +35,16 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	}
 
 	// PlayerState
-	AMagePlayerState* PS = CastChecked<AMagePlayerState>(PlayerState);
-	PS->AttributePointChangedDelegate.AddLambda(
+
+	GetMagePS()->AttributePointChangedDelegate.AddLambda(
 	[this](const int32& NewAttributePoint)
 		{
 			OnAttributePointChangedDelegate.Broadcast(NewAttributePoint);
-		});
-	PS->SkillPointChangedDelegate.AddLambda(
-		[this](const int32& NewSkillPoint)
-		{
-			OnSkillPointChangedDelegate.Broadcast(NewSkillPoint);
 		});
 }
 
 void UAttributeMenuWidgetController::BroadcastAttributeData(const FGameplayTag& AttributeTag, const FGameplayAttribute& Attribute) const
 {
-	check(AttributeData);
 	FMageAttributeData FoundAttributeData = AttributeData->FindAttributeDataForTag(AttributeTag);
 	FoundAttributeData.AttributeValue = Attribute.GetNumericValue(AttributeSet);
 	AttributeMenuDataDelegate.Broadcast(FoundAttributeData);
@@ -62,6 +52,5 @@ void UAttributeMenuWidgetController::BroadcastAttributeData(const FGameplayTag& 
 
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	UMageAbilitySystemComponent* ASC = CastChecked<UMageAbilitySystemComponent>(AbilitySystemComponent);
-	ASC->UpgradeAttribute(AttributeTag);
+	GetMageASC()->UpgradeAttribute(AttributeTag);
 }

@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "UI/WidgetController/MageWidgetController.h"
 #include "MageHUD.generated.h"
 
+class USkillMenuWidgetController;
 class UAttributeMenuWidgetController;
 struct FWidgetControllerParams;
 struct FWigetControllerParams;
@@ -22,8 +24,9 @@ class MAGE_API AMageHUD : public AHUD
 	GENERATED_BODY()
 
 public:
-	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& InWigetControllerParams);
-	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& InWigetControllerParams);
+	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& InWidgetControllerParams);
+	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams);
+	USkillMenuWidgetController* GetSkillMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams);
 	
 	UFUNCTION(BlueprintCallable)
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
@@ -47,4 +50,10 @@ private:
 	TObjectPtr<UAttributeMenuWidgetController> AttributeMenuWidgetController;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
+
+	/** SkillMenuWidgetController */
+	UPROPERTY()
+	TObjectPtr<USkillMenuWidgetController> SkillMenuWidgetController;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USkillMenuWidgetController> SkillMenuWidgetControllerClass;
 };

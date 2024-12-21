@@ -113,6 +113,9 @@ void AMageCharacte::AddToLevel_Implementation(int32 InLevel)
 	AMagePlayerState* MagePlayerState = Cast<AMagePlayerState>(GetPlayerState());
 	check(MagePlayerState);
 	MagePlayerState->AddToLevel(InLevel);
+
+	UMageAbilitySystemComponent* MageASC = CastChecked<UMageAbilitySystemComponent>(GetAbilitySystemComponent());
+	MageASC->UpdateAbilityStatuses(MagePlayerState->GetPlayerLevel()); // 更新符合等级的技能状态
 }
 
 void AMageCharacte::AddToAttributePoint_Implementation(int32 InAttributePoint)

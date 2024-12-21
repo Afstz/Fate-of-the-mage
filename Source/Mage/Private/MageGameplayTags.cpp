@@ -78,6 +78,10 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Input.R"), FString("R key"));
 	MageGameplayTags.Input_T = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.T"), FString("T key"));
+	MageGameplayTags.Input_Passive_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Passive.1"), FString("Passive Skill 1"));
+	MageGameplayTags.Input_Passive_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input.Passive.2"), FString("Passive Skill 2"));
 
 	/** GameplayEffect Tags */
 	MageGameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -108,7 +112,27 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Abilities.Summon"), FString("Summon Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Fire.FireBall"), FString("FireBall Ability Gameplay Tag"));
-
+	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Lightning.LightningChain"), FString("LightningChain Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.HitReact"), FString("Hit React Ability Tag"));
+	/** Abilities Status */
+	MageGameplayTags.Abilities_Status_Unlocked = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Status.Unlocked"), FString("Unlocked Status Ability Tag"));
+	MageGameplayTags.Abilities_Status_Eligible = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Status.Eligible"), FString("Eligible Status Ability Tag"));
+	MageGameplayTags.Abilities_Status_Locked = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Status.Locked"), FString("Locked Status Ability Tag"));
+	MageGameplayTags.Abilities_Status_Equipped = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Status.Equipped"), FString("Equipped Status Ability Tag"));
+	/** Abilities Type */
+	MageGameplayTags.Abilities_Type_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Type.None"), FString("None Type Ability Tag"));
+	MageGameplayTags.Abilities_Type_Offensive = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Abilities.Type.Offensive"), FString("Offensive Type Ability Tag"));
+	MageGameplayTags.Abilities_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Type.Passive"), FString("Passive Type Ability Tag"));
+	
 	/** Cooldown */
 	MageGameplayTags.Cooldown_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Fire.FireBall"), FString("FireBall Cooldown Tag"));

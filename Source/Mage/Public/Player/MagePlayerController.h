@@ -74,6 +74,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMageUserWidget> SkillMenuWidget;
 	void SkillMenu(const FInputActionValue& InputActionValue);
+	
 	/** Shift Key Attack*/
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> ShiftAction;

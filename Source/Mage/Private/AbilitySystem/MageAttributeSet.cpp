@@ -86,7 +86,7 @@ void UMageAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-	
+
 	FEffectProperties EffectProps;
 	SetEffectProperties(Data, EffectProps);;
 

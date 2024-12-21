@@ -49,6 +49,8 @@ public:
 	FGameplayTag Input_E;
 	FGameplayTag Input_R;
 	FGameplayTag Input_T;
+	FGameplayTag Input_Passive_1;
+	FGameplayTag Input_Passive_2;
 
 	/** GameplayEffect Tags */
 	FGameplayTag Effects_HitReact;
@@ -65,6 +67,17 @@ public:
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_Fire_FireBall;
+	FGameplayTag Abilities_Lightning_LightningChain;
+	FGameplayTag Abilities_HitReact;
+	/** Abilities Status */
+	FGameplayTag Abilities_Status_Locked;
+	FGameplayTag Abilities_Status_Eligible;
+	FGameplayTag Abilities_Status_Unlocked;
+	FGameplayTag Abilities_Status_Equipped;
+	/** Abilities Type */
+	FGameplayTag Abilities_Type_None;
+	FGameplayTag Abilities_Type_Offensive;
+	FGameplayTag Abilities_Type_Passive;
 
 	/** Cooldown */
 	FGameplayTag Cooldown_Fire_FireBall;
@@ -74,6 +87,7 @@ public:
 	FGameplayTag Montage_Attack_2;
 	FGameplayTag Montage_Attack_3;
 	FGameplayTag Montage_Attack_4;
+	
 	/** CombatSocket Tag */
 	FGameplayTag CombatSocket_Weapon;
 	FGameplayTag CombatSocket_LeftHand;

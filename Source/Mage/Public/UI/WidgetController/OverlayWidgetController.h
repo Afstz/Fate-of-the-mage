@@ -32,7 +32,7 @@ struct FMessageWdigetData : public FTableRowBase
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetSignature, const FMessageWdigetData&, MessageWdigetData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityDataSignature, const FMageAbilityData& , Data);
+
 /**
  * 
  */
@@ -55,8 +55,6 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
 	FMessageWidgetSignature MessageWidgetDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "GAS | WidgetData")
-	FAbilityDataSignature AbilityDataDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS | PlayerStat")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
@@ -66,14 +64,11 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
 	TObjectPtr<UDataTable> MessageDataTable; // 拾取消息配置信息
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
-	TObjectPtr<UAbilityData> AbilityData; // 技能配置信息
 	
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
-
-	void OnInitializeStartupAbilities(UMageAbilitySystemComponent* MageASC);
-	void OnXPChanged(const int32 NewXP) const;
+	
+	void OnXPChanged(const int32 NewXP);
 };
 
 template <typename T>
