@@ -3,9 +3,11 @@
 
 #include "UI/WidgetController/MageWidgetController.h"
 
+#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "AbilitySystem/Data/AbilityData.h"
+#include "AbilitySystem/GameplayAbility/MageGameplayAbility.h"
 #include "Player/MagePlayerController.h"
 #include "Player/MagePlayerState.h"
 
@@ -77,4 +79,37 @@ void UMageWidgetController::BroadcastAbilityData()
 	
 	// 遍历技能并执行委托回调
 	GetMageASC()->ForeachAbilitiesExecute(ForeachDelegate);
+}
+
+bool UMageWidgetController::GetAbilityDescFromAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = GetMageASC()->GetSpecFromAbilityTag(AbilityTag))
+	{
+		// 已有的技能
+		if (UMageGameplayAbility* MageGameplayAbility = Cast<UMageGameplayAbility>(AbilitySpec->Ability))
+		{
+			OutDescription = MageGameplayAbility->GetDescription(AbilitySpec->Level);
+			OutNextLevelDescription = MageGameplayAbility->GetNextLevelDescription(AbilitySpec->Level + 1);
+			return true;
+		}
+	}
+	// 未解锁的技能
+	if (!AbilityTag.IsValid() || AbilityTag.MatchesTagExact(FMageGameplayTags::Get().Abilities_None))
+	{
+		// 无效技能
+		OutDescription = FString();
+	}
+	else
+	{
+		// 有效技能
+		FMageAbilityData Data = AbilityData->FindAbilityDataForTag(AbilityTag, false);
+		OutDescription = UMageGameplayAbility::GetLockedDescription(Data.AbilityLevelRequirement); 
+	}
+	OutNextLevelDescription = FString();
+	return false;
+}
+
+void UMageWidgetController::ClearAllDelegate()
+{
+	AbilityDataDelegate.Clear();
 }

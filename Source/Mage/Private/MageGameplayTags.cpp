@@ -106,6 +106,8 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Attributes_Secondary_LightningResistence);
 
 	/** Abilites */
+	MageGameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.None"), FString("None Tag. like the nullptr"));
 	MageGameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Attack"), FString("Attack Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(

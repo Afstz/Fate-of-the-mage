@@ -4,7 +4,7 @@
 #include "AbilitySystem/Data/AbilityData.h"
 #include "Mage/LogMageChannels.h"
 
-FMageAbilityData UAbilityData::FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound)
+FMageAbilityData UAbilityData::FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound) const
 {
 	for (const FMageAbilityData& Data : AbilitiesData)
 	{

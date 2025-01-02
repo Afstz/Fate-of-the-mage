@@ -27,5 +27,9 @@ protected:
 
 	// AI
 	UFUNCTION(BlueprintPure, Category = "Mechanics")
-	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const; 
+	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
+
+	float GetAbilityDamage(int32 InAbilityLevel); // 获取技能伤害
+private:
+	
 };

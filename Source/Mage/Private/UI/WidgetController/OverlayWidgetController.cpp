@@ -2,6 +2,8 @@
 
 
 #include "UI/WidgetController/OverlayWidgetController.h"
+
+#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "AbilitySystem/Data/AbilityData.h"
@@ -78,6 +80,8 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				}
 			}
 		});
+		
+		GetMageASC()->AbilityEquippedDelegate.AddUObject(this, &ThisClass::OnAbilityEquipped); // 更新主UI技能装备情况
 	}
 	
 	// PlayerState 回调函数绑定
@@ -110,4 +114,21 @@ void UOverlayWidgetController::OnXPChanged(const int32 NewXP)
 
 		OnXPPercentChangedDelegate.Broadcast(LevelUpPercent);
 	}
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PrevInputTag)
+{
+	const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();
+	// 清理插槽之前的数据
+	FMageAbilityData ClearAbilityData;
+	ClearAbilityData.AbilityTag = MageGameplayTags.Abilities_None;
+	ClearAbilityData.StatusTag = MageGameplayTags.Abilities_Status_Unlocked;
+	ClearAbilityData.AbilityInputTag = PrevInputTag;
+	AbilityDataDelegate.Broadcast(ClearAbilityData);
+
+	// 重新赋予数据
+	FMageAbilityData EquippedAbilityData = AbilityData->FindAbilityDataForTag(AbilityTag);
+	EquippedAbilityData.StatusTag = StatusTag;
+	EquippedAbilityData.AbilityInputTag = InputTag;
+	AbilityDataDelegate.Broadcast(EquippedAbilityData);
 }

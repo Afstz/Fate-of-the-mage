@@ -24,6 +24,8 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 protected:
+	virtual void ClearAllDelegate() override;
+	
 	UPROPERTY(BlueprintAssignable)
 	FAttributeMenuDataSignatrue AttributeMenuDataDelegate; // AttributeRow绑定
 	UPROPERTY(EditDefaultsOnly)

@@ -15,7 +15,7 @@ class MAGE_API UProjectileSpellAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 public:
-	
+
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 private:

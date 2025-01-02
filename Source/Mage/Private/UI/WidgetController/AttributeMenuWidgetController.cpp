@@ -54,3 +54,9 @@ void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& Attrib
 {
 	GetMageASC()->UpgradeAttribute(AttributeTag);
 }
+
+void UAttributeMenuWidgetController::ClearAllDelegate()
+{
+	AttributeMenuDataDelegate.Clear();
+	OnAttributePointChangedDelegate.Clear();
+}

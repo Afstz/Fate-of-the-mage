@@ -21,6 +21,9 @@ struct FMageAbilityData
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag StatusTag = FGameplayTag(); // 技能状态标签
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FGameplayTag AbilityType = FGameplayTag(); // 技能类型标签 (主动/被动)
+
 	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag AbilityInputTag = FGameplayTag(); // 技能输入标签
 	
@@ -48,7 +51,7 @@ class MAGE_API UAbilityData : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	FMageAbilityData FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound = true);
+	FMageAbilityData FindAbilityDataForTag(const FGameplayTag& AbilityTag, bool bWarnIfNotFound = false) const;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FMageAbilityData> AbilitiesData;
 protected:

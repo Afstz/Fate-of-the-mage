@@ -12,7 +12,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsSignature, const FGameplayTa
 DECLARE_MULTICAST_DELEGATE(FAbilitiesGivenSignature); // 技能初始化委托
 DECLARE_DELEGATE_OneParam(FForeachAbilitiesSignature, const FGameplayAbilitySpec&); // 遍历技能单播委托
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityStatusChanged, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/, int32 /* New Level*/);
+DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquippedSignature, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/, const FGameplayTag& /* Input Tag*/, const FGameplayTag& /* Prev Input Tag*/);
 /**
  * 
  */
@@ -42,11 +43,25 @@ public:
 	static FGameplayTag GetStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
 	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
-	
+	FGameplayTag GetStatusTagFromAbilityTag(const FGameplayTag& AbilityTag);
+	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
+
+	/** Skill */
 	FAbilityStatusChanged AbilityStatusChanged;
+	FAbilityEquippedSignature AbilityEquippedDelegate;
 	void UpdateAbilityStatuses(const int32 InPlayerLevel);
 	UFUNCTION(Client, Reliable)
-	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag);
+	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 NewLevel);
+	UFUNCTION(Server, Reliable)
+	void ServerSpendSkillPoint(const FGameplayTag& AbilityTag);
+	UFUNCTION(Server, Reliable)
+	void ServerEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& InputTag);
+	UFUNCTION(Client, Reliable)
+	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PrevInputTag);
+	void ClearSlot(FGameplayAbilitySpec* AbilitySpec);
+	void ClearAbilitiesOfSlot(const FGameplayTag& InputTag);
+	bool AbilityHasInputTag(const FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& InputTag);
+	
 	
 	/** Attribute */
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);

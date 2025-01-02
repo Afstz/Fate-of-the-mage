@@ -58,7 +58,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, ReplicatedUsing = OnRep_AttributePoints)
 	int32 AttributePoints = 4;
 	UPROPERTY(EditDefaultsOnly, ReplicatedUsing = OnRep_SkillPoints)
-	int32 SkillPoints = 1;
+	int32 SkillPoints = 0;
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 	UFUNCTION()

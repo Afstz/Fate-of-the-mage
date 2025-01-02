@@ -29,3 +29,13 @@ FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TAr
 	
 	return FTaggedMontage();
 }
+
+float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel)
+{
+	float TotalDamage = 0.f;
+	for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
+	{
+		TotalDamage += Pair.Value.GetValueAtLevel(InAbilityLevel);
+	}
+	return TotalDamage;
+}

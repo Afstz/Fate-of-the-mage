@@ -87,4 +87,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WidgetData")
 	TObjectPtr<UAbilityData> AbilityData; // 技能配置信息
 	void BroadcastAbilityData();
+
+	bool GetAbilityDescFromAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutNextLevelDescription); // 获取技能描述
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ClearAllDelegate(); // 清理委托所有回调函数
 };
