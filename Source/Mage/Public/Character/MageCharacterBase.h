@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "MageCharacterBase.generated.h"
 
+class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UMotionWarpingComponent;
 class UGameplayAbility;
@@ -28,16 +29,18 @@ public:
 	/** Combat Interface */
 	virtual FVector GetLocationByWeaponSocket_Implementation() const override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() const override;
-	virtual void Die() override;
+	virtual void Die(const FVector& InDeathImpulse) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	virtual int32 GetMinionCount_Implementation() const override;
 	virtual void AddMinionCount_Implementation(const int32 InMinionCount) override;
 	virtual ECharacterClass GetCharacterClass_Implementation() const override;
+	virtual FASCRegisteredSignature GetASCRegisteredDelegate() override;
+	virtual FOnDeathSignature GetOnDeathDelegate() override;
 	
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MultiHandleDeath();
+	virtual void MultiHandleDeath(const FVector& DeathImpulse);
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo();
@@ -86,6 +89,13 @@ protected:
 	/** Minion */
 	UPROPERTY(EditAnywhere, Category = "Minion")
 	int32 MinionCount = 0;
+
+	/** Combat Interface Delegate */
+	FASCRegisteredSignature ASCRegisteredDelegate;
+	FOnDeathSignature OnDeathDelegate;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> BurnNiagaraComponent;
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;

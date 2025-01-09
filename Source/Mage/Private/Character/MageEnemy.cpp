@@ -65,6 +65,8 @@ void AMageEnemy::InitAbilityActorInfo()
 	{
 		InitDefaultAttributes();
 	}
+	
+	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 }
 
 void AMageEnemy::InitDefaultAttributes()
@@ -176,7 +178,7 @@ void AMageEnemy::MultiHiddenWidget_Implementation()
 	HealthBar->SetVisibility(false);
 }
 
-void AMageEnemy::Die()
+void AMageEnemy::Die(const FVector& InDeathImpulseDir)
 {
 	if (MageAIController)
 	{
@@ -184,7 +186,7 @@ void AMageEnemy::Die()
 	}
 	SetLifeSpan(LifeSpan);
 	MultiHiddenWidget();
-	Super::Die();
+	Super::Die(InDeathImpulseDir);
 }
 
 

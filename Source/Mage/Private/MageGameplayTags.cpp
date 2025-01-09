@@ -98,13 +98,35 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Damage.Fire"), FString("Fire Damage Type"));
 	MageGameplayTags.Damage_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Damage.Lightning"), FString("Lightning Damage Type"));
-
 	// 建立属性映射关系，便于计算
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Physical, MageGameplayTags.Attributes_Secondary_PhysicalResistence);
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Magical, MageGameplayTags.Attributes_Secondary_MagicalResistence);
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Fire, MageGameplayTags.Attributes_Secondary_FireResistence);
 	MageGameplayTags.DamageTypesToResistence.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Attributes_Secondary_LightningResistence);
-
+	
+	/** Debuff Tags */
+	MageGameplayTags.Debuff_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	FName("Debuff.Physical"), FString("Physical Debuff"));
+	MageGameplayTags.Debuff_Magical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Magical"), FString("Magical Debuff"));
+	MageGameplayTags.Debuff_Burn = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Burn"), FString("Burn Debuff"));
+	MageGameplayTags.Debuff_Stun = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Stun"), FString("Stun Debuff"));
+	MageGameplayTags.Debuff_Chance = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Chance"), FString("Debuff Chance"));
+	MageGameplayTags.Debuff_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Damage"), FString("Debuff Damage"));
+	MageGameplayTags.Debuff_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Duration"), FString("Debuff Duration"));
+	MageGameplayTags.Debuff_Frequence = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Debuff.Frequence"), FString("Debuff Frequence"));
+	// 建立属性映射关系，便于计算
+	MageGameplayTags.DamageTypesToDebuffs.Add(MageGameplayTags.Damage_Physical, MageGameplayTags.Debuff_Physical);
+	MageGameplayTags.DamageTypesToDebuffs.Add(MageGameplayTags.Damage_Magical, MageGameplayTags.Debuff_Magical);
+	MageGameplayTags.DamageTypesToDebuffs.Add(MageGameplayTags.Damage_Fire, MageGameplayTags.Debuff_Burn);
+	MageGameplayTags.DamageTypesToDebuffs.Add(MageGameplayTags.Damage_Lightning, MageGameplayTags.Debuff_Stun);
+	
 	/** Abilites */
 	MageGameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.None"), FString("None Tag. like the nullptr"));

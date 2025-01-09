@@ -5,7 +5,7 @@
 
 FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 {
-	float Damage = GetAbilityDamage(AbilityLevel);
+	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
 	
@@ -19,13 +19,13 @@ FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，击中敌人发生爆炸。</>")
 		
-		, AbilityLevel, Damage, ManaCost, CooldownTime, AbilityLevel);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, AbilityLevel);
 
 }
 
 FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 {
-	float Damage = GetAbilityDamage(AbilityLevel);
+	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
 	
@@ -39,5 +39,5 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，击中敌人发生爆炸。造成更高的伤害。</>")
 		
-		, AbilityLevel, Damage, ManaCost, CooldownTime, AbilityLevel);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, AbilityLevel);
 }

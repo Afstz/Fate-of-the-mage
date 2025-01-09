@@ -7,8 +7,12 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
-
+class UAbilitySystemComponent;
 class UNiagaraSystem;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FASCRegisteredSignature, UAbilitySystemComponent*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -34,7 +38,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat Interface")
 	void UpdateFacingTarget(const FVector& TargetLocation); // 更新要面向的目标的位置
 	
-	virtual void Die() = 0;
+	virtual void Die(const FVector& InDeathImpulse) = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	bool IsDead() const;
@@ -48,4 +52,8 @@ public:
 	void AddMinionCount(const int32 InMinionCount);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	ECharacterClass GetCharacterClass() const;
+
+	// Delegate
+	virtual FASCRegisteredSignature GetASCRegisteredDelegate() = 0;
+	virtual FOnDeathSignature GetOnDeathDelegate() = 0;
 };

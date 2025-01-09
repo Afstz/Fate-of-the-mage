@@ -1,6 +1,5 @@
 // Copyright AFstz.
 
-
 #include "Player/MagePlayerController.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
@@ -122,7 +121,7 @@ void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 	const FRotator Rotation = GetControlRotation(); // 默认 0 0 0
 	// 只保留Yaw分量，其他分量设为0
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
+	
 	// 将YawRotation转换成旋转矩阵，并从中提取X轴和Y轴方向向量
 	// 因为YawRotaion始终为 0 0 0 , 变成标准的基向量组成的4x4矩阵
 	//（UE默认的正方向为X轴）旋转矩阵前方向 X:1,0,0  右方向 Y:0,1,0

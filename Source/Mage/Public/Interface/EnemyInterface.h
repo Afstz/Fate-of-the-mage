@@ -25,7 +25,7 @@ struct FTaggedMontage // 蒙太奇与对应的事件标签和武器插槽数据
 	FName CombatSocketName; // 触发伤害的骨骼插槽
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* ImpactSound; // 击中音效
+	TObjectPtr<USoundBase> ImpactSound; // 击中音效
 };
 
 // This class does not need to be modified.

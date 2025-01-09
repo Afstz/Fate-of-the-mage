@@ -1,6 +1,5 @@
 // Copyright AFstz.
 
-
 #include "AbilitySystem/GameplayAbility/DamageGameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -10,11 +9,9 @@ void UDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, 1.f);
 
-	for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes) // 遍历所有设置的伤害类型
-	{
-		const float DamageMagnitude = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, DamageMagnitude);
-	}
+	const float DamageMagnitude = Damage.GetValueAtLevel(GetAbilityLevel());
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, DamageMagnitude);
+	
 	// 对敌方造成伤害
 	UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor)->ApplyGameplayEffectSpecToSelf(*DamageSpecHandle.Data.Get());
 }
@@ -32,10 +29,41 @@ FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TAr
 
 float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel)
 {
-	float TotalDamage = 0.f;
-	for (TTuple<FGameplayTag, FScalableFloat>& Pair : DamageTypes)
+	float CausedDamage = Damage.GetValueAtLevel(InAbilityLevel);
+	
+	return CausedDamage;
+}
+
+FDamageEffectParams UDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
+{
+	FDamageEffectParams DamageEffectParams;
+	
+	DamageEffectParams.WorldContextObject = GetAvatarActorFromActorInfo();
+	DamageEffectParams.DamageEffectClass = DamageEffectClass;
+	DamageEffectParams.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
+	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	DamageEffectParams.BaseDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+	DamageEffectParams.DamageType = DamageType;
+	DamageEffectParams.AbilityLevel = GetAbilityLevel();
+	DamageEffectParams.DebuffChance = DebuffChance;
+	DamageEffectParams.DebuffDamage = DebuffDamage;
+	DamageEffectParams.DebuffDuration = DebuffDuration;
+	DamageEffectParams.DebuffFrequence = DebuffFrequence;
+	DamageEffectParams.DeathImpulseMagnitude = DeathImpulseMagnitude;
+	DamageEffectParams.KnockbackChance = KnockbackChance;
+	DamageEffectParams.KnockbackMagnitude = KnockbackMagnitude;
+	if (IsValid(TargetActor))
 	{
-		TotalDamage += Pair.Value.GetValueAtLevel(InAbilityLevel);
+		if (bool bKnockbackSuccessful = KnockbackChance >= FMath::RandRange(1, 100))
+		{
+			FRotator KnockbackForceRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+			KnockbackForceRotation.Pitch = 45.f;
+		
+			const FVector ToTarget = KnockbackForceRotation.Vector();
+			DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude; // 死亡的冲击力
+			DamageEffectParams.KnockbackForce = ToTarget * KnockbackMagnitude; // 击退的力
+		}
 	}
-	return TotalDamage;
+
+	return DamageEffectParams;
 }

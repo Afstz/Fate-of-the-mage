@@ -14,6 +14,7 @@ struct FEffectProperties
 	
 	// Source
 	FGameplayEffectContextHandle SourceEffectContextHandle;
+	FGameplayEffectSpec SourceEffectSpec;
 	UPROPERTY()
 	UAbilitySystemComponent* SourceASC = nullptr;
 	UPROPERTY() 
@@ -65,7 +66,6 @@ public:
 
 	/** Attribute Menu */
 	TMap<FGameplayTag, FGameplayAttribute> TagsToAttributes; // 属性标签及对应的GetAttribute方法
-	
 	
 	/*
 	 * Character Base Attributes
@@ -222,7 +222,10 @@ private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& EffectProperties);
 	void ShowCharacterDamageText(const FEffectProperties& EffectProperties, const float DamageValue,
 		const bool bIsCriticalHit, const bool bIsBlockHit) const; // 显示对对方造成的伤害
-	void SendXPRewardEvent(FEffectProperties& EffectProperties);
+	void SendXPRewardEvent(const FEffectProperties& EffectProperties);
+	void HandleReceivedXP(const FEffectProperties& EffectProps);
+	void HandleReceivedDamage(const FEffectProperties& EffectProps);
+	void HandleDebuff(const FEffectProperties& EffectProps);
 
 	/** Level */
 	bool bFillInHealth = false; 

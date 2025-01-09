@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "MageAbilityTypes.h"
 #include "GameFramework/Actor.h"
 #include "MageProjectile.generated.h"
 
@@ -22,7 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	FGameplayEffectSpecHandle EffectSpecHandle;
+	FDamageEffectParams DamageEffectParams;
 protected:
 	virtual void BeginPlay() override;
 

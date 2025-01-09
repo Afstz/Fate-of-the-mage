@@ -1,7 +1,65 @@
 #pragma once
 
+#include "GameplayEffect.h"
 #include "GameplayEffectTypes.h"
 #include "MageAbilityTypes.generated.h"
+
+
+USTRUCT(BlueprintType)
+struct FDamageEffectParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UObject> WorldContextObject = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	float BaseDamage = 0.f;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float AbilityLevel = 1.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTag DamageType = FGameplayTag();
+
+	UPROPERTY(BlueprintReadWrite)
+	float DebuffChance = 0.f;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float DebuffDamage = 0.f;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float DebuffDuration = 0.f;
+	
+	UPROPERTY(BlueprintReadWrite)
+	float DebuffFrequence = 0.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	float DeathImpulseMagnitude = 0.f; // 死亡的冲击力
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector DeathImpulse = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite)
+	float KnockbackChance = 0.f; 
+
+	UPROPERTY(BlueprintReadWrite)
+	float KnockbackMagnitude = 0.f; // 击退的力
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector KnockbackForce = FVector::ZeroVector;
+};
+
+
 
 /**
  * 因为原先的上下文不能满足我们传递特定变量的需求
@@ -14,11 +72,25 @@ struct FMageGameplayEffectContext : public FGameplayEffectContext
 	GENERATED_BODY()
 
 public:
-
 	bool GetCriticalHit() const { return bCriticalHit; }
 	bool GetBlockHit() const { return bBlockHit; }
-	void SetCriticalHit(bool bInIsCriticalHit) { bCriticalHit = bInIsCriticalHit; }
-	void SetBlockHit(bool bInIsBlockHit) { bBlockHit = bInIsBlockHit; }
+	bool GetSuccessfulDebuff() const { return bSuccessfulDebuff; }
+	float GetDebuffDamage() const { return DebuffDamage; }
+	float GetDebuffDuration() const { return DebuffDuration; }
+	float GetDebuffFrequence() const { return DebuffFrequence; }
+	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
+	FVector GetDeathImpulse() const { return DeathImpulse; }
+	FVector GetKnockbackForce() const { return KnockbackForce; }
+	
+	void SetCriticalHit(bool bInCriticalHit) { bCriticalHit = bInCriticalHit; }
+	void SetBlockHit(bool bInBlockHit) { bBlockHit = bInBlockHit; }
+	void SetSuccessfulDebuff(bool bInSuccessfulDebuff) { bSuccessfulDebuff = bInSuccessfulDebuff; }
+	void SetDebuffDamage(float InDebuffDamage) { DebuffDamage = InDebuffDamage; }
+	void SetDebuffDuration(float InDebuffDuration) { DebuffDuration = InDebuffDuration; }
+	void SetDebuffFrequence(float InDebuffFrequence) { DebuffFrequence = InDebuffFrequence; }
+	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
+	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
+	void SetKnockbackForce(const FVector& InKnockbackForce) { KnockbackForce = InKnockbackForce; }
 	
 	/**
 	 * 自定义序列化，子类必须重写此函数
@@ -54,6 +126,26 @@ protected:
 
 	UPROPERTY()
 	bool bBlockHit = false; // 格挡
+
+	UPROPERTY()
+	bool bSuccessfulDebuff = false; // 是否成功应用Debuff
+
+	UPROPERTY()
+	float DebuffDamage = 0.f; // Debuff伤害
+	
+	UPROPERTY()
+	float DebuffDuration = 0.f; // 持续时间
+	
+	UPROPERTY()
+	float DebuffFrequence = 0.f; // 频率
+	
+	TSharedPtr<FGameplayTag> DamageType; // 伤害类型
+
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector; // 造成死亡的冲击力
+	
+	UPROPERTY()
+	FVector KnockbackForce = FVector::ZeroVector; // 击退的力
 };
 
 // 一些C++结构的信息是不能通过模板探测出来的，就需要我们手动标记提供了。

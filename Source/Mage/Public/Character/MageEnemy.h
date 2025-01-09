@@ -34,7 +34,7 @@ public:
 
 	/** Combat Interface. */
 	FORCEINLINE virtual int32 GetCharacterLevel_Implementation() const override { return Level; }
-	virtual void Die() override;
+	virtual void Die(const FVector& InDeathImpulseDir) override;
 
 	/** Widget */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")

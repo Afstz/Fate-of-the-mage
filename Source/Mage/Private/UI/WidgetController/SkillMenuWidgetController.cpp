@@ -40,7 +40,6 @@ void USkillMenuWidgetController::BindCallbacksToDependencies()
 				SphereSelectedDelegate.Broadcast(bSkillPointButtonEnable, bEquipButtonEnable, Description, NextLevelDescription); 
 			}
 		});
-	
 	GetMageASC()->AbilityEquippedDelegate.AddUObject(this, &ThisClass::OnAbilityEquipped);
 
 	// PS
@@ -200,7 +199,8 @@ void USkillMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTa
 
 void USkillMenuWidgetController::ClearAllDelegate()
 {
-	AbilityDataDelegate.RemoveAll(this);
+	Super::ClearAllDelegate();
+	
 	OnSkillPointChangedDelegate.Clear();
 	SphereSelectedDelegate.Clear();
 	WaitForEquipDelegate.Clear();

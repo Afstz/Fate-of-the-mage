@@ -57,19 +57,27 @@ void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	// 防止击中队友
 	if (!UMageAbilitySystemLibrary::IsNotFriend(GetInstigator(), OtherActor)) return;
 	
-	
 	if (HasAuthority())
 	{
-		UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-		if (ASC)
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			ASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
+			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			DamageEffectParams.DeathImpulse = DeathImpulse;
+			if (bool bKnockbackSuccessful = DamageEffectParams.KnockbackChance >= FMath::RandRange(1, 100))
+			{
+				FRotator ProjectileRotation = GetActorRotation();
+				ProjectileRotation.Pitch = 45.f;
+				const FVector ProjectileForceDirection = ProjectileRotation.Vector();
+				
+				const FVector KnockbackForce = ProjectileForceDirection * DamageEffectParams.KnockbackMagnitude;
+				DamageEffectParams.KnockbackForce = KnockbackForce;
+			}
+			UMageAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		Destroy();
 	}
 }
-
-
 
 void AMageProjectile::PlayImpactEffect()
 {

@@ -2,8 +2,11 @@
 
 
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "MageAbilityTypes.h"
+#include "MageGameplayTags.h"
 #include "Engine/OverlapResult.h"
 #include "Game/MageGameModeBase.h"
 #include "Interface/CombatInterface.h"
@@ -167,6 +170,72 @@ bool UMageAbilitySystemLibrary::GetBlockHit(const FGameplayEffectContextHandle& 
 	return false;
 }
 
+bool UMageAbilitySystemLibrary::GetSuccessfulDebuff(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetSuccessfulDebuff();
+	}
+	return false;
+}
+
+float UMageAbilitySystemLibrary::GetDebuffDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetDebuffDamage();
+	}
+	return 0.f;
+}
+
+float UMageAbilitySystemLibrary::GetDebuffDuration(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetDebuffDuration();
+	}
+	return 0.f;
+}
+
+float UMageAbilitySystemLibrary::GetDebuffFrequence(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetDebuffFrequence();
+	}
+	return 0.f;
+}
+
+FGameplayTag UMageAbilitySystemLibrary::GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		if (EffectContext->GetDamageType().IsValid())
+		{
+			return *EffectContext->GetDamageType();
+		}
+	}
+	return FGameplayTag();
+}
+
+FVector UMageAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetDeathImpulse();
+	}
+	return FVector::ZeroVector;
+}
+
+FVector UMageAbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetKnockbackForce();
+	}
+	return FVector::ZeroVector;
+}
+
 void UMageAbilitySystemLibrary::SetCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsCriticalHit)
 {
 	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -183,8 +252,90 @@ void UMageAbilitySystemLibrary::SetBlockHit(FGameplayEffectContextHandle& Effect
     }
 }
 
+void UMageAbilitySystemLibrary::SetSuccessfulDebuff(FGameplayEffectContextHandle& EffectContextHandle, bool bInSuccessfulDebuff)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetSuccessfulDebuff(bInSuccessfulDebuff);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDebuffDamage(FGameplayEffectContextHandle& EffectContextHandle, float InDebuffDamage)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetDebuffDamage(InDebuffDamage);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDebuffDuration(FGameplayEffectContextHandle& EffectContextHandle, float InDebuffDuration)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetDebuffDuration(InDebuffDuration);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDebuffFrequence(FGameplayEffectContextHandle& EffectContextHandle, float InDebuffFrequence)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetDebuffFrequence(InDebuffFrequence);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& EffectContextHandle, FGameplayTag InDamageType)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		TSharedPtr<FGameplayTag> DamageType = MakeShared<FGameplayTag>(InDamageType);
+		if (DamageType.IsValid())
+		{
+			EffectContext->SetDamageType(DamageType);
+		}
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDeathImpulse(FGameplayEffectContextHandle& EffectContextHandle, FVector InDeathImpulse)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetDeathImpulse(InDeathImpulse);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetKnockbackForce(FGameplayEffectContextHandle& EffectContextHandle, FVector InKnockbackForce)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetKnockbackForce(InKnockbackForce);
+	}
+}
+
+void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
+{
+	if (!IsValid(DamageEffectParams.TargetAbilitySystemComponent)) return;
+	
+	const AActor* AvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	FGameplayEffectContextHandle ContextHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+	ContextHandle.AddSourceObject(AvatarActor);
+	SetDeathImpulse(ContextHandle, DamageEffectParams.DeathImpulse); // 设置造成死亡后的冲击力
+	SetKnockbackForce(ContextHandle, DamageEffectParams.KnockbackForce); // 设置造成击退的力度
+	
+	// 设置技能相关伤害属性
+	FMageGameplayTags MageGameplayTags = FMageGameplayTags::Get();
+	const FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectParams.DamageEffectClass, DamageEffectParams.AbilityLevel, ContextHandle);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageEffectParams.DamageType, DamageEffectParams.BaseDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, MageGameplayTags.Debuff_Chance, DamageEffectParams.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, MageGameplayTags.Debuff_Damage, DamageEffectParams.DebuffDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, MageGameplayTags.Debuff_Duration, DamageEffectParams.DebuffDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, MageGameplayTags.Debuff_Frequence, DamageEffectParams.DebuffFrequence);
+	
+	DamageEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data); // 向目标应用游戏效果
+}
+
 void UMageAbilitySystemLibrary::GetAlivePlayerInSphereRadius(const UObject* WorldContextObject,
-	TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& InActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
+                                                             TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& InActorsToIgnore, float SphereRadius, const FVector& SphereOrigin)
 {
 	FCollisionQueryParams SphereParams; // 碰撞查询的相关参数
 	SphereParams.AddIgnoredActors(InActorsToIgnore); // 要忽略的Actor

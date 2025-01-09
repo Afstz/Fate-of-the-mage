@@ -37,17 +37,7 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 
-	// 设置游戏效果和伤害
-	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
-	FGameplayEffectContextHandle EffectContextHandle = ASC->MakeEffectContext();
-	const FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
-
-	for (auto& Pair : DamageTypes)
-	{
-		const float DamageMagnitude = Pair.Value.GetValueAtLevel(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, DamageMagnitude); 
-	}
+	Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults(); // 创建伤害结构体用于计算
 		
-	Projectile->EffectSpecHandle = SpecHandle;
 	Projectile->FinishSpawning(SpawnTransform);
 }

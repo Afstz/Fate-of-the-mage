@@ -25,7 +25,6 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	FAggregatorEvaluateParameters AggregatorParameters;
 	AggregatorParameters.SourceTags = SourceTags;
 	AggregatorParameters.TargetTags = TargetTags;
-
 	
 	float Vigor = 0.f;
 	GetCapturedAttributeMagnitude(VigorDef, Spec, AggregatorParameters, Vigor); // 根据捕获的属性获取值

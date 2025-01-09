@@ -3,7 +3,9 @@
 
 #include "Character/MageCharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Mage/Mage.h"
@@ -11,7 +13,7 @@
 AMageCharacterBase::AMageCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -21,6 +23,10 @@ AMageCharacterBase::AMageCharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	BurnNiagaraComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("BurnNiagaraComponent"));
+	BurnNiagaraComponent->SetupAttachment(GetRootComponent());
+	BurnNiagaraComponent->DebuffTag = FMageGameplayTags::Get().Debuff_Burn;
 }
 
 UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
@@ -44,10 +50,10 @@ UAnimMontage* AMageCharacterBase::GetHitReactMontage_Implementation() const
 	return HitReactMontage;
 }
 
-void AMageCharacterBase::Die()
+void AMageCharacterBase::Die(const FVector& InDeathImpulse)
 {
 	Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	MultiHandleDeath();
+	MultiHandleDeath(InDeathImpulse);
 }
 
 bool AMageCharacterBase::IsDead_Implementation() const
@@ -80,22 +86,35 @@ ECharacterClass AMageCharacterBase::GetCharacterClass_Implementation() const
 	return CharacterClass;
 }
 
-void AMageCharacterBase::MultiHandleDeath_Implementation()
+FASCRegisteredSignature AMageCharacterBase::GetASCRegisteredDelegate()
+{
+	return ASCRegisteredDelegate;
+}
+
+FOnDeathSignature AMageCharacterBase::GetOnDeathDelegate()
+{
+	return OnDeathDelegate;
+}
+
+void AMageCharacterBase::MultiHandleDeath_Implementation(const FVector& InDeathImpulse)
 {
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
 	
 	Weapon->SetSimulatePhysics(true);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Weapon->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	Weapon->AddImpulse(InDeathImpulse * 0.04f);
 	
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetMesh()->AddImpulse(InDeathImpulse);
 	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
 	
 	bDead = true;
+	BurnNiagaraComponent->DestroyComponent();
 }
 
 void AMageCharacterBase::BeginPlay()

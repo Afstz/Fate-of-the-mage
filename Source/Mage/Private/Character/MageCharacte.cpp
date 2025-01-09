@@ -164,6 +164,7 @@ void AMageCharacte::InitAbilityActorInfo()
 	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagePlayerState->GetAttributeSet(); 
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
+	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet(); // 绑定效果应用回调
 
 	if (AMagePlayerController* PlayerController = Cast<AMagePlayerController>(GetController()))
