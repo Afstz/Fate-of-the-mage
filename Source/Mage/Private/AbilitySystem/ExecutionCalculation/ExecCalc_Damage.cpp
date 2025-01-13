@@ -75,18 +75,19 @@ void UExecCalc_Damage::CalcDebuff(const FGameplayEffectCustomExecutionParameters
 	for (const auto& [DamageType, Debuff] : MageGameplayTags.DamageTypesToDebuffs)
 	{
 		float Damage = Spec.GetSetByCallerMagnitude(DamageType, false, -1.f);
-		if (Damage > 1.f) // 有效伤害
+		if (Damage > -1.f) // 有效伤害
 		{
 			// 获取目标抗性值
 			const FGameplayTag& ResistanceTag = MageGameplayTags.DamageTypesToResistence[DamageType];
 			float TargetResistancePercent;
 			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().TagsToCaptureDefs[ResistanceTag], AggregatorParameters, TargetResistancePercent);
 			TargetResistancePercent = FMath::Clamp(TargetResistancePercent, 0.f, 100.f);
-			
-			float DebuffChance = Spec.GetSetByCallerMagnitude(MageGameplayTags.Debuff_Chance);
-			float EffectiveDebuffChance = DebuffChance * (100 - TargetResistancePercent) / 100; // 计算有效的Debuff几率
-			bool bApplyDebuff = EffectiveDebuffChance >= FMath::RandRange(1, 100);
-			if (bApplyDebuff) // 施加Debuff
+
+			// Debuff计算
+			const float DebuffChance = Spec.GetSetByCallerMagnitude(MageGameplayTags.Debuff_Chance);
+			const float EffectiveDebuffChance = DebuffChance * (100 - TargetResistancePercent) / 100; // 计算有效的Debuff几率
+			const bool bApplyDebuff = EffectiveDebuffChance >= FMath::RandRange(1, 100);
+			if (bApplyDebuff) 
 			{
 				// 设置Debuff信息传递给AttributeSet
 				FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();

@@ -314,7 +314,7 @@ void UMageAbilitySystemLibrary::SetKnockbackForce(FGameplayEffectContextHandle& 
 
 void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
 {
-	if (!IsValid(DamageEffectParams.TargetAbilitySystemComponent)) return;
+	checkf(DamageEffectParams.TargetAbilitySystemComponent, TEXT("function [%hs] have not TargetAbilitySystemComponent"), __FUNCTION__);
 	
 	const AActor* AvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	FGameplayEffectContextHandle ContextHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
@@ -323,7 +323,7 @@ void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& Dam
 	SetKnockbackForce(ContextHandle, DamageEffectParams.KnockbackForce); // 设置造成击退的力度
 	
 	// 设置技能相关伤害属性
-	FMageGameplayTags MageGameplayTags = FMageGameplayTags::Get();
+	const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();
 	const FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectParams.DamageEffectClass, DamageEffectParams.AbilityLevel, ContextHandle);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageEffectParams.DamageType, DamageEffectParams.BaseDamage);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, MageGameplayTags.Debuff_Chance, DamageEffectParams.DebuffChance);
@@ -365,4 +365,46 @@ bool UMageAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondAc
 	bool bEnemyFriend = FirstActor->ActorHasTag("Enemy") && SecondActor->ActorHasTag("Enemy");
 	bool bFriend = bPlayerFriend || bEnemyFriend; // 是否是友方
 	return !bFriend;
+}
+
+TArray<FRotator> UMageAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumRotators)
+{
+	TArray<FRotator> OutRotators;
+	
+	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, RotationAxis); // 左侧扩散
+	if (NumRotators > 1) 
+	{	// 散射
+		float DeltaSpread = Spread / (NumRotators - 1); // 扩散的间隔
+		for (int32 i = 0; i < NumRotators; i++)
+		{
+			FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, RotationAxis);
+			OutRotators.Add(Direction.Rotation());
+		}
+	}
+	else 
+	{	// 直线
+		OutRotators.Add(Forward.Rotation());	
+	}
+	return OutRotators;
+}
+
+TArray<FVector> UMageAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumVectors)
+{
+	TArray<FVector> OutVectors;
+	
+	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, RotationAxis);
+	if (NumVectors > 1)
+	{
+		float DeltaSpread = Spread / (NumVectors - 1);
+		for (int32 i = 0; i < NumVectors; i++)
+		{
+			FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, RotationAxis);
+			OutVectors.Add(Direction);
+		}
+	}
+	else
+	{
+		OutVectors.Add(Forward);	
+	}
+	return OutVectors;
 }

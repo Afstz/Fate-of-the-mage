@@ -68,7 +68,7 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		}
 		if (!KnockbackForce.IsZero())
 		{
-			RepBits |= 1 << 16;
+			RepBits |= 1 << 15;
 		}
 	}
 

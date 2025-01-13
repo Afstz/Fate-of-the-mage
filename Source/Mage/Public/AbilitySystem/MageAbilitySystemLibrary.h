@@ -113,6 +113,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumRotators);
+	
+	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumVectors);
+	
 	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | XP")
 	static int32 GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
 };

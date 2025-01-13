@@ -11,52 +11,52 @@ struct FDamageEffectParams
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<UObject> WorldContextObject = nullptr;
+	TObjectPtr<UObject> WorldContextObject = nullptr; // 上下文
 
 	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
+	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr; // 伤害效果类
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent = nullptr;
+	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent = nullptr; // 源技能组件
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent = nullptr;
+	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent = nullptr; // 目标技能组件
 
 	UPROPERTY(BlueprintReadWrite)
-	float BaseDamage = 0.f;
+	float BaseDamage = 0.f; // 基础伤害
 	
 	UPROPERTY(BlueprintReadWrite)
-	float AbilityLevel = 1.f;
+	float AbilityLevel = 1.f;  // 技能等级
 
 	UPROPERTY(BlueprintReadWrite)
-	FGameplayTag DamageType = FGameplayTag();
+	FGameplayTag DamageType = FGameplayTag(); // 伤害类型
 
 	UPROPERTY(BlueprintReadWrite)
-	float DebuffChance = 0.f;
+	float DebuffChance = 0.f; // Debuff几率
 	
 	UPROPERTY(BlueprintReadWrite)
-	float DebuffDamage = 0.f;
+	float DebuffDamage = 0.f; // Debuff伤害
 	
 	UPROPERTY(BlueprintReadWrite)
-	float DebuffDuration = 0.f;
+	float DebuffDuration = 0.f; // Debuff持续时间
 	
 	UPROPERTY(BlueprintReadWrite)
-	float DebuffFrequence = 0.f;
+	float DebuffFrequence = 0.f; // Debuff频率
 
 	UPROPERTY(BlueprintReadWrite)
-	float DeathImpulseMagnitude = 0.f; // 死亡的冲击力
+	float DeathImpulseMagnitude = 0.f; // 死亡的冲击力度
 
 	UPROPERTY(BlueprintReadWrite)
-	FVector DeathImpulse = FVector::ZeroVector;
+	FVector DeathImpulse = FVector::ZeroVector; // 死亡冲击力向量
 
 	UPROPERTY(BlueprintReadWrite)
-	float KnockbackChance = 0.f; 
+	float KnockbackChance = 0.f; // 击退几率
 
 	UPROPERTY(BlueprintReadWrite)
 	float KnockbackMagnitude = 0.f; // 击退的力
 
 	UPROPERTY(BlueprintReadWrite)
-	FVector KnockbackForce = FVector::ZeroVector;
+	FVector KnockbackForce = FVector::ZeroVector; //击退向量
 };
 
 

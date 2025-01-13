@@ -60,6 +60,7 @@ void UTargetDataUnderMouse::SendMouseTargetData()
 		AbilitySystemComponent->ScopedPredictionKey
 		);
 
+
 	if (ShouldBroadcastAbilityTaskDelegates()) // 广播本地发来的数据
 	{
 		MouseTargetValidData.Broadcast(TargetDataHandle);

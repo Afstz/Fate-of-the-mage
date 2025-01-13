@@ -54,13 +54,12 @@ FDamageEffectParams UDamageGameplayAbility::MakeDamageEffectParamsFromClassDefau
 	DamageEffectParams.KnockbackMagnitude = KnockbackMagnitude;
 	if (IsValid(TargetActor))
 	{
+		FRotator KnockbackForceRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+		KnockbackForceRotation.Pitch = 45.f;
+		const FVector ToTarget = KnockbackForceRotation.Vector();
+		DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude; // 死亡的冲击力
 		if (bool bKnockbackSuccessful = KnockbackChance >= FMath::RandRange(1, 100))
 		{
-			FRotator KnockbackForceRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
-			KnockbackForceRotation.Pitch = 45.f;
-		
-			const FVector ToTarget = KnockbackForceRotation.Vector();
-			DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude; // 死亡的冲击力
 			DamageEffectParams.KnockbackForce = ToTarget * KnockbackMagnitude; // 击退的力
 		}
 	}

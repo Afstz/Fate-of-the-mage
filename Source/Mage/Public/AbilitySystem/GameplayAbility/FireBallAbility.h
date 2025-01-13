@@ -16,4 +16,22 @@ class MAGE_API UFireBallAbility : public UProjectileSpellAbility
 public:
 	virtual FString GetDescription(int32 AbilityLevel) override;
 	virtual FString GetNextLevelDescription(int32 AbilityLevel) override;
+	UFUNCTION(BlueprintCallable)
+	void SpawnProjectiles(const FVector& ProjectileLocation, const bool bOverridePitch, float PitchOverride, AActor* HomingTarget);
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
+	int32 NumProjectiles = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
+	float SpawnSpread = 90.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
+	float MinHomingAcceleration = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
+	float MaxHomingAcceleration = 1100.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
+	bool bHomingTarget = true;
 };

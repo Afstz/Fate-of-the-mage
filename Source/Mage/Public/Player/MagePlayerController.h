@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MagePlayerController.generated.h"
 
+class UNiagaraSystem;
 class UDamageTextComponent;
 class USplineComponent;
 class UMageAbilitySystemComponent;
@@ -111,4 +112,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<USplineComponent> Spline;
 	void AutoRunning();
+	UPROPERTY(EditDefaultsOnly, Category = "Run")
+	TObjectPtr<UNiagaraSystem> MouseClickEffect; // 鼠标单击地板特效
 };

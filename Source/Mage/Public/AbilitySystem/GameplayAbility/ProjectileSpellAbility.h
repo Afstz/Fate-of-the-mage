@@ -18,10 +18,10 @@ public:
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-private:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AMageProjectile> ProjectileClass;
+private:
 	UFUNCTION(BlueprintCallable)
-	void SpawnProjectile(const FVector& ProjectileLocation);
+	virtual void SpawnProjectile(const FVector& ProjectileLocation, const bool bOverridePitch = false, float PitchOverride = 0.f);
 	
 };

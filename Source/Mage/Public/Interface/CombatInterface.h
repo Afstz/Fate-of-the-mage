@@ -10,8 +10,8 @@
 class UAbilitySystemComponent;
 class UNiagaraSystem;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FASCRegisteredSignature, UAbilitySystemComponent*);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor);
+DECLARE_MULTICAST_DELEGATE_OneParam(FASCRegisteredSignature, UAbilitySystemComponent*); // ASC初始化完成后委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor); // Actor死亡时委托
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -54,6 +54,6 @@ public:
 	ECharacterClass GetCharacterClass() const;
 
 	// Delegate
-	virtual FASCRegisteredSignature GetASCRegisteredDelegate() = 0;
-	virtual FOnDeathSignature GetOnDeathDelegate() = 0;
+	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() = 0;
+	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;
 };

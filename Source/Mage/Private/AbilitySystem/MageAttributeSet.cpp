@@ -91,9 +91,9 @@ void UMageAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	
 	FEffectProperties EffectProps;
 	SetEffectProperties(Data, EffectProps);;
-	
-	if (EffectProps.TargetCharacter->Implements<UCombatInterface>() &&
-		ICombatInterface::Execute_IsDead(EffectProps.TargetCharacter)) return; // 死亡则不执行
+
+	// 死亡则不进行计算处理
+	if (EffectProps.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(EffectProps.TargetCharacter)) return; 
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -219,7 +219,8 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 	
 	FString EffectName = FString::Printf(TEXT("DynamicDebuff_%s"), *DamageType.ToString());
 	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
-	
+
+	// Effect属性设置
 	GameplayEffect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	GameplayEffect->DurationMagnitude = FScalableFloat(DebuffDuration);
 	GameplayEffect->Period = DebuffFrequence;
@@ -232,7 +233,7 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 	InheritedTagContainer.AddTag(MageGameplayTags.DamageTypesToDebuffs[DamageType]);
 	TargetTagsComp.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
-	// 添加ModifierInfo
+	// 添加要修改的属性
 	int Index = GameplayEffect->Modifiers.Num();
 	GameplayEffect->Modifiers.Add(FGameplayModifierInfo());
 	FGameplayModifierInfo& ModifierInfo = GameplayEffect->Modifiers[Index];

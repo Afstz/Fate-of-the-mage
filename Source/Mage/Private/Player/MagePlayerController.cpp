@@ -6,6 +6,7 @@
 #include "MageGameplayTags.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -257,6 +258,7 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			Spline->ClearSplinePoints(); // 清除样条线已有的点,重新计算
 			UNavigationPath* FoundPath = UNavigationSystemV1::FindPathToLocationSynchronously(
 				this, ControlledPawn->GetActorLocation(), CachedDestination);
+			
 			if (FoundPath && FoundPath->PathPoints.Num() > 0)
 			{
 				for (const FVector& PathPoint : FoundPath->PathPoints)
@@ -267,6 +269,7 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
 				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];
 				bAutoRunning = true; // 开始自动移动
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MouseClickEffect, CachedDestination);
 			}
 		}
 	}

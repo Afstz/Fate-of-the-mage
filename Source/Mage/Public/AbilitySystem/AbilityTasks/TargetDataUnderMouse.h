@@ -29,4 +29,5 @@ private:
 
 	// 接收客户端发来的数据的回调函数
 	void ReplicatedTargetDataCallBack(const FGameplayAbilityTargetDataHandle& TargetDataHandle, FGameplayTag ApplicationTag);
+	
 };

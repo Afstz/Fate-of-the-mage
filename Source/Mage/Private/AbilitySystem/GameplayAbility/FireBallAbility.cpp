@@ -2,6 +2,11 @@
 
 
 #include "AbilitySystem/GameplayAbility/FireBallAbility.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
+#include "Actor/MageProjectile.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Interface/CombatInterface.h"
 
 FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 {
@@ -40,4 +45,58 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 		"<Small>发射 %d 个火球，击中敌人发生爆炸。造成更高的伤害。</>")
 		
 		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, AbilityLevel);
+}
+
+void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const bool bOverridePitch, float PitchOverride, AActor* HomingTarget)
+{
+	bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
+	if (!bIsServer) return;
+	
+	APawn* Instigator = Cast<APawn>(GetAvatarActorFromActorInfo());
+	
+	const FVector SpawnLocation = ICombatInterface::Execute_GetLocationByWeaponSocket(Instigator);
+	FRotator SpawnRotation = (TargetLocation - SpawnLocation).Rotation();
+	if (bOverridePitch)
+	{
+		SpawnRotation.Pitch = PitchOverride;
+	}
+	const FVector Forward = SpawnRotation.Vector(); // 目标方向
+	
+	float MaxNumProjectile = FMath::Max(NumProjectiles, GetAbilityLevel());
+
+	// 等间距旋转
+	TArray<FRotator> Rotators = UMageAbilitySystemLibrary::EvenlySpacedRotators(Forward, FVector::UpVector, SpawnSpread, MaxNumProjectile); 
+	for (FRotator& Rot : Rotators)
+	{
+		// 延迟生成炮弹
+		FTransform SpawnTransform;
+		SpawnTransform.SetLocation(SpawnLocation);
+		SpawnTransform.SetRotation(Rot.Quaternion());
+		AMageProjectile* Projectile = GetWorld()->SpawnActorDeferred<AMageProjectile>(
+			ProjectileClass,
+			SpawnTransform,
+			GetOwningActorFromActorInfo(),
+			Instigator,
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		);
+		
+		// 导航
+		if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
+		{
+			ACharacter* Character = Cast<ACharacter>(HomingTarget);
+			Projectile->ProjectileMovement->HomingTargetComponent = Character->GetMesh(); // 寻航组件
+		}
+		else
+		{
+			// 不是角色实体
+			Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
+			Projectile->HomingTargetSceneComponent->SetWorldLocation(TargetLocation);
+			Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
+		}
+		Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::RandRange(MinHomingAcceleration, MaxHomingAcceleration); // 寻航速度
+		Projectile->ProjectileMovement->bIsHomingProjectile = bHomingTarget; // 炮弹是否导航到目标
+		
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		Projectile->FinishSpawning(SpawnTransform);
+	}
 }

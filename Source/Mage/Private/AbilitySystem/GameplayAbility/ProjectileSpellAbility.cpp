@@ -15,7 +15,7 @@ void UProjectileSpellAbility::ActivateAbility(const FGameplayAbilitySpecHandle H
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
+void UProjectileSpellAbility::SpawnProjectile(const FVector& TargetLocation, const bool bOverridePitch, float PitchOverride)
 {
 	bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
@@ -24,8 +24,12 @@ void UProjectileSpellAbility::SpawnProjectile(const FVector& ProjectileLocation)
 	// 设置发射物位置和方向
 	FTransform SpawnTransform;
 	FVector SpawnLocation = ICombatInterface::Execute_GetLocationByWeaponSocket(Instigator); // NativeEvent必须用静态函数
-	FRotator SpawnRotation = (ProjectileLocation - SpawnLocation).Rotation();
-
+	FRotator SpawnRotation = (TargetLocation - SpawnLocation).Rotation();
+	if (bOverridePitch)
+	{
+		SpawnRotation.Pitch = PitchOverride;
+	}
+	
 	SpawnTransform.SetLocation(SpawnLocation);
 	SpawnTransform.SetRotation(SpawnRotation.Quaternion());
 		

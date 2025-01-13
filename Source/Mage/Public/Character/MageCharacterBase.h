@@ -36,8 +36,8 @@ public:
 	virtual int32 GetMinionCount_Implementation() const override;
 	virtual void AddMinionCount_Implementation(const int32 InMinionCount) override;
 	virtual ECharacterClass GetCharacterClass_Implementation() const override;
-	virtual FASCRegisteredSignature GetASCRegisteredDelegate() override;
-	virtual FOnDeathSignature GetOnDeathDelegate() override;
+	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() override;
+	virtual FOnDeathSignature& GetOnDeathDelegate() override;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath(const FVector& DeathImpulse);
@@ -91,8 +91,8 @@ protected:
 	int32 MinionCount = 0;
 
 	/** Combat Interface Delegate */
-	FASCRegisteredSignature ASCRegisteredDelegate;
-	FOnDeathSignature OnDeathDelegate;
+	FASCRegisteredSignature ASCRegisteredDelegate; // ASC初始化时委托
+	FOnDeathSignature OnDeathDelegate; // Actor死亡时委托
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> BurnNiagaraComponent;

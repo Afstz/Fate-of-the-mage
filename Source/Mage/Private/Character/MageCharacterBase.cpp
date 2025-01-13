@@ -86,12 +86,12 @@ ECharacterClass AMageCharacterBase::GetCharacterClass_Implementation() const
 	return CharacterClass;
 }
 
-FASCRegisteredSignature AMageCharacterBase::GetASCRegisteredDelegate()
+FASCRegisteredSignature& AMageCharacterBase::GetASCRegisteredDelegate()
 {
 	return ASCRegisteredDelegate;
 }
 
-FOnDeathSignature AMageCharacterBase::GetOnDeathDelegate()
+FOnDeathSignature& AMageCharacterBase::GetOnDeathDelegate()
 {
 	return OnDeathDelegate;
 }
@@ -114,6 +114,7 @@ void AMageCharacterBase::MultiHandleDeath_Implementation(const FVector& InDeathI
 	Dissolve();
 	
 	bDead = true;
+	OnDeathDelegate.Broadcast(this);
 	BurnNiagaraComponent->DestroyComponent();
 }
 
