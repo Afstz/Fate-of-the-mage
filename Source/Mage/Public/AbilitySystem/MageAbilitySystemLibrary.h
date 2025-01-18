@@ -110,6 +110,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static void GetAlivePlayerInSphereRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& InActorsToIgnore, float SphereRadius, const FVector& SphereOrigin);
 
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	static void GetClosetActors(int32 MaxClosetActors, TArray<AActor*> ActorsToCheck, TArray<AActor*>& OutClosetActors, AActor* OriginActor);
+
 	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 

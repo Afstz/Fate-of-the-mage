@@ -13,6 +13,7 @@ FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
+	MaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
 	
 	return FString::Printf(TEXT(
 		// Title
@@ -24,7 +25,7 @@ FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，击中敌人发生爆炸。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, AbilityLevel);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, MaxNumProjectiles);
 
 }
 
@@ -33,6 +34,7 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
+	MaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
 	
 	return FString::Printf(TEXT(
 		// Title
@@ -44,7 +46,7 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，击中敌人发生爆炸。造成更高的伤害。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, AbilityLevel);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, MaxNumProjectiles);
 }
 
 void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const bool bOverridePitch, float PitchOverride, AActor* HomingTarget)
@@ -62,7 +64,7 @@ void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const boo
 	}
 	const FVector Forward = SpawnRotation.Vector(); // 目标方向
 	
-	float MaxNumProjectile = FMath::Max(NumProjectiles, GetAbilityLevel());
+	float MaxNumProjectile = FMath::Min(MaxNumProjectiles, GetAbilityLevel());
 
 	// 等间距旋转
 	TArray<FRotator> Rotators = UMageAbilitySystemLibrary::EvenlySpacedRotators(Forward, FVector::UpVector, SpawnSpread, MaxNumProjectile); 
@@ -83,8 +85,7 @@ void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const boo
 		// 导航
 		if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
 		{
-			ACharacter* Character = Cast<ACharacter>(HomingTarget);
-			Projectile->ProjectileMovement->HomingTargetComponent = Character->GetMesh(); // 寻航组件
+			Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent(); // 寻航组件
 		}
 		else
 		{
@@ -93,10 +94,12 @@ void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const boo
 			Projectile->HomingTargetSceneComponent->SetWorldLocation(TargetLocation);
 			Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
 		}
-		Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::RandRange(MinHomingAcceleration, MaxHomingAcceleration); // 寻航速度
+		// 寻航速度
+		Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::RandRange(MinHomingAcceleration, MaxHomingAcceleration); 
 		Projectile->ProjectileMovement->bIsHomingProjectile = bHomingTarget; // 炮弹是否导航到目标
 		
 		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

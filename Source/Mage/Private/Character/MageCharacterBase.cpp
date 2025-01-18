@@ -86,6 +86,11 @@ ECharacterClass AMageCharacterBase::GetCharacterClass_Implementation() const
 	return CharacterClass;
 }
 
+USkeletalMeshComponent* AMageCharacterBase::GetWeaponMesh_Implementation() const
+{
+	return Weapon;
+}
+
 FASCRegisteredSignature& AMageCharacterBase::GetASCRegisteredDelegate()
 {
 	return ASCRegisteredDelegate;
@@ -115,7 +120,6 @@ void AMageCharacterBase::MultiHandleDeath_Implementation(const FVector& InDeathI
 	
 	bDead = true;
 	OnDeathDelegate.Broadcast(this);
-	BurnNiagaraComponent->DestroyComponent();
 }
 
 void AMageCharacterBase::BeginPlay()

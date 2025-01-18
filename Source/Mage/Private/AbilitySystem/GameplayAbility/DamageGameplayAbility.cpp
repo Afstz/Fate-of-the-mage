@@ -27,7 +27,7 @@ FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TAr
 	return FTaggedMontage();
 }
 
-float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel)
+float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel) const
 {
 	float CausedDamage = Damage.GetValueAtLevel(InAbilityLevel);
 	

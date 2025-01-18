@@ -49,6 +49,29 @@ void UMageAbilitySystemComponent::AddCharacterPassiveAbilites(TArray<TSubclassOf
 	}
 }
 
+void UMageAbilitySystemComponent::AbilityInputPressed(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return;
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities()) // 获取所以可激活的技能数组
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag)) // 从动态标签容器中找是否有匹配标签
+		{
+			AbilitySpecInputPressed(AbilitySpec);
+			if (AbilitySpec.IsActive())
+			{
+				// 必须在技能激活的时候才有效
+				// 如果有人正在监听，他们可能会将InputPressed事件复制到服务器。
+				InvokeReplicatedEvent( 
+					EAbilityGenericReplicatedEvent::InputPressed,
+					AbilitySpec.Handle,
+					AbilitySpec.ActivationInfo.GetActivationPredictionKey()
+				);
+			}
+		}
+	}
+}
+
 void UMageAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
@@ -75,6 +98,14 @@ void UMageAbilitySystemComponent::AbilityInputReleased(const FGameplayTag& Gamep
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(GameplayTag))
 		{
 			AbilitySpecInputReleased(AbilitySpec);
+			if (AbilitySpec.IsActive())
+			{
+				InvokeReplicatedEvent( 
+					EAbilityGenericReplicatedEvent::InputReleased,
+					AbilitySpec.Handle,
+					AbilitySpec.ActivationInfo.GetActivationPredictionKey()
+				);
+			}
 		}
 	}
 }

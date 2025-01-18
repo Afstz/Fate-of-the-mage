@@ -52,7 +52,12 @@ public:
 	void AddMinionCount(const int32 InMinionCount);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	ECharacterClass GetCharacterClass() const;
-
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat Interface")
+	void SetInShockLoop(bool InShockLoop);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
+	USkeletalMeshComponent* GetWeaponMesh() const;
+	
 	// Delegate
 	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() = 0;
 	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;

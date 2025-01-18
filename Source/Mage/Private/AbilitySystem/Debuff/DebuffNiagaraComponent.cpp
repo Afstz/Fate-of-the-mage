@@ -52,4 +52,5 @@ void UDebuffNiagaraComponent::OnDebuffTagChanged(const FGameplayTag InDebuffTag,
 void UDebuffNiagaraComponent::OnOwnerDead(AActor* DeadActor)
 {
 	Deactivate();
+	DestroyComponent();
 }

@@ -15,6 +15,7 @@
 #include "Interface/EnemyInterface.h"
 #include "UI/Widget/MageUserWidget.h"
 #include "GameFramework/Character.h"
+#include "Mage/Mage.h"
 #include "UI/Widget/WidgetCompoent/DamageTextComponent.h"
 
 AMagePlayerController::AMagePlayerController()
@@ -67,6 +68,15 @@ void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetChar
 
 void AMagePlayerController::CursorTrace()
 {
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_CursorTrace))
+	{
+		CurrentCursorActor->UnHighlightActor();
+		LastCursorActor->UnHighlightActor();
+		CurrentCursorActor = nullptr;
+		LastCursorActor = nullptr;
+		return;
+	}
+	
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
@@ -117,6 +127,11 @@ void AMagePlayerController::SetupInputComponent()
 
 void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
+	{
+		return;
+	}
+	
 	bAutoRunning = false;
 	const FVector2D InputAxisValue = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation(); // 默认 0 0 0
@@ -191,17 +206,31 @@ void AMagePlayerController::SetSkillMenuWidget(UMageUserWidget* InSkillMenu)
 
 void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
+	{
+		return;
+	}
+	
 	if (InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
 	{
 		bTargeting = CurrentCursorActor ? true : false;
 		bAutoRunning = false;
 		HoldingTime = 0.f; // 重置自动移动按住时间
 	}
-	
+
+	if (GetMageAbilitySystemComponent())
+	{
+		GetMageAbilitySystemComponent()->AbilityInputPressed(InputTag);
+	}
 }
 
 void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputHeld))
+	{
+		return;
+	}
+	
 	if (!InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
 	{
 		if (GetMageAbilitySystemComponent())
@@ -236,6 +265,11 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputReleased))
+	{
+		return;
+	}
+	
 	if (!InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
 	{
 		if (GetMageAbilitySystemComponent())
@@ -269,7 +303,10 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
 				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];
 				bAutoRunning = true; // 开始自动移动
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MouseClickEffect, CachedDestination);
+				if (GetMageAbilitySystemComponent() && !GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
+				{
+					UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MouseClickEffect, CachedDestination);
+				}
 			}
 		}
 	}

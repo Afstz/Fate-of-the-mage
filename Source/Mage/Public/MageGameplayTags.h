@@ -105,6 +105,12 @@ public:
 	FGameplayTag CombatSocket_LeftHand;
 	FGameplayTag CombatSocket_RightHand;
 	FGameplayTag CombatSocket_Tail;
+
+	/* Block Tag */
+	FGameplayTag Block_Player_CursorTrace;
+	FGameplayTag Block_Player_InputPressed;
+	FGameplayTag Block_Player_InputHeld;
+	FGameplayTag Block_Player_InputReleased;
 protected:
 	
 private:

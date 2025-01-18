@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AsyncTreeDifferences.h"
 #include "MageAbilityTypes.h"
 #include "MageGameplayTags.h"
 #include "Engine/OverlapResult.h"
@@ -357,6 +358,36 @@ void UMageAbilitySystemLibrary::GetAlivePlayerInSphereRadius(const UObject* Worl
 		}
 	}
 	
+}
+
+void UMageAbilitySystemLibrary::GetClosetActors(int32 MaxClosetActors, TArray<AActor*> ActorsToCheck, TArray<AActor*>& OutClosetActors, AActor* OriginActor)
+{
+	if (ActorsToCheck.Num() <= MaxClosetActors)
+	{
+		OutClosetActors = ActorsToCheck;
+		return;
+	}
+	
+	int32 NumActorsFound = 0;
+	while (NumActorsFound < MaxClosetActors)
+	{
+		if (ActorsToCheck.Num() == 0) return; // 遍历完成
+		
+		AActor* ClosetActor;
+		double ClosetDistance = TNumericLimits<double>::Max();
+		for (AActor* CheckActor : ActorsToCheck) // 寻找最近的Actor
+		{
+			const double Distance = CheckActor->GetDistanceTo(OriginActor);
+			if (Distance < ClosetDistance)
+			{
+				ClosetDistance = Distance;
+				ClosetActor = CheckActor;
+			}
+		}
+		ActorsToCheck.Remove(ClosetActor);
+		OutClosetActors.AddUnique(ClosetActor);
+		NumActorsFound++;
+	}
 }
 
 bool UMageAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)

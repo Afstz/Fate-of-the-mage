@@ -4,6 +4,7 @@
 #include "AbilitySystem/AbilityTasks/TargetDataUnderMouse.h"
 
 #include "AbilitySystemComponent.h"
+#include "Mage/Mage.h"
 
 UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
@@ -45,7 +46,7 @@ void UTargetDataUnderMouse::SendMouseTargetData()
 	
 	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	FHitResult CursorResult;
-	PC->GetHitResultUnderCursor(ECC_Visibility, false, CursorResult);
+	PC->GetHitResultUnderCursor(ECC_MouseHit, false, CursorResult);
 
 	FGameplayAbilityTargetDataHandle TargetDataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit();

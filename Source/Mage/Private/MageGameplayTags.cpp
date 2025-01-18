@@ -179,4 +179,14 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("CombatSocket.RightHand"), FString("RightHand Socket"));
 	MageGameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("CombatSocket.Tail"), FString("Tail Socket"));
+
+	/** Block Tag */
+	MageGameplayTags.Block_Player_CursorTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Player.CursorTrace"), FString("Block Cursor Tracing"));
+	MageGameplayTags.Block_Player_InputPressed = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Player.InputPressed"), FString("Block Input Pressed callback"));
+	MageGameplayTags.Block_Player_InputHeld = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Player.InputHeld"), FString("Block Input InputHeld callback"));
+	MageGameplayTags.Block_Player_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Player.InputReleased"), FString("Block Input InputReleased callback"));
 }

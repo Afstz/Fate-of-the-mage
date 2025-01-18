@@ -30,6 +30,7 @@ public:
 	FEffectAssetTagsSignature EffectAssetTagsDelegate;
 	
 	/** Ability */
+	void AbilityInputPressed(const FGameplayTag& InputTag);
 	void AbilityInputHeld(const FGameplayTag& InputTag);
 	void AbilityInputReleased(const FGameplayTag& InputTag);
 

@@ -18,17 +18,21 @@ class MAGE_API UDamageGameplayAbility : public UMageGameplayAbility
 public:
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void CauseDamage(AActor* TargetActor);
-
+	
+	UFUNCTION(BlueprintPure)
+	float GetAbilityDamage(int32 InAbilityLevel) const; // 获取技能伤害
 protected:
 	// Damage
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	
+
+	// 伤害类型
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	FGameplayTag DamageType; // 伤害类型
-	
+	FGameplayTag DamageType;
+
+	// 造成的伤害
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	FScalableFloat Damage; // 造成的伤害
+	FScalableFloat Damage;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float DebuffChance = 10.f;
@@ -42,16 +46,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float DebuffFrequence = 1.f;
 
+	// 造成死亡的冲击力(>0 必定)
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	float DeathImpulseMagnitude = 10.f; // 造成死亡的冲击力(>0 必定)
+	float DeathImpulseMagnitude = 10.f; 
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	float KnockbackChance = 0.f; 
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage")
-	float KnockbackMagnitude = 0.f; // 击退的力(基于概率)
-	
-	float GetAbilityDamage(int32 InAbilityLevel); // 获取技能伤害
+	// 击退的力(基于概率)
+	UPROPERTY(EditDefaultsOnly, Category = "Damage") 
+	float KnockbackMagnitude = 0.f; 
 
 	UFUNCTION(BlueprintPure, Category = "Damage")
 	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
