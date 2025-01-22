@@ -189,4 +189,6 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Block.Player.InputHeld"), FString("Block Input InputHeld callback"));
 	MageGameplayTags.Block_Player_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Block.Player.InputReleased"), FString("Block Input InputReleased callback"));
+	MageGameplayTags.Block_Player_AutoRun = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Block.Player.AutoRun"), FString("Block AutoRun Function"));
 }

@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
 #include "Interface/CombatInterface.h"
 #include "GameFramework/Character.h"
 #include "MageCharacterBase.generated.h"
 
+struct FGameplayTag;
 class UDebuffNiagaraComponent;
 class UNiagaraSystem;
 class UMotionWarpingComponent;
@@ -39,11 +41,14 @@ public:
 	virtual USkeletalMeshComponent* GetWeaponMesh_Implementation() const override;
 	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() override;
 	virtual FOnDeathSignature& GetOnDeathDelegate() override;
+	virtual void SetBeingShocked_Implementation(bool InBeingShocked) override;
+	virtual bool IsBeingShocked_Implementation() const override;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath(const FVector& DeathImpulse);
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void InitAbilityActorInfo();
 	
 	UPROPERTY()
@@ -65,6 +70,15 @@ protected:
 	TObjectPtr<USoundBase> DeathSound;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Attributes")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 600.f;
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Stunned, Category = "Combat")
+	bool bStunned = false; // 眩晕状态
+	UFUNCTION()
+	virtual void OnRep_Stunned(bool OldStunned);
+	virtual void OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount);
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Combat")
+	bool bBeingShocked = false;
 
 	/** Init Attribute */
 	UPROPERTY(EditDefaultsOnly, Category = "Attributes")
@@ -94,12 +108,16 @@ protected:
 	/** Combat Interface Delegate */
 	FASCRegisteredSignature ASCRegisteredDelegate; // ASC初始化时委托
 	FOnDeathSignature OnDeathDelegate; // Actor死亡时委托
-
+	/** Debuff Component*/
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> BurnNiagaraComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> StunNiagaraComponent;
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilites;
 };
+
+

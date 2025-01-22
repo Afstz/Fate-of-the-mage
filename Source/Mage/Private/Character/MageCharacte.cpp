@@ -3,6 +3,7 @@
 
 #include "Character/MageCharacte.h"
 #include "AbilitySystemComponent.h"
+#include "MageGameplayTags.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpData.h"
@@ -132,6 +133,38 @@ void AMageCharacte::AddToSkillPoint_Implementation(int32 InSkillPoint)
 	MagePlayerState->AddToSkillPoints(InSkillPoint);
 }
 
+void AMageCharacte::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AMageCharacte::OnRep_Stunned(bool OldStunned)
+{
+	if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+	{
+		const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();
+		FGameplayTagContainer BlockTags;
+		BlockTags.AddTag(MageGameplayTags.Block_Player_InputPressed);
+		BlockTags.AddTag(MageGameplayTags.Block_Player_InputHeld);
+		BlockTags.AddTag(MageGameplayTags.Block_Player_InputReleased);
+		BlockTags.AddTag(MageGameplayTags.Block_Player_AutoRun);
+		if (bStunned)
+		{
+			ASC->AddLooseGameplayTags(BlockTags);
+		}
+		else
+		{
+			ASC->RemoveLooseGameplayTags(BlockTags);
+		}
+	}
+}
+
+void AMageCharacte::OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount)
+{
+	Super::OnStunTagChanged(StunTag, NewCount);
+	
+}
+
 void AMageCharacte::LevelUp_Implementation()
 {
 	MulticastLevelUpEffect();
@@ -164,9 +197,10 @@ void AMageCharacte::InitAbilityActorInfo()
 	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
 	AttributeSet = MagePlayerState->GetAttributeSet(); 
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
-	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 	Cast<UMageAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoIsSet(); // 绑定效果应用回调
-
+	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMageGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::OnStunTagChanged);
+	
 	if (AMagePlayerController* PlayerController = Cast<AMagePlayerController>(GetController()))
 	{
 		if (AMageHUD* MageHUD = Cast<AMageHUD>(PlayerController->GetHUD()))

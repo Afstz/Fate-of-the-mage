@@ -28,6 +28,8 @@ AMageEnemy::AMageEnemy()
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+
+	BaseWalkSpeed = 250.f;
 }
 
 void AMageEnemy::PossessedBy(AController* NewController)
@@ -45,7 +47,6 @@ void AMageEnemy::PossessedBy(AController* NewController)
 void AMageEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	
 	InitAbilityActorInfo();
 	
@@ -67,6 +68,16 @@ void AMageEnemy::InitAbilityActorInfo()
 	}
 	
 	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMageGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::OnStunTagChanged);
+}
+
+void AMageEnemy::OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount)
+{
+	Super::OnStunTagChanged(StunTag, NewCount);
+	if (MageAIController && MageAIController->GetBlackboardComponent())
+	{
+		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("Stunned"), bStunned);
+	}
 }
 
 void AMageEnemy::InitDefaultAttributes()

@@ -160,7 +160,7 @@ void UMageAttributeSet::HandleReceivedDamage(const FEffectProperties& EffectProp
 {
 	const float LocalDamage = GetReceivedDamage();
 	SetReceivedDamage(0.f);
-	if (LocalDamage >= 0.f)
+	if (LocalDamage > 0.f)
 	{
 		float NewHealth = GetHealth() - LocalDamage;
 		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
@@ -179,7 +179,9 @@ void UMageAttributeSet::HandleReceivedDamage(const FEffectProperties& EffectProp
 		{
 			FGameplayTagContainer Tags;
 			EffectProps.SourceEffectSpec.GetAllGrantedTags(Tags);
-			if (!Tags.HasTag(FGameplayTag::RequestGameplayTag(FName("Debuff")))) // 没有Debuff才播放受击动画
+			bool bDebuff = Tags.HasTag(FGameplayTag::RequestGameplayTag(FName("Debuff")));
+			bool bShocked = EffectProps.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsBeingShocked(EffectProps.TargetCharacter);
+			if (!bDebuff && !bShocked) // 没有Debuff且不在电击状态才播放受击动画
 			{
 				// HitReact Ability
 				FGameplayTagContainer TagContainer;
@@ -218,7 +220,7 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 	const float DebuffFrequence = UMageAbilitySystemLibrary::GetDebuffFrequence(EffectProps.SourceEffectContextHandle);
 	
 	FString EffectName = FString::Printf(TEXT("DynamicDebuff_%s"), *DamageType.ToString());
-	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
+	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName), RF_WasLoaded);
 
 	// Effect属性设置
 	GameplayEffect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
@@ -230,7 +232,20 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 	// 向Effect添加赋予标签
 	UTargetTagsGameplayEffectComponent& TargetTagsComp = GameplayEffect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.AddTag(MageGameplayTags.DamageTypesToDebuffs[DamageType]);
+	FGameplayTag DebuffTag = MageGameplayTags.DamageTypesToDebuffs[DamageType];
+	InheritedTagContainer.AddTag(DebuffTag);
+	if (DebuffTag == MageGameplayTags.Debuff_Stun)
+	{
+		// 眩晕就取消HitReact
+		FGameplayTagContainer Tags;
+		Tags.AddTag(MageGameplayTags.Effects_HitReact);
+		EffectProps.TargetASC->CancelAbilities(&Tags);
+		// 禁止操作
+		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputPressed);
+		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputHeld);
+		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputReleased);
+		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_AutoRun);
+	}
 	TargetTagsComp.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
 	// 添加要修改的属性

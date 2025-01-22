@@ -93,6 +93,10 @@ void AMagePlayerController::CursorTrace()
 void AMagePlayerController::AutoRunning()
 {
 	if (!bAutoRunning) return;
+	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_AutoRun))
+	{
+		return;
+	}
 	
 	if (APawn* ControlledPawn = GetPawn())
 	{

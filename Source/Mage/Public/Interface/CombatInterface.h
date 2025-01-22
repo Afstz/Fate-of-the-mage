@@ -57,6 +57,11 @@ public:
 	void SetInShockLoop(bool InShockLoop);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
 	USkeletalMeshComponent* GetWeaponMesh() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
+	void SetBeingShocked(bool InBeingShocked);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat Interface")
+	bool IsBeingShocked() const;
 	
 	// Delegate
 	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() = 0;

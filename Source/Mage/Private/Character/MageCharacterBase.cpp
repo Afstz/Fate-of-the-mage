@@ -7,8 +7,10 @@
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Mage/Mage.h"
+#include "Net/UnrealNetwork.h"
 
 AMageCharacterBase::AMageCharacterBase()
 {
@@ -27,6 +29,24 @@ AMageCharacterBase::AMageCharacterBase()
 	BurnNiagaraComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("BurnNiagaraComponent"));
 	BurnNiagaraComponent->SetupAttachment(GetRootComponent());
 	BurnNiagaraComponent->DebuffTag = FMageGameplayTags::Get().Debuff_Burn;
+	StunNiagaraComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("StunNiagaraComponent"));
+	StunNiagaraComponent->SetupAttachment(GetRootComponent());
+	StunNiagaraComponent->DebuffTag = FMageGameplayTags::Get().Debuff_Stun;
+}
+
+void AMageCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+}
+
+void AMageCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AMageCharacterBase, bStunned);
+	DOREPLIFETIME(AMageCharacterBase, bBeingShocked);
 }
 
 UAbilitySystemComponent* AMageCharacterBase::GetAbilitySystemComponent() const
@@ -101,6 +121,16 @@ FOnDeathSignature& AMageCharacterBase::GetOnDeathDelegate()
 	return OnDeathDelegate;
 }
 
+void AMageCharacterBase::SetBeingShocked_Implementation(bool InBeingShocked)
+{
+	bBeingShocked = InBeingShocked;
+}
+
+bool AMageCharacterBase::IsBeingShocked_Implementation() const
+{
+	return bBeingShocked;
+}
+
 void AMageCharacterBase::MultiHandleDeath_Implementation(const FVector& InDeathImpulse)
 {
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
@@ -120,11 +150,6 @@ void AMageCharacterBase::MultiHandleDeath_Implementation(const FVector& InDeathI
 	
 	bDead = true;
 	OnDeathDelegate.Broadcast(this);
-}
-
-void AMageCharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void AMageCharacterBase::InitAbilityActorInfo()
@@ -176,4 +201,15 @@ void AMageCharacterBase::InitDefaultAttributes()
 	ApplyEffectToSelf(DefaultPrimaryEffects, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryEffects, 1.f);
 	ApplyEffectToSelf(DefaultBaseEffects, 1.f);
+}
+
+void AMageCharacterBase::OnRep_Stunned(bool OldStunned)
+{
+	
+}
+
+void AMageCharacterBase::OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount)
+{
+	bStunned = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bStunned ? 0.f : BaseWalkSpeed;
 }

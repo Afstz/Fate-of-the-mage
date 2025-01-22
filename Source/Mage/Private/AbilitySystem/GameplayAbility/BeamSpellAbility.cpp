@@ -59,9 +59,10 @@ void UBeamSpellAbility::TraceFirstTarget(const FVector& BeamEndLocation)
 	
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(MouseHitActor)) // 绑定角色死亡时委托
 	{
-		if (!CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &ThisClass::UBeamSpellAbility::FirstTargetDied))
+		// 判断是否已经绑定委托
+		if (!CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &UBeamSpellAbility::FirstTargetDied))
 		{
-			CombatInterface->GetOnDeathDelegate().AddDynamic(this, &ThisClass::UBeamSpellAbility::FirstTargetDied);
+			CombatInterface->GetOnDeathDelegate().AddDynamic(this, &UBeamSpellAbility::FirstTargetDied);
 		}
 	}
 }
@@ -81,9 +82,9 @@ void UBeamSpellAbility::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTar
 		MouseHitLocation
 	);
 	
-	NumMaxShockTargets = FMath::Min(NumMaxShockTargets, GetAbilityLevel()); // 最大链接数量
+	int32 MaxAdditionalTarget = FMath::Min(NumMaxShockTargets, GetAbilityLevel()); // 最大链接数量
 	
-	UMageAbilitySystemLibrary::GetClosetActors(NumMaxShockTargets, OverlapActors, OutAdditionalTargets, MouseHitActor);
+	UMageAbilitySystemLibrary::GetClosetActors(MaxAdditionalTarget, OverlapActors, OutAdditionalTargets, MouseHitActor);
 
 	for (auto It = OutAdditionalTargets.CreateIterator(); It; ++It)
 	{
@@ -97,10 +98,25 @@ void UBeamSpellAbility::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTar
 	{
 		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(AdditionalTarget))
 		{
-			if (!CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &ThisClass::UBeamSpellAbility::AdditionalTargetDied))
+			if (!CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &UBeamSpellAbility::AdditionalTargetDied))
 			{
-				CombatInterface->GetOnDeathDelegate().AddDynamic(this, &ThisClass::UBeamSpellAbility::AdditionalTargetDied);
+				CombatInterface->GetOnDeathDelegate().AddDynamic(this, &UBeamSpellAbility::AdditionalTargetDied);
 			}
+		}
+	}
+}
+
+void UBeamSpellAbility::ClearDelegate(AActor* TargetActor)
+{
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetActor))
+	{
+		if (CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &UBeamSpellAbility::FirstTargetDied))
+		{
+			CombatInterface->GetOnDeathDelegate().RemoveDynamic(this, &UBeamSpellAbility::FirstTargetDied);
+		}
+		if (CombatInterface->GetOnDeathDelegate().IsAlreadyBound(this, &UBeamSpellAbility::AdditionalTargetDied))
+		{
+			CombatInterface->GetOnDeathDelegate().RemoveDynamic(this, &UBeamSpellAbility::AdditionalTargetDied);
 		}
 	}
 }

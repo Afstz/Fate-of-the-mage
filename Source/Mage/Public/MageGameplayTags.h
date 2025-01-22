@@ -111,6 +111,7 @@ public:
 	FGameplayTag Block_Player_InputPressed;
 	FGameplayTag Block_Player_InputHeld;
 	FGameplayTag Block_Player_InputReleased;
+	FGameplayTag Block_Player_AutoRun;
 protected:
 	
 private:

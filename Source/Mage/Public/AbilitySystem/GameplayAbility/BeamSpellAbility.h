@@ -22,6 +22,8 @@ public:
 	void TraceFirstTarget(const FVector& BeamEndLocation); // 追踪射线的第一个目标
 	UFUNCTION(BlueprintCallable, Category = "Beam")
 	void StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTargets);
+	UFUNCTION(BlueprintCallable, Category = "Beam")
+	void ClearDelegate(AActor* TargetActor);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Beam")
 	void FirstTargetDied(AActor* FirstTarget);
@@ -38,5 +40,5 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Beam")
 	TObjectPtr<ACharacter> OwnerCharacter;
 	UPROPERTY(EditDefaultsOnly, Category = "Beam")
-	int32 NumMaxShockTargets = 4.f;
+	int32 NumMaxShockTargets = 5.f;
 };

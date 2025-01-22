@@ -40,8 +40,13 @@ public:
 	virtual void AddToSkillPoint_Implementation(int32 InSkillPoint) override;
 
 protected:
+	virtual void BeginPlay() override;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
+
+	/** Combat */
+	virtual void OnRep_Stunned(bool OldStunned) override;
+	virtual void OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount) override;
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;

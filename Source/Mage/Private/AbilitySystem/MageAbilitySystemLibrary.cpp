@@ -368,7 +368,7 @@ void UMageAbilitySystemLibrary::GetClosetActors(int32 MaxClosetActors, TArray<AA
 		return;
 	}
 	
-	int32 NumActorsFound = 0;
+	int32 NumActorsFound = 0; // 已找到的最近目标数量
 	while (NumActorsFound < MaxClosetActors)
 	{
 		if (ActorsToCheck.Num() == 0) return; // 遍历完成

@@ -32,7 +32,7 @@ public:
 	/** DamageFloatingText */
 	UFUNCTION(Client, Reliable)
 	void ShowDamageText(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit);
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
