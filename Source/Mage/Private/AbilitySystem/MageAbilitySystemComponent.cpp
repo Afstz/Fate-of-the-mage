@@ -52,6 +52,7 @@ void UMageAbilitySystemComponent::AddCharacterPassiveAbilites(TArray<TSubclassOf
 void UMageAbilitySystemComponent::AbilityInputPressed(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities()) // 获取所以可激活的技能数组
 	{
@@ -75,6 +76,7 @@ void UMageAbilitySystemComponent::AbilityInputPressed(const FGameplayTag& InputT
 void UMageAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities()) // 获取所以可激活的技能数组
 	{
@@ -92,6 +94,7 @@ void UMageAbilitySystemComponent::AbilityInputHeld(const FGameplayTag& InputTag)
 void UMageAbilitySystemComponent::AbilityInputReleased(const FGameplayTag& GameplayTag)
 {
 	if (!GameplayTag.IsValid()) return;
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
@@ -180,6 +183,20 @@ FGameplayAbilitySpec* UMageAbilitySystemComponent::GetSpecFromAbilityTag(const F
 	return nullptr;
 }
 
+FGameplayAbilitySpec* UMageAbilitySystemComponent::GetSpecFromInputTag(const FGameplayTag& InputTag)
+{
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			return &AbilitySpec;
+		}
+	}
+	return nullptr;
+}
+
 FGameplayTag UMageAbilitySystemComponent::GetStatusTagFromAbilityTag(const FGameplayTag& AbilityTag)
 {
 	if (const FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
@@ -205,6 +222,7 @@ void UMageAbilitySystemComponent::UpdateAbilityStatuses(const int32 InPlayerLeve
 	{
 		if (!Data.AbilityTag.IsValid()) continue;
 		if (Data.AbilityLevelRequirement > InPlayerLevel) continue;
+		
 		if (GetSpecFromAbilityTag(Data.AbilityTag) == nullptr) // 没有赋予这个技能
 		{
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Data.AbilityClass, 1.f);
@@ -276,6 +294,41 @@ bool UMageAbilitySystemComponent::AbilityHasInputTag(const FGameplayAbilitySpec*
 	return false;
 }
 
+bool UMageAbilitySystemComponent::SlotHasAbility(const FGameplayTag& InputTag)
+{
+	FScopedAbilityListLock ScopedAbilityListLock(*this);
+
+	for (const FGameplayAbilitySpec& Spce : GetActivatableAbilities())
+	{
+		if (AbilityHasInputTag(&Spce, InputTag))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UMageAbilitySystemComponent::IsPassiveAbility(const FGameplayAbilitySpec* AbilitySpec)
+{
+	return AbilitySpec->Ability->AbilityTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Passive")));
+}
+
+bool UMageAbilitySystemComponent::AbilityHasAnyInputTag(const FGameplayAbilitySpec* AbilitySpec)
+{
+	return AbilitySpec->Ability->AbilityTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Input")));
+}
+
+void UMageAbilitySystemComponent::AssignInputTagForAbility(FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& InputTag)
+{
+	ClearSlot(&AbilitySpec);
+	AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+}
+
+void UMageAbilitySystemComponent::MulticastActivatePassiveEffect_Implementation(const FGameplayTag& PassiveTag, const bool bInActivate)
+{
+	OnPassiveActivationChanged.Broadcast(PassiveTag, bInActivate);
+}
+
 void UMageAbilitySystemComponent::ServerEquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& InputTag)
 {
 	if (FGameplayAbilitySpec* AbilitySpec = GetSpecFromAbilityTag(AbilityTag))
@@ -287,9 +340,39 @@ void UMageAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 		const bool bStatusValid = StatusTag == MageGameplayTags.Abilities_Status_Unlocked || StatusTag == MageGameplayTags.Abilities_Status_Equipped;
 		if (bStatusValid)
 		{
-			ClearAbilitiesOfSlot(PrevInputTag); // 移除之前容器里Ability的InputTag
-			ClearSlot(AbilitySpec); // 移除要装备的Ability的InputTag
-			AbilitySpec->DynamicAbilityTags.AddTag(InputTag); // 添加新的InputTag
+			if (SlotHasAbility(InputTag)) // 对插槽已有的技能进行处理(被动技能取消激活 etc.)
+			{
+				FGameplayAbilitySpec* SpecWithSlot = GetSpecFromInputTag(InputTag);
+
+				if (SpecWithSlot)
+				{
+					FGameplayTag PrevSpecAbilityTag = GetAbilityTagFromSpec(*SpecWithSlot);
+					
+					if (AbilityTag.MatchesTagExact(PrevSpecAbilityTag))
+					{
+						// 要装备的技能与插槽的技能相同,不进行处理
+						ClientEquipAbility(AbilityTag, StatusTag, InputTag, PrevInputTag); 
+						return;
+					}
+
+					if (IsPassiveAbility(SpecWithSlot)) // 插槽的被动技能结束
+					{
+						DeactivatePassiveDelegate.Broadcast(PrevSpecAbilityTag);
+						MulticastActivatePassiveEffect(PrevSpecAbilityTag, false); // 多播关闭被动特效
+					}
+
+					ClearSlot(SpecWithSlot); // 清理插槽技能的InputTag
+				}
+			}
+			if (IsPassiveAbility(AbilitySpec))
+			{
+				if (!AbilityHasAnyInputTag(AbilitySpec)) // 被动技能没有被赋予
+				{
+					TryActivateAbility(AbilitySpec->Handle);
+					MulticastActivatePassiveEffect(AbilityTag, true);
+				}
+			}
+			AssignInputTagForAbility(*AbilitySpec, InputTag); // 添加新的InputTag
 			
 			if (StatusTag.MatchesTagExact(MageGameplayTags.Abilities_Status_Unlocked))
 			{
@@ -298,8 +381,8 @@ void UMageAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 				AbilitySpec->DynamicAbilityTags.AddTag(MageGameplayTags.Abilities_Status_Equipped);
 				StatusTag = MageGameplayTags.Abilities_Status_Equipped;
 			}
+			
 			MarkAbilitySpecDirty(*AbilitySpec);
-
 			ClientEquipAbility(AbilityTag, StatusTag, InputTag, PrevInputTag); // 更新客户端技能装备数据
 		}
 	}

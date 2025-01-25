@@ -2,7 +2,6 @@
 
 
 #include "UI/WidgetController/SkillMenuWidgetController.h"
-
 #include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityData.h"

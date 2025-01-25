@@ -14,6 +14,9 @@ DECLARE_DELEGATE_OneParam(FForeachAbilitiesSignature, const FGameplayAbilitySpec
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/, int32 /* New Level*/);
 DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquippedSignature, const FGameplayTag& /* Ability Tag*/, const FGameplayTag& /* Status Tag*/, const FGameplayTag& /* Input Tag*/, const FGameplayTag& /* Prev Input Tag*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivatePassiveAbility, const FGameplayTag& /* Ability Tag */);
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnPassiveActivationChanged, const FGameplayTag& /* Passive Tag */, const bool /* Activation State*/)
 /**
  * 
  */
@@ -44,12 +47,15 @@ public:
 	static FGameplayTag GetStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 
 	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
+	FGameplayAbilitySpec* GetSpecFromInputTag(const FGameplayTag& InputTag);
 	FGameplayTag GetStatusTagFromAbilityTag(const FGameplayTag& AbilityTag);
 	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
 
 	/** Skill */
 	FAbilityStatusChanged AbilityStatusChanged;
 	FAbilityEquippedSignature AbilityEquippedDelegate;
+	FDeactivatePassiveAbility DeactivatePassiveDelegate;
+	FOnPassiveActivationChanged OnPassiveActivationChanged;
 	void UpdateAbilityStatuses(const int32 InPlayerLevel);
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 NewLevel);
@@ -59,10 +65,16 @@ public:
 	void ServerEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& InputTag);
 	UFUNCTION(Client, Reliable)
 	void ClientEquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PrevInputTag);
+
 	void ClearSlot(FGameplayAbilitySpec* AbilitySpec);
 	void ClearAbilitiesOfSlot(const FGameplayTag& InputTag);
-	bool AbilityHasInputTag(const FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& InputTag);
-	
+	static bool AbilityHasInputTag(const FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& InputTag);
+	bool SlotHasAbility(const FGameplayTag& InputTag);
+	static bool IsPassiveAbility(const FGameplayAbilitySpec* AbilitySpec);
+	static bool AbilityHasAnyInputTag(const FGameplayAbilitySpec* AbilitySpec);
+	void AssignInputTagForAbility(FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& InputTag);
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastActivatePassiveEffect(const FGameplayTag& PassiveTag, const bool bInActivate);
 	
 	/** Attribute */
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);

@@ -81,6 +81,10 @@ public:
 	FGameplayTag Abilities_Fire_FireBall;
 	FGameplayTag Abilities_Lightning_LightningChain;
 	FGameplayTag Abilities_HitReact;
+	/* Passive Ability */
+	FGameplayTag Abilities_Passive_HaloOfProtection;
+	FGameplayTag Abilities_Passive_LifeRegenerate;
+	FGameplayTag Abilities_Passive_ManaRegenerate;
 	/* Abilities Status */
 	FGameplayTag Abilities_Status_Locked;
 	FGameplayTag Abilities_Status_Eligible;

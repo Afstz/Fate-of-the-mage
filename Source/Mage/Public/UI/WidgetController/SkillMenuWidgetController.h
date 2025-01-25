@@ -14,9 +14,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWaitForEquipSignature, const FGamep
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStopWaitForEquipSignature, const FGameplayTag&, AbilityType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityReassignedSignature, const FGameplayTag&, AbilityTag);
 
+USTRUCT(BlueprintType)
 struct FSelectedAbility
 {
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag AbilityTag = FGameplayTag();
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag StatusTag = FGameplayTag();
 };
 /**
@@ -55,13 +60,14 @@ protected:
 	void EquipButtonPressed();
 	UFUNCTION(BlueprintCallable)
 	void EquipRowSpherePressed(const FGameplayTag& AbilityType, const FGameplayTag& InputTag);
-
+	
+	// 记录当前选中技能的信息
+	UPROPERTY(BlueprintReadOnly)
+	FSelectedAbility SelectedAbility { FMageGameplayTags::Get().Abilities_None, FMageGameplayTags::Get().Abilities_Status_Locked};
 private:
 	void ShouldButtonEnables(int32 SkillPoint, const FGameplayTag& StatusTag, bool& bShouldSkillPointEnable, bool& bShouldEquipButtonEnable);
 	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PrevInputTag);
 
-	// 记录当前选中技能的信息
-	FSelectedAbility SelectedAbility { FMageGameplayTags::Get().Abilities_None, FMageGameplayTags::Get().Abilities_Status_Locked};
 	int32 CurrentSkillPoint = 0;
 
 	bool bWaitingForEquip = false;

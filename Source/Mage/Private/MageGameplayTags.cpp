@@ -140,6 +140,13 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	FName("Abilities.Lightning.LightningChain"), FString("LightningChain Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.HitReact"), FString("Hit React Ability Tag"));
+	/** Passive Abilities */
+	MageGameplayTags.Abilities_Passive_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Passive.HaloOfProtection"), FString("Halo Of Protection"));
+	MageGameplayTags.Abilities_Passive_LifeRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Passive.LifeRegenerate"), FString("Life Regenerate"));
+	MageGameplayTags.Abilities_Passive_ManaRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Passive.ManaRegenerate"), FString("Mana Regenerate"));
 	/** Abilities Status */
 	MageGameplayTags.Abilities_Status_Unlocked = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Abilities.Status.Unlocked"), FString("Unlocked Status Ability Tag"));

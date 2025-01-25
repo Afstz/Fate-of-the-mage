@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "MageCharacterBase.generated.h"
 
+class UPassiveNiagaraComponent;
 struct FGameplayTag;
 class UDebuffNiagaraComponent;
 class UNiagaraSystem;
@@ -118,6 +119,16 @@ private:
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilites;
+
+	/** Passive Effect*/
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> EffectAttachComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagaraComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> LifeRegenerateNiagaraComponent;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> ManaRegenerateNiagaraComponent;
 };
 
 

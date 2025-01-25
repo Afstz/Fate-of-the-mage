@@ -6,6 +6,7 @@
 #include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
+#include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,6 +33,15 @@ AMageCharacterBase::AMageCharacterBase()
 	StunNiagaraComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("StunNiagaraComponent"));
 	StunNiagaraComponent->SetupAttachment(GetRootComponent());
 	StunNiagaraComponent->DebuffTag = FMageGameplayTags::Get().Debuff_Stun;
+
+	EffectAttachComponent = CreateDefaultSubobject<USceneComponent>(TEXT("EffectAttachComponent"));
+	EffectAttachComponent->SetupAttachment(GetRootComponent());
+	HaloOfProtectionNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("HaloOfProtectionNiagaraComponent"));
+	HaloOfProtectionNiagaraComponent->SetupAttachment(EffectAttachComponent);
+	LifeRegenerateNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("LifeRegenerateNiagaraComponent"));
+	LifeRegenerateNiagaraComponent->SetupAttachment(EffectAttachComponent);
+	ManaRegenerateNiagaraComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("ManaRegenerateNiagaraComponent"));
+	ManaRegenerateNiagaraComponent->SetupAttachment(EffectAttachComponent);
 }
 
 void AMageCharacterBase::BeginPlay()

@@ -2,7 +2,6 @@
 
 
 #include "UI/WidgetController/MageWidgetController.h"
-
 #include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "AbilitySystem/MageAttributeSet.h"

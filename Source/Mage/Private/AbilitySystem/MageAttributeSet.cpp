@@ -240,7 +240,7 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 		FGameplayTagContainer Tags;
 		Tags.AddTag(MageGameplayTags.Effects_HitReact);
 		EffectProps.TargetASC->CancelAbilities(&Tags);
-		// 禁止操作
+		// 禁止的操作
 		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputPressed);
 		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputHeld);
 		InheritedTagContainer.AddTag(MageGameplayTags.Block_Player_InputReleased);
@@ -282,12 +282,15 @@ void UMageAttributeSet::HandleReceivedXP(const FEffectProperties& EffectProps)
 
 		if (LevelUpCount > 0) // 有升级就执行升级的逻辑
 		{
-			int32 AttributePoint = IPlayerInterface::Execute_GetAttributePointReward(
-				EffectProps.SourceCharacter, NewLevel);
-			int32 SkillPoint = IPlayerInterface::Execute_GetSkillPointReward(EffectProps.SourceCharacter, NewLevel);
-
-			IPlayerInterface::Execute_AddToAttributePoint(EffectProps.SourceCharacter, AttributePoint * LevelUpCount);
-			IPlayerInterface::Execute_AddToSkillPoint(EffectProps.SourceCharacter, SkillPoint * LevelUpCount);
+			int32 AttributePoint = 0;
+			int32 SkillPoint = 0;
+			for (int32 i = 1; i <= LevelUpCount; ++i) // 获取每一级的奖励
+			{
+				AttributePoint += IPlayerInterface::Execute_GetAttributePointReward(EffectProps.SourceCharacter, CurrentLevel + i);
+				SkillPoint += IPlayerInterface::Execute_GetSkillPointReward(EffectProps.SourceCharacter, CurrentLevel + i);
+			}
+			IPlayerInterface::Execute_AddToAttributePoint(EffectProps.SourceCharacter, AttributePoint);
+			IPlayerInterface::Execute_AddToSkillPoint(EffectProps.SourceCharacter, SkillPoint);
 			IPlayerInterface::Execute_AddToLevel(EffectProps.SourceCharacter, LevelUpCount);
 
 			bFillInHealth = true; // 延迟填充，因为等级升级后最大值会重新进行MMC计算

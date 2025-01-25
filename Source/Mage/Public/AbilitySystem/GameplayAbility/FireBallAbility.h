@@ -21,7 +21,7 @@ public:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
-	int32 MaxNumProjectiles = 1.f;
+	int32 MaxNumProjectiles = 5.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "FireBall")
 	float SpawnSpread = 90.f; // 火球生成范围

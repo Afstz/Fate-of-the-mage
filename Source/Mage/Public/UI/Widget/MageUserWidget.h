@@ -19,7 +19,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly) 
 	TObjectPtr<UObject> WidgetController;
-
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent) // C++声明,蓝图实现
 	void WidgetControllerIsSet();
