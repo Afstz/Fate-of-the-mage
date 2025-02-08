@@ -8,8 +8,10 @@
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
+#include "Actor/MagicCircle.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/DecalComponent.h"
 #include "Components/SplineComponent.h"
 #include "Input/MageInputComponent.h"
 #include "Interface/EnemyInterface.h"
@@ -49,6 +51,7 @@ void AMagePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	AutoRunning();
+	UpdateMagicCircleLocation();
 }
 void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit)
 {
@@ -77,7 +80,10 @@ void AMagePlayerController::CursorTrace()
 		return;
 	}
 	
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	// 释放贴花技能切换通道
+	const ECollisionChannel TraceChannel = IsValid(MagicCircleDecal) ? ECC_MouseSkill : ECC_Visibility;
+	
+	GetHitResultUnderCursor(TraceChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	LastCursorActor = CurrentCursorActor;
@@ -109,6 +115,37 @@ void AMagePlayerController::AutoRunning()
 		if (Destination <= AutoRunAcceptanceRadius) // 到达阈值停止移动
 		{
 			bAutoRunning = false;
+		}
+	}
+}
+
+void AMagePlayerController::ShowMagicCircle(UMaterialInterface* DecalMaterial)
+{
+	if (!IsValid(MagicCircleDecal))
+	{
+		MagicCircleDecal = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass);
+		if (DecalMaterial)
+		{
+			MagicCircleDecal->MagicCircleDecalComponent->SetMaterial(0, DecalMaterial);
+		}
+	}
+}
+
+void AMagePlayerController::HideMagicCircle()
+{
+	if (IsValid(MagicCircleDecal))
+	{
+		MagicCircleDecal->Destroy();
+	}
+}
+
+void AMagePlayerController::UpdateMagicCircleLocation() const
+{
+	if (IsValid(MagicCircleDecal))
+	{
+		if (CursorHit.bBlockingHit)
+		{
+			MagicCircleDecal->SetActorLocation(CursorHit.ImpactPoint);
 		}
 	}
 }

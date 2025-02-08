@@ -32,7 +32,7 @@ void USkillMenuWidgetController::BindCallbacksToDependencies()
 				bool bSkillPointButtonEnable = false;
 				bool bEquipButtonEnable = false;
 				SelectedAbility.StatusTag = StatusTag;
-				ShouldButtonEnables(CurrentSkillPoint, StatusTag, bSkillPointButtonEnable, bEquipButtonEnable);
+				ShouldButtonEnables(CurrentSkillPoint, StatusTag, AbilityTag,bSkillPointButtonEnable, bEquipButtonEnable);
 				FString Description;
 				FString NextLevelDescription;
 				GetAbilityDescFromAbilityTag(AbilityTag, Description, NextLevelDescription); // 获取技能的描述
@@ -51,7 +51,7 @@ void USkillMenuWidgetController::BindCallbacksToDependencies()
 			bool bSkillPointButtonEnable = false;
 			bool bEquipButtonEnable = false;
 			CurrentSkillPoint = InSkillPoint;
-			ShouldButtonEnables(CurrentSkillPoint, SelectedAbility.StatusTag, bSkillPointButtonEnable, bEquipButtonEnable);
+			ShouldButtonEnables(CurrentSkillPoint, SelectedAbility.StatusTag, SelectedAbility.AbilityTag, bSkillPointButtonEnable, bEquipButtonEnable);
 			FString Description;
 			FString NextLevelDescription;
 			GetAbilityDescFromAbilityTag(SelectedAbility.AbilityTag, Description, NextLevelDescription); // 获取技能的描述
@@ -91,16 +91,25 @@ void USkillMenuWidgetController::OnSphereButtonSelected(const FGameplayTag& Abil
 	bool bEquipButtonEnable = false;
 	SelectedAbility.AbilityTag = AbilityTag;
 	SelectedAbility.StatusTag = SkillStatusTag;
-	ShouldButtonEnables(SkillPoints, SkillStatusTag, bSkillPointButtonEnable, bEquipButtonEnable); // 根据状态和技能点判断是否启用按钮
+	ShouldButtonEnables(SkillPoints, SkillStatusTag, AbilityTag, bSkillPointButtonEnable, bEquipButtonEnable); // 根据状态和技能点判断是否启用按钮
 	FString Description;
 	FString NextLevelDescription;
 	GetAbilityDescFromAbilityTag(AbilityTag, Description, NextLevelDescription); // 获取技能的描述
 	SphereSelectedDelegate.Broadcast(bSkillPointButtonEnable, bEquipButtonEnable, Description, NextLevelDescription);
 }
 
-void USkillMenuWidgetController::ShouldButtonEnables(int32 SkillPoint, const FGameplayTag& StatusTag, bool& bShouldSkillPointEnable, bool& bShouldEquipButtonEnable)
+void USkillMenuWidgetController::ShouldButtonEnables(int32 SkillPoint, const FGameplayTag& StatusTag, const FGameplayTag& AbilityTag, bool& bShouldSkillPointEnable, bool& bShouldEquipButtonEnable)
 {
 	FMageGameplayTags MageGameplayTags = FMageGameplayTags::Get();
+
+	if (AbilityTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Passive.Unupgradable"), false)) &&
+		(StatusTag.MatchesTagExact(MageGameplayTags.Abilities_Status_Unlocked) ||
+			StatusTag.MatchesTagExact(MageGameplayTags.Abilities_Status_Equipped)))
+	{
+		bShouldSkillPointEnable = false;
+		bShouldEquipButtonEnable = true;
+		return;
+	}
 	
 	bShouldSkillPointEnable = false;
 	bShouldEquipButtonEnable = false;
@@ -128,7 +137,6 @@ void USkillMenuWidgetController::ShouldButtonEnables(int32 SkillPoint, const FGa
 			bShouldSkillPointEnable = true;
 		}
 	}
-	
 }
 
 void USkillMenuWidgetController::SpendSkillPointPressed()
@@ -191,7 +199,7 @@ void USkillMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTa
 	EquippedAbilityData.AbilityInputTag = InputTag;
 	AbilityDataDelegate.Broadcast(EquippedAbilityData);
 
-	StopWaitForEquipDelegate.Broadcast(EquippedAbilityData.AbilityType); // 停止等待装备技能
+	StopWaitForEquipDelegate.Broadcast(EquippedAbilityData.AbilityType); // 停止等待装备技能,关闭选择动画
 	AbilityReassignedDelegate.Broadcast(AbilityTag); // 重新指派技能成功
 	SkillSphereDeselect(); // 退出装备状态
 }

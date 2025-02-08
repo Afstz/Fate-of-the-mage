@@ -237,6 +237,42 @@ FVector UMageAbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContex
 	return FVector::ZeroVector;
 }
 
+bool UMageAbilitySystemLibrary::GetIsRadialDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetIsRadialDamage();
+	}
+	return false;
+}
+
+FVector UMageAbilitySystemLibrary::GetRadialDamageOrigin(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageOrigin();
+	}
+	return FVector::ZeroVector;
+}
+
+float UMageAbilitySystemLibrary::GetRadialDamageInnerRadius(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageInnerRadius();
+	}
+	return 0.f;
+}
+
+float UMageAbilitySystemLibrary::GetRadialDamageOuterRadius(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FMageGameplayEffectContext* EffectContext = static_cast<const FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageOuterRadius();
+	}
+	return 0.f;
+}
+
 void UMageAbilitySystemLibrary::SetCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bIsCriticalHit)
 {
 	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -313,6 +349,38 @@ void UMageAbilitySystemLibrary::SetKnockbackForce(FGameplayEffectContextHandle& 
 	}
 }
 
+void UMageAbilitySystemLibrary::SetIsRadialDamage(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsRadialDamage)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetIsRadialDamage(bInIsRadialDamage);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetRadialDamageOrigin(FGameplayEffectContextHandle& EffectContextHandle, FVector InRadialDamageOrigin)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageOrigin(InRadialDamageOrigin);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetRadialDamageInnerRadius(FGameplayEffectContextHandle& EffectContextHandle, float InRadialDamageInnerRadius)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageInnerRadius(InRadialDamageInnerRadius);
+	}
+}
+
+void UMageAbilitySystemLibrary::SetRadialDamageOuterRadius(FGameplayEffectContextHandle& EffectContextHandle, float InRadialDamageOuterRadius)
+{
+	if (FMageGameplayEffectContext* EffectContext = static_cast<FMageGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageOuterRadius(InRadialDamageOuterRadius);
+	}
+}
+
 void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
 {
 	checkf(DamageEffectParams.TargetAbilitySystemComponent, TEXT("function [%hs] have not TargetAbilitySystemComponent"), __FUNCTION__);
@@ -322,6 +390,10 @@ void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& Dam
 	ContextHandle.AddSourceObject(AvatarActor);
 	SetDeathImpulse(ContextHandle, DamageEffectParams.DeathImpulse); // 设置造成死亡后的冲击力
 	SetKnockbackForce(ContextHandle, DamageEffectParams.KnockbackForce); // 设置造成击退的力度
+	SetIsRadialDamage(ContextHandle, DamageEffectParams.bIsRadialDamage); // 设置是否是范围伤害
+	SetRadialDamageOrigin(ContextHandle, DamageEffectParams.RadialDamageOrigin); // 设置范围伤害中心
+	SetRadialDamageInnerRadius(ContextHandle, DamageEffectParams.RadialDamageInnerRadius); // 设置范围伤害内半径
+	SetRadialDamageOuterRadius(ContextHandle, DamageEffectParams.RadialDamageOuterRadius); // 设置范围伤害外半径
 	
 	// 设置技能相关伤害属性
 	const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();

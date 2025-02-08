@@ -13,7 +13,7 @@ FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
-	MaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
+	int32 InMaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
 	
 	return FString::Printf(TEXT(
 		// Title
@@ -23,9 +23,9 @@ FString UFireBallAbility::GetDescription(int32 AbilityLevel)
 		"<Default>耗蓝量:</><ManaCost>%.1f</>\n"
 		"<Default>冷却时间:</><CooldownTime>%.1f</>\n\n"
 		// Description
-		"<Small>发射 %d 个火球，击中敌人发生爆炸。</>")
+		"<Small>发射 %d 个火球，击中敌人发生爆炸，有几率造成灼烧伤害。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, MaxNumProjectiles);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, InMaxNumProjectiles);
 
 }
 
@@ -34,7 +34,7 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 	float CausedDamage = GetAbilityDamage(AbilityLevel);
 	float ManaCost = GetManaCost(AbilityLevel);
 	float CooldownTime = GetCooldownTime(AbilityLevel);
-	MaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
+	int32 InMaxNumProjectiles = FMath::Min(MaxNumProjectiles, AbilityLevel);
 	
 	return FString::Printf(TEXT(
 		// Title
@@ -44,9 +44,9 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 		"<Default>耗蓝量:</><ManaCost>%.1f</>\n"
 		"<Default>冷却时间:</><CooldownTime>%.1f</>\n\n"
 		// Description
-		"<Small>发射 %d 个火球，击中敌人发生爆炸。造成更高的伤害。</>")
+		"<Small>发射 %d 个火球，击中敌人发生爆炸，有几率造成灼烧伤害，造成更高的伤害。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, MaxNumProjectiles);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, InMaxNumProjectiles);
 }
 
 void UFireBallAbility::SpawnProjectiles(const FVector& TargetLocation, const bool bOverridePitch, float PitchOverride, AActor* HomingTarget)

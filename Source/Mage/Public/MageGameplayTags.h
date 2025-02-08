@@ -80,11 +80,12 @@ public:
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_Fire_FireBall;
 	FGameplayTag Abilities_Lightning_LightningChain;
+	FGameplayTag Abilities_Magical_ArcaneShards;
 	FGameplayTag Abilities_HitReact;
 	/* Passive Ability */
 	FGameplayTag Abilities_Passive_HaloOfProtection;
-	FGameplayTag Abilities_Passive_LifeRegenerate;
-	FGameplayTag Abilities_Passive_ManaRegenerate;
+	FGameplayTag Abilities_Passive_Unupgradable_LifeRegenerate;
+	FGameplayTag Abilities_Passive_Unupgradable_ManaRegenerate;
 	/* Abilities Status */
 	FGameplayTag Abilities_Status_Locked;
 	FGameplayTag Abilities_Status_Eligible;

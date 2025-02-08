@@ -47,5 +47,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void AddToSkillPoint(int32 InSkillPoint);
 
-	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HideMagicCircle();
 };

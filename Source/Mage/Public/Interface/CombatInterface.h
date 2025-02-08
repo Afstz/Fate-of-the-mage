@@ -12,6 +12,7 @@ class UNiagaraSystem;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FASCRegisteredSignature, UAbilitySystemComponent*); // ASC初始化完成后委托
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathSignature, AActor*, DeadActor); // Actor死亡时委托
+DECLARE_MULTICAST_DELEGATE_OneParam(FDamageDelegate, float /* Damage */);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -66,4 +67,5 @@ public:
 	// Delegate
 	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() = 0;
 	virtual FOnDeathSignature& GetOnDeathDelegate() = 0;
+	virtual FDamageDelegate& GetDamageDelegate() = 0;
 };

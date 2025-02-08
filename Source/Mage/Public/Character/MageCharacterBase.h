@@ -25,6 +25,7 @@ class MAGE_API AMageCharacterBase : public ACharacter, public IAbilitySystemInte
 
 public:
 	AMageCharacterBase();
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
@@ -42,6 +43,7 @@ public:
 	virtual USkeletalMeshComponent* GetWeaponMesh_Implementation() const override;
 	virtual FASCRegisteredSignature& GetASCRegisteredDelegate() override;
 	virtual FOnDeathSignature& GetOnDeathDelegate() override;
+	virtual FDamageDelegate& GetDamageDelegate() override;
 	virtual void SetBeingShocked_Implementation(bool InBeingShocked) override;
 	virtual bool IsBeingShocked_Implementation() const override;
 	
@@ -109,6 +111,7 @@ protected:
 	/** Combat Interface Delegate */
 	FASCRegisteredSignature ASCRegisteredDelegate; // ASC初始化时委托
 	FOnDeathSignature OnDeathDelegate; // Actor死亡时委托
+	FDamageDelegate DamageDelegate;
 	/** Debuff Component*/
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> BurnNiagaraComponent;

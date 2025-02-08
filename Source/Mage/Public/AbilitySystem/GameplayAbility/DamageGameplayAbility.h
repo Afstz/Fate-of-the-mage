@@ -19,8 +19,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void CauseDamage(AActor* TargetActor);
 	
+	// 获取技能伤害
 	UFUNCTION(BlueprintPure)
-	float GetAbilityDamage(int32 InAbilityLevel) const; // 获取技能伤害
+	float GetAbilityDamage(int32 InAbilityLevel) const; 
 protected:
 	// Damage
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
@@ -55,10 +56,26 @@ protected:
 
 	// 击退的力(基于概率)
 	UPROPERTY(EditDefaultsOnly, Category = "Damage") 
-	float KnockbackMagnitude = 0.f; 
+	float KnockbackMagnitude = 0.f;
+
+	// 是否是范围伤害
+	UPROPERTY(EditDefaultsOnly, Category = "Damage") 
+	bool bIsRadialDamage = false; 
+
+	// 范围伤害内半径
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage") 
+	float RadialDamageInnerRadius = 0.f; 
+
+	// 范围伤害外半径
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage") 
+	float RadialDamageOuterRadius = 0.f; 
 
 	UFUNCTION(BlueprintPure, Category = "Damage")
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(
+		AActor* TargetActor = nullptr,
+		FVector InRadialDamageOrigin = FVector::ZeroVector,
+		bool bOverridePitch = false,
+		float InPitchOverride = 0.f) const;
 	
 	// AI
 	UFUNCTION(BlueprintPure, Category = "Mechanics")

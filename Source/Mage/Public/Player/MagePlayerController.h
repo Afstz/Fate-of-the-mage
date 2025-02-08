@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MagePlayerController.generated.h"
 
+class AMagicCircle;
 class UNiagaraSystem;
 class UDamageTextComponent;
 class USplineComponent;
@@ -32,7 +33,12 @@ public:
 	/** DamageFloatingText */
 	UFUNCTION(Client, Reliable)
 	void ShowDamageText(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit);
-
+	
+	/** Magic Circle Function */
+	UFUNCTION(BlueprintCallable)
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
+	UFUNCTION(BlueprintCallable)
+	void HideMagicCircle();
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -114,4 +120,11 @@ private:
 	void AutoRunning();
 	UPROPERTY(EditDefaultsOnly, Category = "Run")
 	TObjectPtr<UNiagaraSystem> MouseClickEffect; // 鼠标单击地板特效
+	
+	/** Magic Circle*/
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMagicCircle> MagicCircleClass;
+	UPROPERTY()
+	TObjectPtr<AMagicCircle> MagicCircleDecal; // 魔法贴花
+	void UpdateMagicCircleLocation() const;
 };

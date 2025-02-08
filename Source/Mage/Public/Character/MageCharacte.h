@@ -38,6 +38,8 @@ public:
 	virtual void AddToLevel_Implementation(int32 InLevel) override;
 	virtual void AddToAttributePoint_Implementation(int32 InAttributePoint) override;
 	virtual void AddToSkillPoint_Implementation(int32 InSkillPoint) override;
+	virtual void ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial = nullptr) override;
+	virtual void HideMagicCircle_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;

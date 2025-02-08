@@ -57,6 +57,18 @@ struct FDamageEffectParams
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector KnockbackForce = FVector::ZeroVector; //击退向量
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsRadialDamage = false; // 是否是范围伤害
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector RadialDamageOrigin = FVector::ZeroVector; // 范围伤害中心
+	
+	UPROPERTY(BlueprintReadWrite)
+	float RadialDamageInnerRadius = 0.f; // 范围伤害内半径
+	
+	UPROPERTY(BlueprintReadWrite)
+	float RadialDamageOuterRadius = 0.f; // 范围伤害外半径
 };
 
 
@@ -81,6 +93,10 @@ public:
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 	FVector GetDeathImpulse() const { return DeathImpulse; }
 	FVector GetKnockbackForce() const { return KnockbackForce; }
+	bool GetIsRadialDamage() const { return bIsRadialDamage; }
+	FVector GetRadialDamageOrigin() const { return RadialDamageOrigin; }
+	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
+	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
 	
 	void SetCriticalHit(bool bInCriticalHit) { bCriticalHit = bInCriticalHit; }
 	void SetBlockHit(bool bInBlockHit) { bBlockHit = bInBlockHit; }
@@ -91,6 +107,10 @@ public:
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
 	void SetDeathImpulse(const FVector& InDeathImpulse) { DeathImpulse = InDeathImpulse; }
 	void SetKnockbackForce(const FVector& InKnockbackForce) { KnockbackForce = InKnockbackForce; }
+	void SetIsRadialDamage(bool bInIsRadialDamage) { bIsRadialDamage = bInIsRadialDamage; }
+	void SetRadialDamageOrigin(const FVector& InDeathImpulse) { RadialDamageOrigin = InDeathImpulse; }
+	void SetRadialDamageInnerRadius(float InRadialDamageInnerRadius) { RadialDamageInnerRadius = InRadialDamageInnerRadius; }
+	void SetRadialDamageOuterRadius(float InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
 	
 	/**
 	 * 自定义序列化，子类必须重写此函数
@@ -146,6 +166,18 @@ protected:
 	
 	UPROPERTY()
 	FVector KnockbackForce = FVector::ZeroVector; // 击退的力
+	
+	UPROPERTY()
+	bool bIsRadialDamage = false; // 是否是范围伤害
+
+	UPROPERTY()
+	FVector RadialDamageOrigin = FVector::ZeroVector; // 范围伤害中心
+	
+	UPROPERTY()
+	float RadialDamageInnerRadius = 0.f; // 范围伤害内半径
+	
+	UPROPERTY()
+	float RadialDamageOuterRadius = 0.f; // 范围伤害外半径
 };
 
 // 一些C++结构的信息是不能通过模板探测出来的，就需要我们手动标记提供了。

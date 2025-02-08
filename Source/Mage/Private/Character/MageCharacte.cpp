@@ -133,6 +133,22 @@ void AMageCharacte::AddToSkillPoint_Implementation(int32 InSkillPoint)
 	MagePlayerState->AddToSkillPoints(InSkillPoint);
 }
 
+void AMageCharacte::ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial)
+{
+	AMagePlayerController* MagePC = Cast<AMagePlayerController>(GetController());
+	check(MagePC)
+	MagePC->ShowMagicCircle(DecalMaterial);
+	MagePC->bShowMouseCursor = false;
+}
+
+void AMageCharacte::HideMagicCircle_Implementation()
+{
+	AMagePlayerController* MagePC = Cast<AMagePlayerController>(GetController());
+	check(MagePC)
+	MagePC->HideMagicCircle();
+	MagePC->bShowMouseCursor = true;
+}
+
 void AMageCharacte::BeginPlay()
 {
 	Super::BeginPlay();

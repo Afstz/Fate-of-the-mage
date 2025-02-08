@@ -16,25 +16,7 @@ void UDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor)->ApplyGameplayEffectSpecToSelf(*DamageSpecHandle.Data.Get());
 }
 
-FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
-{
-	if (TaggedMontages.Num() > 0)
-	{
-		const int32 RandomIndex = FMath::RandRange(0, TaggedMontages.Num() - 1);
-		return TaggedMontages[RandomIndex];
-	}
-	
-	return FTaggedMontage();
-}
-
-float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel) const
-{
-	float CausedDamage = Damage.GetValueAtLevel(InAbilityLevel);
-	
-	return CausedDamage;
-}
-
-FDamageEffectParams UDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
+FDamageEffectParams UDamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor,FVector InRadialDamageOrigin, bool bOverridePitch, float InPitchOverride) const
 {
 	FDamageEffectParams DamageEffectParams;
 	
@@ -52,17 +34,59 @@ FDamageEffectParams UDamageGameplayAbility::MakeDamageEffectParamsFromClassDefau
 	DamageEffectParams.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	DamageEffectParams.KnockbackChance = KnockbackChance;
 	DamageEffectParams.KnockbackMagnitude = KnockbackMagnitude;
+	
 	if (IsValid(TargetActor))
 	{
-		FRotator KnockbackForceRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
-		KnockbackForceRotation.Pitch = 45.f;
-		const FVector ToTarget = KnockbackForceRotation.Vector();
-		DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude; // 死亡的冲击力
-		if (bool bKnockbackSuccessful = KnockbackChance >= FMath::RandRange(1, 100))
+		FRotator ToTargetRotation;
+		
+		if (!bIsRadialDamage)
+		{
+			ToTargetRotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+		}
+		else
+		{
+			// 范围伤害的方向
+			ToTargetRotation = (TargetActor->GetActorLocation() - InRadialDamageOrigin).Rotation();
+		}
+		
+		if (bOverridePitch)
+		{
+			ToTargetRotation.Pitch = InPitchOverride;
+		}
+		const FVector ToTarget = ToTargetRotation.Vector();
+
+		if (KnockbackChance >= FMath::RandRange(1, 100))
 		{
 			DamageEffectParams.KnockbackForce = ToTarget * KnockbackMagnitude; // 击退的力
 		}
+		DamageEffectParams.DeathImpulse = ToTarget * DeathImpulseMagnitude; // 死亡的冲击力
+	}
+	
+	if (bIsRadialDamage) // 范围伤害
+	{
+		DamageEffectParams.bIsRadialDamage = bIsRadialDamage;
+		DamageEffectParams.RadialDamageOrigin = InRadialDamageOrigin;
+		DamageEffectParams.RadialDamageInnerRadius = RadialDamageInnerRadius;
+		DamageEffectParams.RadialDamageOuterRadius = RadialDamageOuterRadius;
 	}
 
 	return DamageEffectParams;
+}
+
+FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
+{
+	if (TaggedMontages.Num() > 0)
+	{
+		const int32 RandomIndex = FMath::RandRange(0, TaggedMontages.Num() - 1);
+		return TaggedMontages[RandomIndex];
+	}
+	
+	return FTaggedMontage();
+}
+
+float UDamageGameplayAbility::GetAbilityDamage(int32 InAbilityLevel) const
+{
+	float CausedDamage = Damage.GetValueAtLevel(InAbilityLevel);
+	
+	return CausedDamage;
 }

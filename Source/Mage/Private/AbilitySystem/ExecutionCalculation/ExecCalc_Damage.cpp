@@ -6,6 +6,7 @@
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "AbilitySystem/MageAttributeSet.h"
 #include "Interface/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 
 struct FDamageStatics
@@ -45,7 +46,7 @@ static const FDamageStatics& GetDamageStatics()
 	
 	if (DamageStatics.TagsToCaptureDefs.Num() <= 1)
 	{
-		DamageStatics.TagsToCaptureDefs.Add(FMageGameplayTags::Get().Attributes_Secondary_PhysicalResistence,FDamageStatics().PhysicalResistenceDef);
+		DamageStatics.TagsToCaptureDefs.Add(FMageGameplayTags::Get().Attributes_Secondary_PhysicalResistence, FDamageStatics().PhysicalResistenceDef);
 		DamageStatics.TagsToCaptureDefs.Add(FMageGameplayTags::Get().Attributes_Secondary_MagicalResistence, FDamageStatics().MagicalResistenceDef);
 		DamageStatics.TagsToCaptureDefs.Add(FMageGameplayTags::Get().Attributes_Secondary_FireResistence, FDamageStatics().FireResistenceDef);
 		DamageStatics.TagsToCaptureDefs.Add(FMageGameplayTags::Get().Attributes_Secondary_LightningResistence, FDamageStatics().LightningResistenceDef);
@@ -111,7 +112,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 {
 	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
-
+	
 	AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
 	AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
 
@@ -132,6 +133,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	AggregatorParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	AggregatorParameters.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
 
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	
 	// Debuff
 	CalcDebuff(ExecutionParams, Spec, AggregatorParameters);
 	
@@ -149,6 +152,35 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageType, false, 0); // 当前类型属性伤害
 		// 按敌方抗性值百分比降低伤害
 		DamageTypeValue *= (100 - ResistancePercentage) / 100;
+
+		if (DamageTypeValue <= 0.f) continue; // 不执行逻辑
+
+		if (UMageAbilitySystemLibrary::GetIsRadialDamage(EffectContextHandle)) 
+		{
+			// 应用范围伤害
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
+			{
+				// 提前绑定lambda函数接收伤害数据
+				CombatInterface->GetDamageDelegate().AddLambda([&](float InCausedDamage)
+				{
+					DamageTypeValue = InCausedDamage;
+				});
+				
+				// 重载的TakeDamage函数会广播范围伤害数据
+				UGameplayStatics::ApplyRadialDamageWithFalloff( 
+					TargetAvatar,
+					DamageTypeValue,
+					0.f,
+					UMageAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+					UMageAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+					UMageAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+					1.f,
+					UDamageType::StaticClass(),
+					TArray<AActor*>(),
+					SourceAvatar,
+					nullptr);
+			}
+		}
 		
 		TotalDamage += DamageTypeValue; // 累加计算后的总伤害
 	}
@@ -175,8 +207,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float EffectiveCriticalHit = SourceCriticalHitChance - TargetCriticalHitRes * CriticalHitResistanceCoeff;
 	const bool bCriticalHit = EffectiveCriticalHit >= FMath::RandRange(1 , 100); // 判断是否暴击
 	TotalDamage = bCriticalHit ? TotalDamage * 2.f + SourceCriticalHitDamage : TotalDamage; // 暴击成功双倍并加上爆伤
-
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	
 	UMageAbilitySystemLibrary::SetCriticalHit(EffectContextHandle, bCriticalHit); // 设置上下文
 	
 	// 2. 计算敌方是否格挡

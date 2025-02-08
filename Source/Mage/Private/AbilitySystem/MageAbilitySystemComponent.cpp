@@ -223,13 +223,21 @@ void UMageAbilitySystemComponent::UpdateAbilityStatuses(const int32 InPlayerLeve
 		if (!Data.AbilityTag.IsValid()) continue;
 		if (Data.AbilityLevelRequirement > InPlayerLevel) continue;
 		
-		if (GetSpecFromAbilityTag(Data.AbilityTag) == nullptr) // 没有赋予这个技能
+		if (GetSpecFromAbilityTag(Data.AbilityTag) == nullptr) // 判断是否赋予了这个技能
 		{
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Data.AbilityClass, 1.f);
-			AbilitySpec.DynamicAbilityTags.AddTag(FMageGameplayTags::Get().Abilities_Status_Eligible);
+			if (Data.AbilityTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Abilities.Passive.Unupgradable"), false)))
+			{
+				AbilitySpec.DynamicAbilityTags.AddTag(FMageGameplayTags::Get().Abilities_Status_Unlocked);
+			}
+			else
+			{
+				AbilitySpec.DynamicAbilityTags.AddTag(FMageGameplayTags::Get().Abilities_Status_Eligible);
+			}
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec); // 无需等待下次更新，直接复制到客户端
-			ClientUpdateAbilityStatus(Data.AbilityTag, FMageGameplayTags::Get().Abilities_Status_Eligible, 1.f);
+			const FGameplayTag StatusTag = GetStatusTagFromSpec(AbilitySpec);
+			ClientUpdateAbilityStatus(Data.AbilityTag, StatusTag, 1.f);
 		}
 	}
 }
@@ -247,7 +255,7 @@ void UMageAbilitySystemComponent::ServerSpendSkillPoint_Implementation(const FGa
 		FGameplayTag StatusTag = GetStatusTagFromSpec(*AbilitySpec);
 		if (StatusTag.MatchesTagExact(MageGameplayTags.Abilities_Status_Eligible)) // 符合条件就解锁
 		{
-			AbilitySpec->DynamicAbilityTags.RemoveTag(MageGameplayTags.Abilities_Status_Eligible); 
+			AbilitySpec->DynamicAbilityTags.RemoveTag(MageGameplayTags.Abilities_Status_Eligible);
 			AbilitySpec->DynamicAbilityTags.AddTag(MageGameplayTags.Abilities_Status_Unlocked);
 			StatusTag = GetStatusTagFromSpec(*AbilitySpec);
 		}
@@ -364,6 +372,7 @@ void UMageAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 					ClearSlot(SpecWithSlot); // 清理插槽技能的InputTag
 				}
 			}
+			
 			if (IsPassiveAbility(AbilitySpec))
 			{
 				if (!AbilityHasAnyInputTag(AbilitySpec)) // 被动技能没有被赋予

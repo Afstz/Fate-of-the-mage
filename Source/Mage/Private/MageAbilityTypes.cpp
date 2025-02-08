@@ -70,10 +70,27 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 15;
 		}
+		if (bIsRadialDamage)
+		{
+			RepBits |= 1 << 16;
+			
+			if (RadialDamageOrigin.IsZero())
+			{
+				RepBits |= 1 << 17;
+			}
+			if (RadialDamageInnerRadius > 0.f)
+			{
+				RepBits |= 1 << 18;
+			}
+			if (RadialDamageOuterRadius > 0.f)
+			{
+				RepBits |= 1 << 19;
+			}
+		}
 	}
 
 	// 将RepBits的值序列化，使用9位长度保存
-	Ar.SerializeBits(&RepBits, 16);
+	Ar.SerializeBits(&RepBits, 20);
 
 	// 判断相对于的变量需要序列化或反序列化(重载过后的左移运算符会根据上下文切换是序列化还是反序列化)
 	if (RepBits & (1 << 0))
@@ -158,6 +175,23 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	if (RepBits & (1 << 15))
 	{
 		KnockbackForce.NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 16))
+	{
+		Ar << bIsRadialDamage;
+		
+		if (RepBits & (1 << 17))
+		{
+			RadialDamageOrigin.NetSerialize(Ar, Map, bOutSuccess);
+		}
+		if (RepBits & (1 << 18))
+		{
+			Ar << RadialDamageInnerRadius;
+		}
+		if (RepBits & (1 << 19))
+		{
+			Ar << RadialDamageOuterRadius;
+		}
 	}
 
 	//如果是反序列化时，需要调用对ASC进行初始化

@@ -44,6 +44,13 @@ AMageCharacterBase::AMageCharacterBase()
 	ManaRegenerateNiagaraComponent->SetupAttachment(EffectAttachComponent);
 }
 
+float AMageCharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float CausedDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamageDelegate.Broadcast(CausedDamage);
+	return CausedDamage;
+}
+
 void AMageCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -129,6 +136,11 @@ FASCRegisteredSignature& AMageCharacterBase::GetASCRegisteredDelegate()
 FOnDeathSignature& AMageCharacterBase::GetOnDeathDelegate()
 {
 	return OnDeathDelegate;
+}
+
+FDamageDelegate& AMageCharacterBase::GetDamageDelegate()
+{
+	return DamageDelegate;
 }
 
 void AMageCharacterBase::SetBeingShocked_Implementation(bool InBeingShocked)

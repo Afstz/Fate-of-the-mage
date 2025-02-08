@@ -65,7 +65,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FSelectedAbility SelectedAbility { FMageGameplayTags::Get().Abilities_None, FMageGameplayTags::Get().Abilities_Status_Locked};
 private:
-	void ShouldButtonEnables(int32 SkillPoint, const FGameplayTag& StatusTag, bool& bShouldSkillPointEnable, bool& bShouldEquipButtonEnable);
+	void ShouldButtonEnables(int32 SkillPoint, const FGameplayTag& StatusTag, const FGameplayTag& AbilityTag, bool& bShouldSkillPointEnable, bool& bShouldEquipButtonEnable);
 	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const FGameplayTag& InputTag, const FGameplayTag& PrevInputTag);
 
 	int32 CurrentSkillPoint = 0;

@@ -137,16 +137,18 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Fire.FireBall"), FString("FireBall Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
-	FName("Abilities.Lightning.LightningChain"), FString("LightningChain Ability Gameplay Tag"));
+		FName("Abilities.Lightning.LightningChain"), FString("LightningChain Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_Magical_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Magical.ArcaneShards"), FString("ArcaneShards Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.HitReact"), FString("Hit React Ability Tag"));
 	/** Passive Abilities */
 	MageGameplayTags.Abilities_Passive_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Passive.HaloOfProtection"), FString("Halo Of Protection"));
-	MageGameplayTags.Abilities_Passive_LifeRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Abilities.Passive.LifeRegenerate"), FString("Life Regenerate"));
-	MageGameplayTags.Abilities_Passive_ManaRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Abilities.Passive.ManaRegenerate"), FString("Mana Regenerate"));
+	MageGameplayTags.Abilities_Passive_Unupgradable_LifeRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Passive.Unupgradable.LifeRegenerate"), FString("Unupgradable Life Regenerate"));
+	MageGameplayTags.Abilities_Passive_Unupgradable_ManaRegenerate = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Passive.Unupgradable.ManaRegenerate"), FString("Unupgradable Mana Regenerate"));
 	/** Abilities Status */
 	MageGameplayTags.Abilities_Status_Unlocked = UGameplayTagsManager::Get().AddNativeGameplayTag(
 	FName("Abilities.Status.Unlocked"), FString("Unlocked Status Ability Tag"));
