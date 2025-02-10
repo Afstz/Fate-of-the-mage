@@ -14,7 +14,8 @@ struct FMageGameplayTags
 {
 public:
     static FMageGameplayTags& Get() { return MageGameplayTags;}
-    static void InitNativeGameplayTags(); // 初始化本地自定义的游戏标签
+	// 初始化本地自定义的游戏标签
+    static void InitNativeGameplayTags(); 
 	
 	/* Primary Attribute Gameplay Tags*/
 	FGameplayTag Attributes_Primary_Strength;
@@ -56,7 +57,9 @@ public:
 	FGameplayTag Effects_HitReact;
 
 	/* Damage Type Tags */
-	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistence; // 伤害属性对应伤害抗性
+	
+	// 伤害类型对应伤害抗性
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistence; 
 	FGameplayTag Damage;
 	FGameplayTag Damage_Physical;
 	FGameplayTag Damage_Magical;
@@ -64,7 +67,9 @@ public:
 	FGameplayTag Damage_Lightning;
 
 	/* Debuff Tags */
-	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs; // 伤害属性对应Debuff
+	
+	// 伤害类型对应Debuff
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs; 
 	FGameplayTag Debuff_Physical;
 	FGameplayTag Debuff_Magical;
 	FGameplayTag Debuff_Burn;
@@ -79,6 +84,7 @@ public:
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_Fire_FireBall;
+	FGameplayTag Abilities_Fire_FireBlast;
 	FGameplayTag Abilities_Lightning_LightningChain;
 	FGameplayTag Abilities_Magical_ArcaneShards;
 	FGameplayTag Abilities_HitReact;
@@ -117,6 +123,10 @@ public:
 	FGameplayTag Block_Player_InputHeld;
 	FGameplayTag Block_Player_InputReleased;
 	FGameplayTag Block_Player_AutoRun;
+
+	/* Gameplay Cue Tag */
+	FGameplayTag GameplayCue_FireBlast;
+
 protected:
 	
 private:

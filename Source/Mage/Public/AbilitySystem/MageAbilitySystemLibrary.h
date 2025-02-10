@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "MageAbilityTypes.h"
 #include "Data/CharacterClassData.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MageAbilitySystemLibrary.generated.h"
@@ -148,15 +150,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static void GetClosetActors(int32 MaxClosetActors, TArray<AActor*> ActorsToCheck, TArray<AActor*>& OutClosetActors, AActor* OriginActor);
 
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
 
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumRotators);
 	
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumVectors);
 	
-	UFUNCTION(BlueprintPure, Category = "MageAbilitySystemLibrary | XP")
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static int32 GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
+
+	/** Damage Effect Params */
+	
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | DamageEffectParams")
+	static void SetRadialDamageEffectParams(UPARAM(ref) FDamageEffectParams& OutDamageEffectParams, bool bInIsRadialDamage, const FVector& InRadialDamageOrigin, float InRadialDamageInnerRadius, float InRadialDamageOuterRadius);
+
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | DamageEffectParams")
+	static void SetEffectParamsTargetASC(UPARAM(ref) FDamageEffectParams& OutDamageEffectParams, UAbilitySystemComponent* InTargetASC);
+
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | DamageEffectParams")
+	static void SetKnockbackForceDirection(UPARAM(ref) FDamageEffectParams& OutDamageEffectParams, FVector InKnockbackDirection, float Magnitude);
+
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | DamageEffectParams")
+	static void SetDeathImpulseDirections(UPARAM(ref) FDamageEffectParams& OutDamageEffectParams, FVector InDeathImpulseDirection, float Magnitude);
 };

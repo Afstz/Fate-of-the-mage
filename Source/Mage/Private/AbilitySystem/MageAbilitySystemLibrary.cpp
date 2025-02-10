@@ -511,3 +511,48 @@ TArray<FVector> UMageAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& F
 	}
 	return OutVectors;
 }
+
+void UMageAbilitySystemLibrary::SetRadialDamageEffectParams(FDamageEffectParams& OutDamageEffectParams,
+	bool bInIsRadialDamage, const FVector& InRadialDamageOrigin, float InRadialDamageInnerRadius, float InRadialDamageOuterRadius)
+{
+	OutDamageEffectParams.bIsRadialDamage = bInIsRadialDamage;
+	OutDamageEffectParams.RadialDamageOrigin = InRadialDamageOrigin;
+	OutDamageEffectParams.RadialDamageInnerRadius = InRadialDamageInnerRadius;
+	OutDamageEffectParams.RadialDamageOuterRadius = InRadialDamageOuterRadius;
+}
+
+void UMageAbilitySystemLibrary::SetEffectParamsTargetASC(FDamageEffectParams& OutDamageEffectParams, UAbilitySystemComponent* InTargetASC)
+{
+	OutDamageEffectParams.TargetAbilitySystemComponent = InTargetASC;
+}
+
+void UMageAbilitySystemLibrary::SetKnockbackForceDirection(FDamageEffectParams& OutDamageEffectParams, FVector InKnockbackDirection, float Magnitude)
+{
+	InKnockbackDirection.Normalize();
+	if (OutDamageEffectParams.KnockbackChance >= FMath::RandRange(1, 100))
+	{
+		if (Magnitude > 0.f)
+		{
+			OutDamageEffectParams.KnockbackMagnitude = Magnitude;
+			OutDamageEffectParams.KnockbackForce = InKnockbackDirection * Magnitude;
+		}
+		else
+		{
+			OutDamageEffectParams.KnockbackForce = InKnockbackDirection * OutDamageEffectParams.KnockbackMagnitude;
+		}
+	}
+}
+
+void UMageAbilitySystemLibrary::SetDeathImpulseDirections(FDamageEffectParams& OutDamageEffectParams, FVector InDeathImpulseDirection, float Magnitude)
+{
+	InDeathImpulseDirection.Normalize();
+	if (Magnitude > 0.f)
+	{
+		OutDamageEffectParams.DeathImpulseMagnitude = Magnitude;
+		OutDamageEffectParams.DeathImpulse = InDeathImpulseDirection * Magnitude;
+	}
+	else
+	{
+		OutDamageEffectParams.DeathImpulse = InDeathImpulseDirection * OutDamageEffectParams.DeathImpulseMagnitude;
+	}
+}

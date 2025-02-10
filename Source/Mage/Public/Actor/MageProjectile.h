@@ -30,18 +30,24 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	// 判断碰撞有效性
+	bool IsValidOverlap(AActor* OtherActor);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float DelayCollisionTime = 0.f;
+	// 延迟启用碰撞
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Projectile")
-	void DelayEnableCollision(); // 延迟启用碰撞
+	void DelayEnableCollision();
 	
-	void PlayImpactEffect();
+	virtual void PlayImpactEffect();
 	
 	UFUNCTION()
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")

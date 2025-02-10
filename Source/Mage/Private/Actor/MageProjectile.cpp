@@ -50,13 +50,20 @@ void AMageProjectile::BeginPlay()
 
 }
 
+bool AMageProjectile::IsValidOverlap(AActor* OtherActor)
+{
+	// 防止击中自己
+	if (GetInstigator() == OtherActor) return false;
+	// 防止击中队友
+	if (!UMageAbilitySystemLibrary::IsNotFriend(GetInstigator(), OtherActor)) return false;
+	
+	return true;
+}
+
 void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// 防止击中自己
-	if (GetInstigator() == OtherActor) return;
-	// 防止击中队友
-	if (!UMageAbilitySystemLibrary::IsNotFriend(GetInstigator(), OtherActor)) return;
+	if (!IsValidOverlap(OtherActor)) return;
 	
 	if (HasAuthority())
 	{
@@ -78,6 +85,12 @@ void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		}
 		Destroy();
 	}
+}
+
+void AMageProjectile::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	
 }
 
 void AMageProjectile::PlayImpactEffect()

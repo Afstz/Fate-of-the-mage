@@ -38,7 +38,7 @@ FString ULightningChainAbility::GetNextLevelDescription(int32 AbilityLevel)
 		"<Default>耗蓝量:</><ManaCost>%.1f</>\n"
 		"<Default>冷却时间:</><CooldownTime>%.1f</>\n\n"
 		// Description
-		"<Small>生成 %d 个闪电链，闪电链会从第一个目标扩散，击中敌人几率造成眩晕，造成更高的伤害。</>")
+		"<Small>生成 %d 个闪电链，闪电链会从第一个目标扩散，击中敌人几率造成眩晕，升级造成更高的伤害。</>")
 		
 		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, InNumMaxShockTargets);	
 }

@@ -44,7 +44,7 @@ FString UFireBallAbility::GetNextLevelDescription(int32 AbilityLevel)
 		"<Default>耗蓝量:</><ManaCost>%.1f</>\n"
 		"<Default>冷却时间:</><CooldownTime>%.1f</>\n\n"
 		// Description
-		"<Small>发射 %d 个火球，击中敌人发生爆炸，有几率造成灼烧伤害，造成更高的伤害。</>")
+		"<Small>发射 %d 个火球，击中敌人发生爆炸，有几率造成灼烧伤害，升级造成更高的伤害。</>")
 		
 		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, InMaxNumProjectiles);
 }

@@ -38,7 +38,7 @@ FString UArcaneShardsAbility::GetNextLevelDescription(int32 AbilityLevel)
 		"<Default>耗蓝量:</><ManaCost>%.1f</>\n"
 		"<Default>冷却时间:</><CooldownTime>%.1f</>\n\n"
 		// Description
-		"<Small>指定位置生成 %d 个碎片，击中敌人造成击退。造成更高的伤害。</>")
+		"<Small>指定位置生成 %d 个碎片，击中敌人造成击退，升级造成更高的伤害。</>")
 		
 		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, InMaxNumShards);
 }

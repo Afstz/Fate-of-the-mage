@@ -136,7 +136,9 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Abilities.Summon"), FString("Summon Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Fire.FireBall"), FString("FireBall Ability Gameplay Tag"));
-	MageGameplayTags.Abilities_Fire_FireBall = UGameplayTagsManager::Get().AddNativeGameplayTag(
+	MageGameplayTags.Abilities_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Fire.FireBlast"), FString("FireBlast Ability Gameplay Tag"));
+	MageGameplayTags.Abilities_Lightning_LightningChain = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Lightning.LightningChain"), FString("LightningChain Ability Gameplay Tag"));
 	MageGameplayTags.Abilities_Magical_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Magical.ArcaneShards"), FString("ArcaneShards Ability Gameplay Tag"));
@@ -200,4 +202,8 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Block.Player.InputReleased"), FString("Block Input InputReleased callback"));
 	MageGameplayTags.Block_Player_AutoRun = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Block.Player.AutoRun"), FString("Block AutoRun Function"));
+
+	/** Gameplay Cue Tag */
+	MageGameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("GameplayCue.FireBlast"), FString("Fire Blast Gameplay Cue Tag"));
 }
