@@ -109,15 +109,23 @@ protected:
 	int32 MinionCount = 0;
 
 	/** Combat Interface Delegate */
-	FASCRegisteredSignature ASCRegisteredDelegate; // ASC初始化时委托
-	FOnDeathSignature OnDeathDelegate; // Actor死亡时委托
+	
+	// ASC初始化时委托
+	FASCRegisteredSignature ASCRegisteredDelegate;
+	
+	// Actor死亡时委托
+	FOnDeathSignature OnDeathDelegate;
+
+	// TakeDamage受到伤害时委托
 	FDamageDelegate DamageDelegate;
+	
 	/** Debuff Component*/
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> BurnNiagaraComponent;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> StunNiagaraComponent;
 private:
+	/** Startup */
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilites;
 	UPROPERTY(EditDefaultsOnly, Category = "Abilites")

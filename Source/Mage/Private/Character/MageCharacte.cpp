@@ -178,7 +178,6 @@ void AMageCharacte::OnRep_Stunned(bool OldStunned)
 void AMageCharacte::OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount)
 {
 	Super::OnStunTagChanged(StunTag, NewCount);
-	
 }
 
 void AMageCharacte::LevelUp_Implementation()

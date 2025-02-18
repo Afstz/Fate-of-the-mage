@@ -17,7 +17,7 @@ public:
 	// 初始化本地自定义的游戏标签
     static void InitNativeGameplayTags(); 
 	
-	/* Primary Attribute Gameplay Tags*/
+	/* Primary Attribute Gameplay Tags. */
 	FGameplayTag Attributes_Primary_Strength;
 	FGameplayTag Attributes_Primary_Intelligence;
 	FGameplayTag Attributes_Primary_Resilience;
@@ -88,15 +88,18 @@ public:
 	FGameplayTag Abilities_Lightning_LightningChain;
 	FGameplayTag Abilities_Magical_ArcaneShards;
 	FGameplayTag Abilities_HitReact;
+	
 	/* Passive Ability */
 	FGameplayTag Abilities_Passive_HaloOfProtection;
 	FGameplayTag Abilities_Passive_Unupgradable_LifeRegenerate;
 	FGameplayTag Abilities_Passive_Unupgradable_ManaRegenerate;
+	
 	/* Abilities Status */
 	FGameplayTag Abilities_Status_Locked;
 	FGameplayTag Abilities_Status_Eligible;
 	FGameplayTag Abilities_Status_Unlocked;
 	FGameplayTag Abilities_Status_Equipped;
+	
 	/* Abilities Type */
 	FGameplayTag Abilities_Type_None;
 	FGameplayTag Abilities_Type_Offensive;

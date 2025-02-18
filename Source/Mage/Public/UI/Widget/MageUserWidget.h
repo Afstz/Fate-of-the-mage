@@ -7,7 +7,7 @@
 #include "MageUserWidget.generated.h"
 
 /**
- * 
+ *  游戏主场景所有Widget的基类
  */
 UCLASS()
 class MAGE_API UMageUserWidget : public UUserWidget

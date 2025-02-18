@@ -228,6 +228,8 @@ private:
 	void HandleDebuff(const FEffectProperties& EffectProps);
 
 	/** Level */
+	
+	// 升级时延迟填充血量和蓝量
 	bool bFillInHealth = false; 
 	bool bFillInMana = false;
 };

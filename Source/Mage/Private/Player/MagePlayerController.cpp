@@ -61,7 +61,7 @@ void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetChar
 	{
 		UDamageTextComponent* DamageTextComponent = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextWidgetCompClass);
 		DamageTextComponent->RegisterComponent(); // 动态的创建组件需要手动注册
-		// 附加到角色身上保证字体在人物位置上
+		// 附加到角色身上保证字体在人物位
 		DamageTextComponent->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		// 从角色身上分离，保证在一个位置播放完成动画不随父物体移动
 		DamageTextComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -224,10 +224,13 @@ void AMagePlayerController::SkillMenu(const FInputActionValue& InputActionValue)
 		SkillMenuWidget = CreateWidget<UMageUserWidget>(GetWorld(), SkillMenuWidgetClass);
 		if (SkillMenuWidget)
 		{
-			float ViewPortWidth = UWidgetLayoutLibrary::GetViewportSize(this).X;
-			float FinalPositionX = ViewPortWidth - (810.f - 35.f);
-			SkillMenuWidget->SetPositionInViewport(FVector2D(FinalPositionX, 20.f));
 			SkillMenuWidget->AddToViewport(1); // 防止其他UI覆盖
+			SkillMenuWidget->ForceLayoutPrepass(); // 强制布局刷新以获取Widget大小
+			float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(this); // 获取视口的缩放比例
+			FVector2D ViewportSize = UWidgetLayoutLibrary::GetViewportSize(this) / ViewportScale; // 物理像素转逻辑坐标
+			FVector2D WidgetSize = SkillMenuWidget->GetDesiredSize();
+			float FinalPositionX = ViewportSize.X - WidgetSize.X;
+			SkillMenuWidget->SetPositionInViewport(FVector2D(FinalPositionX, 25.f), false);
 		}
 	}
 	else
