@@ -2,8 +2,8 @@
 
 
 #include "UI/ViewModel/MVVM_LoadScreen.h"
-
-#include "Game/LoadScreenSaveGame.h"
+#include "Game/MageSaveGame.h"
+#include "Game/MageGameInstance.h"
 #include "Game/MageGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
@@ -17,12 +17,12 @@ void UMVVM_LoadScreen::InitializeLoadSlotViewModels()
 	
 	LoadSlotViewModel_1 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlotViewModel_1->SetLoadSlotName(FString("LoadSlot_1"));
-	LoadSlotViewModel_0->SlotIndex = 1;
+	LoadSlotViewModel_1->SlotIndex = 1;
 	LoadSlotViewModels.Add(1, LoadSlotViewModel_1);
 	
 	LoadSlotViewModel_2 = NewObject<UMVVM_LoadSlot>(this, LoadSlotViewModelClass);
 	LoadSlotViewModel_2->SetLoadSlotName(FString("LoadSlot_2"));
-	LoadSlotViewModel_0->SlotIndex = 2;
+	LoadSlotViewModel_2->SlotIndex = 2;
 	LoadSlotViewModels.Add(2, LoadSlotViewModel_2);
 }
 
@@ -33,10 +33,12 @@ void UMVVM_LoadScreen::LoadSaveData()
 	// 遍历LoadSlotVMs加载数据
 	for (auto& [InSlotIndex, InLoadSlotViewModel] : LoadSlotViewModels)
 	{
-		ULoadScreenSaveGame* LoadScreenSaveGame = MageGameModeBase->GetSaveGameObject(InLoadSlotViewModel, InSlotIndex);
-		InLoadSlotViewModel->LoadSlotStatus = LoadScreenSaveGame->LoadSlotStatus;
-		InLoadSlotViewModel->SetCharacterName(LoadScreenSaveGame->CharacterName);
-		InLoadSlotViewModel->SetMapName(LoadScreenSaveGame->MapName);
+		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByName(InLoadSlotViewModel->GetLoadSlotName(), InSlotIndex);
+		InLoadSlotViewModel->LoadSlotStatus = MageSaveGame->LoadSlotStatus;
+		InLoadSlotViewModel->SetCharacterName(MageSaveGame->CharacterName);
+		InLoadSlotViewModel->SetPlayerLevel(MageSaveGame->Level);
+		InLoadSlotViewModel->SetMapName(MageSaveGame->MapName);
+		InLoadSlotViewModel->PlayerStartTag = MageSaveGame->PlayerStartTag;
 		InLoadSlotViewModel->InitializeSlot();
 	}
 }
@@ -56,8 +58,10 @@ void UMVVM_LoadScreen::CreateCharacterButtonPressed(int32 InSlotIndex, const FSt
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
 
 	LoadSlotViewModels[InSlotIndex]->SetCharacterName(CharacterName);
+	LoadSlotViewModels[InSlotIndex]->SetPlayerLevel(1);
 	LoadSlotViewModels[InSlotIndex]->SetMapName(MageGameModeBase->DefaultMapName);
 	LoadSlotViewModels[InSlotIndex]->LoadSlotStatus = ELoadSlotStatus::Taken;
+	LoadSlotViewModels[InSlotIndex]->PlayerStartTag = MageGameModeBase->DefaultPlayerStartTag;
 	
 	MageGameModeBase->SaveSlotData(LoadSlotViewModels[InSlotIndex], InSlotIndex); // 保存创建的角色名
 	
@@ -85,8 +89,13 @@ void UMVVM_LoadScreen::LoadArchiveButtonPressed(int32 InSlotIndex)
 void UMVVM_LoadScreen::StartGameButtonPressed()
 {
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
+	
 	if (IsValid(SelectedSlotVM))
 	{
+		UMageGameInstance::GetMageGameInstance()->PlayerStartTag = SelectedSlotVM->PlayerStartTag;
+		UMageGameInstance::GetMageGameInstance()->LoadSlotName = SelectedSlotVM->GetLoadSlotName();
+		UMageGameInstance::GetMageGameInstance()->LoadSlotIndex = SelectedSlotVM->SlotIndex;
+		
 		MageGameModeBase->TraveToMap(SelectedSlotVM); // 传送到当前插槽保存的地图
 	}
 }

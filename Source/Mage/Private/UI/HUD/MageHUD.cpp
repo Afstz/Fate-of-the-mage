@@ -10,7 +10,7 @@
 
 UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
 {
-	if (OverlayWidgetController == nullptr) // 单例,没有则创建
+	if (OverlayWidgetController == nullptr) // 没有则创建
 	{
 		OverlayWidgetController = NewObject<UOverlayWidgetController>(this, OverlayWidgetControllerClass);
 		OverlayWidgetController->SetWidgetControllerParams(InWidgetControllerParams);
@@ -21,7 +21,7 @@ UOverlayWidgetController* AMageHUD::GetOverlayWidgetController(const FWidgetCont
 
 UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
 {
-	if (AttributeMenuWidgetController == nullptr) // 单例,没有则创建
+	if (AttributeMenuWidgetController == nullptr) // 没有则创建
 	{
 		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
 		AttributeMenuWidgetController->SetWidgetControllerParams(InWidgetControllerParams);
@@ -32,7 +32,7 @@ UAttributeMenuWidgetController* AMageHUD::GetAttributeMenuWidgetController(const
 
 USkillMenuWidgetController* AMageHUD::GetSkillMenuWidgetController(const FWidgetControllerParams& InWidgetControllerParams)
 {
-	if (SkillMenuWidgetController == nullptr) // 单例,没有则创建
+	if (SkillMenuWidgetController == nullptr) // 没有则创建
     {
     	SkillMenuWidgetController = NewObject<USkillMenuWidgetController>(this, SkillMenuWidgetControllerClass);
     	SkillMenuWidgetController->SetWidgetControllerParams(InWidgetControllerParams);

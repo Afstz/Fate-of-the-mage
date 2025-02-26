@@ -51,4 +51,6 @@ public:
 	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideMagicCircle();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SaveGameProgress(const FName& CheckPointTag);
 };

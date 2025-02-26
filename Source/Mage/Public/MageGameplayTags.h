@@ -44,6 +44,7 @@ public:
 	FGameplayTag Attributes_Meta_ReceivedXP;
 	
 	/* Input Tags */
+	FGameplayTag Input;
 	FGameplayTag Input_LMB;
 	FGameplayTag Input_RMB;
 	FGameplayTag Input_Q;

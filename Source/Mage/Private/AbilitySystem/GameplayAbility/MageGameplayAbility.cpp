@@ -17,7 +17,7 @@ FString UMageGameplayAbility::GetNextLevelDescription(int32 AbilityLevel)
 
 FString UMageGameplayAbility::GetLockedDescription(int32 LevelRequirement)
 {
-	return FString::Printf(TEXT("<Default>技能需要达到人物等级</> <Level>[%d]</> <Default>级解锁</>"), LevelRequirement);
+	return FString::Printf(TEXT("<Default>技能需要达到人物等级</> <Level>[%d]</> <Default>级,花费技能点解锁。</>"), LevelRequirement);
 }
 
 float UMageGameplayAbility::GetManaCost(int32 InAbilityLevel) const

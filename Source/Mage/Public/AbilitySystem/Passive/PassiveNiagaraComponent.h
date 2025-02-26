@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "PassiveNiagaraComponent.generated.h"
 
+class UMageAbilitySystemComponent;
 /**
  *  被动技能粒子组件
  */
@@ -24,4 +25,6 @@ protected:
 	FGameplayTag PassiveAbilityTag;
 	
 	void OnPassiveActivate(const FGameplayTag& PassiveTag, const bool bActivate);
+
+	void ActiveIfEquipped(UMageAbilitySystemComponent* MageASC);
 };

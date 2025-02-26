@@ -38,8 +38,8 @@ void UPassiveAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo())))
 	{
-		MageASC->DeactivatePassiveDelegate.AddUObject(this, &ThisClass::OnAbilityDeactivate);
 		ApplyPassiveGameplayEffect();
+		MageASC->DeactivatePassiveDelegate.AddUObject(this, &ThisClass::OnAbilityDeactivate);
 	}
 }
 

@@ -31,16 +31,16 @@ UAbilitySystemComponent* AMagePlayerState::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AMagePlayerState::SetLevel(const int32 InLevel)
+void AMagePlayerState::SetLevel(const int32 InLevel, bool bUpgraded)
 {
 	Level = InLevel;
-	LevelChangedDelegate.Broadcast(Level);
+	LevelChangedDelegate.Broadcast(Level, bUpgraded);
 }
 
-void AMagePlayerState::AddToLevel(const int32 InLevel)
+void AMagePlayerState::AddToLevel(const int32 InLevel, bool bUpgraded)
 {
 	Level += InLevel;
-	LevelChangedDelegate.Broadcast(Level);
+	LevelChangedDelegate.Broadcast(Level, bUpgraded);
 }
 
 void AMagePlayerState::SetXP(const int32 InXP)
@@ -61,16 +61,28 @@ void AMagePlayerState::AddToAttributePoints(const int32 InAttributePoints)
 	AttributePointChangedDelegate.Broadcast(AttributePoints);
 }
 
+void AMagePlayerState::SetAttributePoints(const int32 InAttributePoints)
+{
+	AttributePoints = InAttributePoints;
+	AttributePointChangedDelegate.Broadcast(AttributePoints);
+}
+
 void AMagePlayerState::AddToSkillPoints(const int32 InSkillPoints)
 {
 	SkillPoints += InSkillPoints;
 	SkillPointChangedDelegate.Broadcast(SkillPoints);
 }
 
+void AMagePlayerState::SetSkillPoints(const int32 InSkillPoints)
+{
+	SkillPoints = InSkillPoints;
+	SkillPointChangedDelegate.Broadcast(SkillPoints);
+}
+
 void AMagePlayerState::OnRep_Level(int32 OldLevel)
 {
 	// 客户端同步
-	LevelChangedDelegate.Broadcast(Level);
+	LevelChangedDelegate.Broadcast(Level, true);
 }
 
 void AMagePlayerState::Onrep_XP(int32 OldXP)

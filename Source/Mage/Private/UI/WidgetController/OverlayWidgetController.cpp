@@ -87,9 +87,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	// PlayerState 回调函数绑定
 	GetMagePS()->XPChangedDelegate.AddUObject(this, &ThisClass::OnXPChanged);
 	GetMagePS()->LevelChangedDelegate.AddLambda(
-		[this](int32 NewLevel)
+		[this](int32 NewLevel, bool bUpgraded)
 		{
-			OnLevelChangedDelegate.Broadcast(NewLevel);
+			OnLevelChangedDelegate.Broadcast(NewLevel, bUpgraded);
 		});
 }
 

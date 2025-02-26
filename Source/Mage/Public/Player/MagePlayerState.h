@@ -11,6 +11,7 @@ class ULevelUpData;
 class UAttributeSet;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /* Statistic Value*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLevelChanged, int32 /* Statistic Value*/, bool /* bUpgraded*/);
 
 /**
  * 
@@ -26,7 +27,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	/** Delegate */
-	FOnPlayerStatChanged LevelChangedDelegate;
+	FOnLevelChanged LevelChangedDelegate;
 	FOnPlayerStatChanged XPChangedDelegate;
 	FOnPlayerStatChanged AttributePointChangedDelegate;
 	FOnPlayerStatChanged SkillPointChangedDelegate;
@@ -39,12 +40,14 @@ public:
 	FORCEINLINE int32 GetPlayerXP() const { return XP; }
 	FORCEINLINE int32 GetAttributePoints() const { return AttributePoints; }
 	FORCEINLINE int32 GetSkillPoints() const { return SkillPoints; }
-	void SetLevel(const int32 InLevel);
-	void AddToLevel(const int32 InLevel);
+	void SetLevel(const int32 InLevel, bool bUpgraded);
+	void AddToLevel(const int32 InLevel, bool bUpgraded);
 	void SetXP(const int32 InXP);
 	void AddToXP(const int32 InXP);
 	void AddToAttributePoints(const int32 InAttributePoints);
+	void SetAttributePoints(const int32 InAttributePoints);
 	void AddToSkillPoints(const int32 InSkillPoints);
+	void SetSkillPoints(const int32 InSkillPoints);
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

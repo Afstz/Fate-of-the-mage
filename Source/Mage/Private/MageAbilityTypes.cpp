@@ -89,7 +89,7 @@ bool FMageGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		}
 	}
 
-	// 将RepBits的值序列化，使用9位长度保存
+	// 将RepBits的值序列化，使用20位长度保存
 	Ar.SerializeBits(&RepBits, 20);
 
 	// 判断相对于的变量需要序列化或反序列化(重载过后的左移运算符会根据上下文切换是序列化还是反序列化)

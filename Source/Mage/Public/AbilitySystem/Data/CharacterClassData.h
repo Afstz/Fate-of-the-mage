@@ -44,6 +44,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TMap<ECharacterClass, FCharacterClassDefaultInfo> DefaultCharacterInfo; // 与相关角色类型相匹配的初始属性
 
+	// 用于玩家加载数据
+	UPROPERTY(EditDefaultsOnly, Category = "Player Class Defaults")
+	TSubclassOf<UGameplayEffect> PrimaryAttributes_SetByCaller;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Player Class Defaults")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes_Infinite;
+	
 	// 共享的数据
 	UPROPERTY(EditDefaultsOnly, Category = "Shared Class Defaults")
 	TSubclassOf<UGameplayEffect> DefaultSecondEffects;

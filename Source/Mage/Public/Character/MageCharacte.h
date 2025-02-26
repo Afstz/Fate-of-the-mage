@@ -40,6 +40,7 @@ public:
 	virtual void AddToSkillPoint_Implementation(int32 InSkillPoint) override;
 	virtual void ShowMagicCircle_Implementation(UMaterialInterface* DecalMaterial = nullptr) override;
 	virtual void HideMagicCircle_Implementation() override;
+	virtual void SaveGameProgress_Implementation(const FName& CheckPointTag) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,6 +50,9 @@ protected:
 	/** Combat */
 	virtual void OnRep_Stunned(bool OldStunned) override;
 	virtual void OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount) override;
+
+	/** Save Game */
+	void LoadGameProgress();
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;

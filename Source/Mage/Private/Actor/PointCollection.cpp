@@ -84,7 +84,7 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(const FVector& PointC
 		CollisionQueryParams.AddIgnoredActors(IgnoreActors);
 		// 获取击中的静态物体位置
 		GetWorld()->LineTraceSingleByProfile(HitResult, RaisedLocation, LoweredLocation, FName("BlockAll"), CollisionQueryParams);
-
+		
 		if (HitResult.bBlockingHit)
 		{
 			const FVector AdjustedLocation = FVector(PointLocation.X, PointLocation.Y, HitResult.ImpactPoint.Z);

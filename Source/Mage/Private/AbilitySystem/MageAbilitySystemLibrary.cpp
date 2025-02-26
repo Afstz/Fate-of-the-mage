@@ -10,6 +10,7 @@
 #include "MageGameplayTags.h"
 #include "Engine/OverlapResult.h"
 #include "Game/MageGameModeBase.h"
+#include "Game/MageSaveGame.h"
 #include "Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/MagePlayerState.h"
@@ -100,6 +101,39 @@ void UMageAbilitySystemLibrary::InitCharacterDefaultAttributes(const UObject* Wo
 	FGameplayEffectSpecHandle BaseAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->DefaultBaseEffects, Level, BaseAttributeContextHande);
 	ASC->ApplyGameplayEffectSpecToSelf(*BaseAttributeSpecHandle.Data.Get());
 	
+}
+
+void UMageAbilitySystemLibrary::InitAttributesFromSaveGame(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UMageSaveGame* MageSaveGame)
+{
+	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject);
+	if (!CharacterClassData || !IsValid(ASC)) return;
+
+	AActor* SourceAvatarActor = ASC->GetAvatarActor();
+	const FMageGameplayTags& MageGameplayTags = FMageGameplayTags::Get();
+	
+	// 设置玩家保存的主要属性
+	FGameplayEffectContextHandle PrimaryAttributeContextHandle = ASC->MakeEffectContext();
+	PrimaryAttributeContextHandle.AddSourceObject(SourceAvatarActor);
+	FGameplayEffectSpecHandle PrimaryAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->PrimaryAttributes_SetByCaller, 1.0f, PrimaryAttributeContextHandle);
+
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeSpecHandle, MageGameplayTags.Attributes_Primary_Strength, MageSaveGame->Strength);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeSpecHandle, MageGameplayTags.Attributes_Primary_Intelligence, MageSaveGame->Intelligence);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeSpecHandle, MageGameplayTags.Attributes_Primary_Resilience, MageSaveGame->Resilience);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeSpecHandle, MageGameplayTags.Attributes_Primary_Vigor, MageSaveGame->Vigor);
+	
+	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributeSpecHandle.Data.Get());
+
+	// 设置次要属性
+	FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
+	SecondaryAttributeContextHandle.AddSourceObject(SourceAvatarActor);
+	FGameplayEffectSpecHandle SecondaryAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->SecondaryAttributes_Infinite, 1.0f, SecondaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeSpecHandle.Data.Get());
+
+	// 设置生命值和法力值
+	FGameplayEffectContextHandle BaseAttributeContextHande = ASC->MakeEffectContext();
+	BaseAttributeContextHande.AddSourceObject(SourceAvatarActor);
+	FGameplayEffectSpecHandle BaseAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->DefaultBaseEffects, 1.0f, BaseAttributeContextHande);
+	ASC->ApplyGameplayEffectSpecToSelf(*BaseAttributeSpecHandle.Data.Get());
 }
 
 void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)

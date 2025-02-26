@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "MageAbilitySystemComponent.generated.h"
 
+class UMageSaveGame;
 class UMageAbilitySystemComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTagsSignature, const FGameplayTagContainer& /* Asset Tags */);
@@ -29,7 +30,8 @@ public:
 	void AbilityActorInfoIsSet();
 	void AddCharacterAbilites(TArray<TSubclassOf<UGameplayAbility>>& AbilitiesClass);
 	void AddCharacterPassiveAbilites(TArray<TSubclassOf<UGameplayAbility>>& PassiveAbilitiesClass);
-
+	void AddCharacterAbilitiesFromSaveGame(const UMageSaveGame* MageSaveGame);
+	
 	FEffectAssetTagsSignature EffectAssetTagsDelegate;
 	
 	/** Ability */

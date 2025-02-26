@@ -66,6 +66,8 @@ void FMageGameplayTags::InitNativeGameplayTags()
 		FName("Attributes.Meta.ReceivedXP"), FString("ReceivedXP Meta Attribute Tag"));
 
 	/** Input Tags*/
+	MageGameplayTags.Input = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Input"), FString("Input Tag"));
 	MageGameplayTags.Input_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Input.LMB"), FString("Left Mouse Button"));
 	MageGameplayTags.Input_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(

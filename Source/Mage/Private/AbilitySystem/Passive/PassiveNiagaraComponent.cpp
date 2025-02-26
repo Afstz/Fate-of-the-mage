@@ -4,6 +4,7 @@
 #include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "MageGameplayTags.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Interface/CombatInterface.h"
 
@@ -20,6 +21,7 @@ void UPassiveNiagaraComponent::BeginPlay()
 	if (MageASC)
 	{
 		MageASC->OnPassiveActivationChanged.AddUObject(this, &UPassiveNiagaraComponent::OnPassiveActivate);
+		ActiveIfEquipped(MageASC);
 	}
 	else if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetOwner())) // ASC未初始化成功
 	{
@@ -28,6 +30,7 @@ void UPassiveNiagaraComponent::BeginPlay()
 			if (UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(InASC))
 			{
 				MageASC->OnPassiveActivationChanged.AddUObject(this, &UPassiveNiagaraComponent::OnPassiveActivate);
+				ActiveIfEquipped(MageASC);
 			}
 		});
 	}
@@ -44,6 +47,20 @@ void UPassiveNiagaraComponent::OnPassiveActivate(const FGameplayTag& PassiveTag,
 		else
 		{
 			Deactivate();
+		}
+	}
+}
+
+void UPassiveNiagaraComponent::ActiveIfEquipped(UMageAbilitySystemComponent* MageASC)
+{
+	// 初始化完毕并且被动技能是装备状态就激活特效。 
+	if (MageASC->bStartupAbilitiesGiven) 
+	{
+		const FGameplayTag StatusTag = MageASC->GetStatusTagFromAbilityTag(PassiveAbilityTag);
+
+		if (StatusTag.MatchesTagExact(FMageGameplayTags::Get().Abilities_Status_Equipped))
+		{
+			Activate();
 		}
 	}
 }

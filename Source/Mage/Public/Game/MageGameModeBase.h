@@ -6,8 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "MageGameModeBase.generated.h"
 
+class UMageGameInstance;
 class UMVVM_LoadSlot;
-class ULoadScreenSaveGame;
+class UMageSaveGame;
 class UAbilityData;
 class UCharacterClassData;
 
@@ -29,20 +30,34 @@ public:
 	TObjectPtr<UAbilityData> AbilityData;
 
 	/** Save Game */
-	void SaveSlotData(UMVVM_LoadSlot* LoadSlotViewModel, int32 InSlotIndex);
-	ULoadScreenSaveGame* GetSaveGameObject(UMVVM_LoadSlot* LoadSlotViewModel, int32 InSlotIndex);
+	void SaveSlotData(UMVVM_LoadSlot* LoadSlotViewModel, int32 InSlotIndex); 
+	void SaveDataInGameProgress(UMageSaveGame* MageSaveGame);
+	UMageSaveGame* GetSaveGameObjectByName(const FString& InSlotName, int32 InSlotIndex);
+	UMageSaveGame* GetSaveGameObjectByGameInstance(UMageGameInstance* MageGameInstance);
 	static void DeleteSaveGameData(const FString& InSlotName, int32 InSlotIndex);
 	void TraveToMap(UMVVM_LoadSlot* LoadSlotViewModel);
+	void SaveWorldState(UWorld* World);
+	void LoadWorldState(UWorld* World);
+	
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
-	TSubclassOf<ULoadScreenSaveGame> LoadScreenSaveGameClass;
+	TSubclassOf<UMageSaveGame> MageSaveGameClass;
 
+	// 默认地图名字
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
 	FString DefaultMapName;
-	
+
+	// 默认地图起始点Tag
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
-	TSoftObjectPtr<UWorld> DefaultMap;
+	FName DefaultPlayerStartTag;
+
+	// 软对象引用,使用时才会加载,减少内存占用
+	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
+	TSoftObjectPtr<UWorld> DefaultMap; 
 
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
 	TMap<FString, TSoftObjectPtr<UWorld>> GameMaps;
+
+protected:
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };

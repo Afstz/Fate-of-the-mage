@@ -2,7 +2,6 @@
 
 
 #include "MageAssetManager.h"
-
 #include "MageGameplayTags.h"
 
 UMageAssetManager& UMageAssetManager::Get()
