@@ -36,7 +36,7 @@ public:
 	UMageSaveGame* GetSaveGameObjectByGameInstance(UMageGameInstance* MageGameInstance);
 	static void DeleteSaveGameData(const FString& InSlotName, int32 InSlotIndex);
 	void TraveToMap(UMVVM_LoadSlot* LoadSlotViewModel);
-	void SaveWorldState(UWorld* World);
+	void SaveWorldState(UWorld* World, const FString& DestinationMapAssetName = FString(""));
 	void LoadWorldState(UWorld* World);
 	
 	
@@ -57,6 +57,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
 	TMap<FString, TSoftObjectPtr<UWorld>> GameMaps;
+	FString GetMapNameByMapAssetName(const FString& MapAssetName);
 
 protected:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;

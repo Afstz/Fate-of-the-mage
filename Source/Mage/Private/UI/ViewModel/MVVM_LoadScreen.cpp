@@ -29,7 +29,7 @@ void UMVVM_LoadScreen::InitializeLoadSlotViewModels()
 void UMVVM_LoadScreen::LoadSaveData()
 {
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
-
+	
 	// 遍历LoadSlotVMs加载数据
 	for (auto& [InSlotIndex, InLoadSlotViewModel] : LoadSlotViewModels)
 	{
@@ -89,12 +89,14 @@ void UMVVM_LoadScreen::LoadArchiveButtonPressed(int32 InSlotIndex)
 void UMVVM_LoadScreen::StartGameButtonPressed()
 {
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
+
+	UMageGameInstance* MageGI = Cast<UMageGameInstance>(GetWorld()->GetGameInstance());
 	
 	if (IsValid(SelectedSlotVM))
 	{
-		UMageGameInstance::GetMageGameInstance()->PlayerStartTag = SelectedSlotVM->PlayerStartTag;
-		UMageGameInstance::GetMageGameInstance()->LoadSlotName = SelectedSlotVM->GetLoadSlotName();
-		UMageGameInstance::GetMageGameInstance()->LoadSlotIndex = SelectedSlotVM->SlotIndex;
+		MageGI->PlayerStartTag = SelectedSlotVM->PlayerStartTag;
+		MageGI->LoadSlotName = SelectedSlotVM->GetLoadSlotName();
+		MageGI->LoadSlotIndex = SelectedSlotVM->SlotIndex;
 		
 		MageGameModeBase->TraveToMap(SelectedSlotVM); // 传送到当前插槽保存的地图
 	}

@@ -30,6 +30,11 @@ AMageEnemy::AMageEnemy()
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
 	BaseWalkSpeed = 250.f;
+
+	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+	GetMesh()->MarkRenderStateDirty();
+	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
+	Weapon->MarkRenderStateDirty();
 }
 
 void AMageEnemy::PossessedBy(AController* NewController)
@@ -126,18 +131,21 @@ void AMageEnemy::HitReactCallBack(const FGameplayTag HitReactTag, int32 NewCount
 	}
 }
 
-void AMageEnemy::HighlightActor()
+void AMageEnemy::HighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(true);
-	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 	Weapon->SetRenderCustomDepth(true);
-	Weapon->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED);
 }
 
-void AMageEnemy::UnHighlightActor()
+void AMageEnemy::UnHighlightActor_Implementation()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AMageEnemy::MoveToLocation_Implementation(FVector& OutDestination)
+{
+	// 不做处理，仅用于存档点等修改目的地位置
 }
 
 AActor* AMageEnemy::GetFacingTarget_Implementation() const

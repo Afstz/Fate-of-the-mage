@@ -18,7 +18,7 @@ enum ELoadSlotStatus : uint8
 };
 
 /**
- *  
+ *  用于显示数据，切换插槽状态，保存游戏
  */
 UCLASS()
 class MAGE_API UMVVM_LoadSlot : public UMVVMViewModelBase

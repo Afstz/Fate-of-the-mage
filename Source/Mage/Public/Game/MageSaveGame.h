@@ -110,9 +110,13 @@ public:
 	UPROPERTY()
 	FName PlayerStartTag = FName();
 
-	// 地图名称
+	// 地图名称(UI显示)
 	UPROPERTY()
 	FString MapName = FString();
+
+	// 地图资产名称
+	UPROPERTY()
+	FString MapAssetName = FString();
 
 	// 判断是否初始化属性和赋予技能
 	UPROPERTY()
@@ -153,5 +157,6 @@ public:
 	TArray<FSavedWorld> SavedWorlds;
 
 	FSavedWorld GetSavedWorldByWorldName(const FString& InWorldName);
+	
 	bool HasMap(const FString& InWorldName);
 };

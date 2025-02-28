@@ -20,11 +20,11 @@ public:
 
 	// 玩家起始点标签
 	UPROPERTY()
-	FName PlayerStartTag = FName();
+	FName PlayerStartTag = FName("MainGame1PlayerStart1");
 
 	// 存档插槽名
 	UPROPERTY()
-	FString LoadSlotName = FString();
+	FString LoadSlotName = FString("LoadSlot_0");
 
 	// 存档插槽索引
 	UPROPERTY()

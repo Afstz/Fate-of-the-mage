@@ -17,6 +17,7 @@
 #include "Interface/EnemyInterface.h"
 #include "UI/Widget/MageUserWidget.h"
 #include "GameFramework/Character.h"
+#include "Interface/HighlightInterface.h"
 #include "Mage/Mage.h"
 #include "UI/Widget/WidgetCompoent/DamageTextComponent.h"
 
@@ -73,8 +74,8 @@ void AMagePlayerController::CursorTrace()
 {
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_CursorTrace))
 	{
-		CurrentCursorActor->UnHighlightActor();
-		LastCursorActor->UnHighlightActor();
+		UnHighlightActor(CurrentCursorActor);
+		UnHighlightActor(LastCursorActor);
 		CurrentCursorActor = nullptr;
 		LastCursorActor = nullptr;
 		return;
@@ -87,12 +88,35 @@ void AMagePlayerController::CursorTrace()
 	if (!CursorHit.bBlockingHit) return;
 
 	LastCursorActor = CurrentCursorActor;
-	CurrentCursorActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+	if (IsValid(CursorHit.GetActor()) && CursorHit.GetActor()->Implements<UHighlightInterface>())
+	{
+		CurrentCursorActor = CursorHit.GetActor();
+	}
+	else
+	{
+		CurrentCursorActor = nullptr;
+	}
 	
 	if (LastCursorActor != CurrentCursorActor)
 	{
-		if (CurrentCursorActor) CurrentCursorActor->HighlightActor();
-		if (LastCursorActor) LastCursorActor->UnHighlightActor();
+		HighlightActor(CurrentCursorActor);
+		UnHighlightActor(LastCursorActor);
+	}
+}
+
+void AMagePlayerController::HighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_HighlightActor(InActor);
+	}
+}
+
+void AMagePlayerController::UnHighlightActor(AActor* InActor)
+{
+	if (IsValid(InActor) && InActor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_UnHighlightActor(InActor);
 	}
 }
 
@@ -175,9 +199,9 @@ void AMagePlayerController::Move(const FInputActionValue& InputActionValue)
 	
 	bAutoRunning = false;
 	const FVector2D InputAxisValue = InputActionValue.Get<FVector2D>();
-	const FRotator Rotation = GetControlRotation(); // 默认 0 0 0
+	// const FRotator Rotation = GetControlRotation(); // 默认 0 0 0
 	// 只保留Yaw分量，其他分量设为0
-	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	const FRotator YawRotation(0.f, 0.f, 0.f);
 	
 	// 将YawRotation转换成旋转矩阵，并从中提取X轴和Y轴方向向量
 	// 因为YawRotaion始终为 0 0 0 , 变成标准的基向量组成的4x4矩阵
@@ -257,7 +281,14 @@ void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	
 	if (InputTag.MatchesTagExact(FMageGameplayTags::Get().Input_LMB))
 	{
-		bTargeting = CurrentCursorActor ? true : false;
+		if (IsValid(CurrentCursorActor) && CurrentCursorActor->Implements<UEnemyInterface>())
+		{
+			TargetingStatus = ETargetingStatus::TargetingEnemy;
+		}
+		else
+		{
+			TargetingStatus = ETargetingStatus::NoneTarget;
+		}
 		bAutoRunning = false;
 		HoldingTime = 0.f; // 重置自动移动按住时间
 	}
@@ -284,7 +315,7 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 	
-	if (bTargeting || bShiftKeyPressed)
+	if (TargetingStatus == ETargetingStatus::TargetingEnemy || bShiftKeyPressed)
 	{
 		// 左键鼠标指向敌人或者按住Shift,执行技能逻辑
 		if (GetMageAbilitySystemComponent())
@@ -302,6 +333,7 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 			CachedDestination = CursorHit.bBlockingHit ? CursorHit.ImpactPoint : ControlledPawn->GetActorLocation();
 			// 获取要移动目的地的方向
 			FVector MoveDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			
 			ControlledPawn->AddMovementInput(MoveDirection);
 		}
 	}
@@ -328,8 +360,18 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		GetMageAbilitySystemComponent()->AbilityInputReleased(InputTag);
 	}
 
-	if (!bTargeting && !bShiftKeyPressed)
+	if (TargetingStatus != ETargetingStatus::TargetingEnemy && !bShiftKeyPressed)
 	{
+		// 如果是存档点就更改目的地到指定位置
+		if (IsValid(CurrentCursorActor) && CurrentCursorActor->Implements<UHighlightInterface>())
+		{
+			IHighlightInterface::Execute_MoveToLocation(CurrentCursorActor, CachedDestination);
+		}
+		else if (GetMageAbilitySystemComponent() && !GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MouseClickEffect, CachedDestination);
+		}
+		
 		APawn* ControlledPawn = GetPawn();
 		if (HoldingTime <= ShortPressThreshold && ControlledPawn) // 小于短按阈值则进行自动移动
 		{
@@ -347,10 +389,6 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				// 以防缓存的目的地在达不到的地方,修改为最后一个路径点
 				CachedDestination = FoundPath->PathPoints[FoundPath->PathPoints.Num() - 1];
 				bAutoRunning = true; // 开始自动移动
-				if (GetMageAbilitySystemComponent() && !GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
-				{
-					UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MouseClickEffect, CachedDestination);
-				}
 			}
 		}
 	}

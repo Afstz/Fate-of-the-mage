@@ -160,8 +160,6 @@ void AMageCharacte::SaveGameProgress_Implementation(const FName& CheckPointTag)
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
 	if (MageGameModeBase)
 	{
-		MageGameModeBase->SaveWorldState(GetWorld()); // 保存世界的Actors状态信息
-		
 		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByGameInstance(UMageGameInstance::GetMageGameInstance());
 		AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
 		if (!MagePlayerState && !IsValid(MageSaveGame)) return;
@@ -217,8 +215,9 @@ void AMageCharacte::LoadGameProgress()
 	if (MageGameModeBase)
 	{
 		MageGameModeBase->LoadWorldState(GetWorld()); // 加载世界的Actors状态信息
-		
-		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByGameInstance(UMageGameInstance::GetMageGameInstance());
+
+		UMageGameInstance* MageGI = Cast<UMageGameInstance>(GetWorld()->GetGameInstance());
+		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByGameInstance(MageGI);
 		AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
 		if (!MagePlayerState && !IsValid(MageSaveGame)) return;
 

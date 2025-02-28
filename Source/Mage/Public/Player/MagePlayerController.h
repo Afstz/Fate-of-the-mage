@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MagePlayerController.generated.h"
 
+class IHighlightInterface;
 class AMagicCircle;
 class UNiagaraSystem;
 class UDamageTextComponent;
@@ -18,6 +19,14 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class IEnemyInterface;
+
+
+enum class ETargetingStatus : uint8
+{
+	TargetingEnemy,
+	TargetingMapEntrance,
+	NoneTarget
+};
 
 /**
  * 
@@ -89,11 +98,17 @@ private:
 	FORCEINLINE void ShiftKeyReleased() { bShiftKeyPressed = false;}
 	bool bShiftKeyPressed = false;
 
-	/** Show Enemy Outline*/
+	/** Show Outline */
 	void CursorTrace();
-	IEnemyInterface* LastCursorActor;
-	IEnemyInterface* CurrentCursorActor;
+	UPROPERTY()
+	TObjectPtr<AActor> LastCursorActor;
+	UPROPERTY()
+	TObjectPtr<AActor> CurrentCursorActor;
 	FHitResult CursorHit;
+	ETargetingStatus TargetingStatus = ETargetingStatus::NoneTarget;
+	void HighlightActor(AActor* InActor);
+	void UnHighlightActor(AActor* InActor);
+	
 
 	/** Ability */
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -111,7 +126,6 @@ private:
 	FVector CachedDestination = FVector::ZeroVector; // 导航目的地
 	float HoldingTime = 0.f; // 按住时间
 	float ShortPressThreshold = 0.25f; // 短按阈值
-	bool bTargeting = false; // 鼠标是否碰到敌人
 	bool bAutoRunning = false; // 自动跑步
 	UPROPERTY(EditDefaultsOnly)
 	float AutoRunAcceptanceRadius = 30.f; // 停止跑步的范围

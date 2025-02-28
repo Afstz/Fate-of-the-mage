@@ -17,11 +17,11 @@ void ALoadScreenHUD::BeginPlay()
 	LoadScreenWidget = CreateWidget<ULoadScreenWidget>(GetWorld(), LoadScreenWidgetClass);
 	LoadScreenWidget->AddToViewport();
 	LoadScreenWidget->BlueprintInitializeWidget(); // 初始化蓝图Widget与LoadSlotViewModel相关联
-
-	LoadScreenViewModel->LoadSaveData(); // 加载存档
-
+	
 	FInputModeUIOnly InputModeUIOnly;
 	InputModeUIOnly.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	GetOwningPlayerController()->SetInputMode(InputModeUIOnly);
 	GetOwningPlayerController()->SetShowMouseCursor(true);
+	
+	LoadScreenViewModel->LoadSaveData(); // 加载存档
 }

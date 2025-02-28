@@ -80,7 +80,7 @@ void AMageGameModeBase::TraveToMap(UMVVM_LoadSlot* LoadSlotViewModel)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, GameMaps.FindChecked(LoadSlotViewModel->GetMapName()));
 }
 
-void AMageGameModeBase::SaveWorldState(UWorld* World)
+void AMageGameModeBase::SaveWorldState(UWorld* World, const FString& DestinationMapAssetName)
 {
 	FString WorldName = World->GetMapName();
 	// 移除地图字符串前缀获取最原始的资产名
@@ -91,6 +91,13 @@ void AMageGameModeBase::SaveWorldState(UWorld* World)
 	
 	if (UMageSaveGame* MageSaveGame = GetSaveGameObjectByGameInstance(MageGameInstance))
 	{
+		if (DestinationMapAssetName != FString("")) // 切换新地图
+		{
+			MageSaveGame->MapAssetName = DestinationMapAssetName;
+			// 用于更新UI
+			MageSaveGame->MapName = GetMapNameByMapAssetName(DestinationMapAssetName);
+		}
+			
 		if (!MageSaveGame->HasMap(WorldName))
 		{
 			FSavedWorld SavedWorld; // 要保存的世界信息
@@ -114,7 +121,7 @@ void AMageGameModeBase::SaveWorldState(UWorld* World)
 			// 创建一个内存写入器，用于将数据直接写入内存中的字节数组
 			FMemoryWriter MemoryWriter(SavedActor.SerializeBytes);
 			
-			// UE 提供的特殊存档类，强制将对象名称（FName）序列化为字符串（String），而不是默认的索引（Index）,字符串在序列化会更安全。
+			// UE 提供的特殊存档类，将对象引用转换为字符串路径，反序列化时再通过路径重新查找对象。
 			FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);
 			// 标记此存档用于保存游戏,仅保存标记为 UPROPERTY(SaveGame) 的属性。
 			Archive.ArIsSaveGame = true;
@@ -134,7 +141,6 @@ void AMageGameModeBase::SaveWorldState(UWorld* World)
 		
 		SaveDataInGameProgress(MageSaveGame); // 保存
 	}
-	
 }
 
 void AMageGameModeBase::LoadWorldState(UWorld* World)
@@ -167,7 +173,7 @@ void AMageGameModeBase::LoadWorldState(UWorld* World)
 
 					// 内存读取器
 					FMemoryReader MemoryReader(InSavedActor.SerializeBytes);
-
+					// 将二进制流中的字符串路径解析为实际对象引用
 					FObjectAndNameAsStringProxyArchive Archive(MemoryReader, true);
 					Archive.ArIsSaveGame = true;
 
@@ -179,6 +185,19 @@ void AMageGameModeBase::LoadWorldState(UWorld* World)
 			}
 		}
 	}
+}
+
+FString AMageGameModeBase::GetMapNameByMapAssetName(const FString& MapAssetName)
+{
+	//D MapName: 显示到UI的名字 MapAssetName: 地图资产名
+	for (auto [MapName, Map] : GameMaps)
+	{
+		if (Map.ToSoftObjectPath().GetAssetName() == MapAssetName)
+		{
+			return MapName;
+		}
+	}
+	return FString();
 }
 
 AActor* AMageGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
