@@ -56,6 +56,7 @@ public:
 
 	/* GameplayEffect Tags */
 	FGameplayTag Effects_HitReact;
+	FGameplayTag Effects_Infinite;
 
 	/* Damage Type Tags */
 	

@@ -88,6 +88,8 @@ void FMageGameplayTags::InitNativeGameplayTags()
 	/** GameplayEffect Tags */
 	MageGameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Effects.HitReact"), FString("Hit React"));
+	MageGameplayTags.Effects_Infinite = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Effects.Infinite"), FString("Infinite Effect"));
 	
 	/** Damage Type Tags */
 	MageGameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(

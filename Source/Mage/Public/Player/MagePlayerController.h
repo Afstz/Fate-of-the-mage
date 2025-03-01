@@ -24,7 +24,7 @@ class IEnemyInterface;
 enum class ETargetingStatus : uint8
 {
 	TargetingEnemy,
-	TargetingMapEntrance,
+	TargetingNoneEnemy,
 	NoneTarget
 };
 
@@ -141,4 +141,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<AMagicCircle> MagicCircleDecal; // 魔法贴花
 	void UpdateMagicCircleLocation() const;
+
+	bool IsCharacterDead();
 };

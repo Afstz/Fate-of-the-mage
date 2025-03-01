@@ -53,17 +53,72 @@ void AMageCharacte::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	// Init Ability Actor Info in the Server.
 
-	InitAbilityActorInfo();
-
-	LoadGameProgress();
+	AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
+	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
+	UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(AbilitySystemComponent);
+	if (IsValid(MageASC) && MageASC->bStartupAbilitiesGiven)
+	{
+		// 后续死亡初始化
+		PlayerRespawnInit(MagePlayerState, MageASC);
+	}
+	else
+	{
+		// 第一次进入游戏
+		InitAbilityActorInfo();
+		LoadGameProgress();
+	}
 }
-
 void AMageCharacte::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	// Init Ability Actor Info in the Client.
-	InitAbilityActorInfo();
+	AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
+	AbilitySystemComponent = MagePlayerState->GetAbilitySystemComponent();
+	UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(AbilitySystemComponent);
+	if (IsValid(MageASC) && MageASC->bStartupAbilitiesGiven)
+	{
+		// 客户端后续死亡初始化
+		ClientPlayerRespawnInit(MagePlayerState, MageASC);
+	}
+	else
+	{
+		// Init Ability Actor Info in the Client.
+		InitAbilityActorInfo();
+		// 客户端初始化数据
+		ClientPlayerFirstInit(MagePlayerState);
+	}
+}
+
+void AMageCharacte::PlayerRespawnInit(AMagePlayerState* MagePlayerState, UMageAbilitySystemComponent* MageASC)
+{
+	FGameplayTagContainer InfiniteTags;
+	InfiniteTags.AddTag(FGameplayTag::RequestGameplayTag("Effects.Infinite"));
+	MageASC->RemoveActiveEffectsWithSourceTags(InfiniteTags); // 移除永久Effect
+	
+	AttributeSet = MagePlayerState->GetAttributeSet();
+	MageASC->SetAvatarActor(this);
+	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
+	MageASC->AbilityActorInfoIsSet(); // 绑定效果应用回调
+	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FMageGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::OnStunTagChanged);
+	// 重生重新赋予Effect
+	UMageAbilitySystemLibrary::InitAttributesWhenRespawn(this, MageASC);
+}
+
+void AMageCharacte::ClientPlayerFirstInit(AMagePlayerState* MagePlayerState)
+{
+	// 修复BUG客户端无法接收到广播数据
+	MagePlayerState->LevelChangedDelegate.Broadcast(MagePlayerState->GetPlayerLevel(), false);
+	MagePlayerState->XPChangedDelegate.Broadcast(MagePlayerState->GetPlayerXP());
+}
+
+void AMageCharacte::ClientPlayerRespawnInit(AMagePlayerState* MagePlayerState, UMageAbilitySystemComponent* MageASC)
+{
+	AttributeSet = MagePlayerState->GetAttributeSet();
+	MageASC->SetAvatarActor(this);
+	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
+	MageASC->AbilityActorInfoIsSet(); // 绑定效果应用回调
+	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 }
 
 int32 AMageCharacte::GetCharacterLevel_Implementation() const
@@ -160,7 +215,8 @@ void AMageCharacte::SaveGameProgress_Implementation(const FName& CheckPointTag)
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this));
 	if (MageGameModeBase)
 	{
-		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByGameInstance(UMageGameInstance::GetMageGameInstance());
+		UMageGameInstance* MageGI = UMageGameInstance::GetMageGameInstance();
+		UMageSaveGame* MageSaveGame = MageGameModeBase->GetSaveGameObjectByGameInstance(MageGI);
 		AMagePlayerState* MagePlayerState = GetPlayerState<AMagePlayerState>();
 		if (!MagePlayerState && !IsValid(MageSaveGame)) return;
 		
@@ -174,12 +230,13 @@ void AMageCharacte::SaveGameProgress_Implementation(const FName& CheckPointTag)
 		MageSaveGame->Resilience = UMageAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		MageSaveGame->Vigor = UMageAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
 		MageSaveGame->bFirstSaveGame = false;
-		UMageGameInstance::GetMageGameInstance()->PlayerStartTag = CheckPointTag; // 保存当前存档点Tag
+		MageGI->PlayerStartTag = CheckPointTag; // 保存当前存档点Tag
 
 		// 保存玩家技能数据
 		UMageAbilitySystemComponent* MageASC = Cast<UMageAbilitySystemComponent>(GetAbilitySystemComponent());
 		UAbilityData* AbilityData = UMageAbilitySystemLibrary::GetAbilityData(this);
 		FForeachAbilitiesSignature ForeachAbilities;
+		MageSaveGame->SavedAbilitiesData.Empty();
 		
 		ForeachAbilities.BindLambda([this, MageASC, AbilityData, MageSaveGame](const FGameplayAbilitySpec& AbilitySpec)
 		{
@@ -277,6 +334,26 @@ void AMageCharacte::OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount)
 {
 	Super::OnStunTagChanged(StunTag, NewCount);
 }
+
+void AMageCharacte::Die(const FVector& InDeathImpulse)
+{
+	Super::Die(InDeathImpulse);
+
+	FTimerDelegate DeathTimerDelegate;
+	DeathTimerDelegate.BindLambda([this]()
+	{
+		if (AMageGameModeBase* MageGameMode = Cast<AMageGameModeBase>(GetWorld()->GetAuthGameMode()))
+		{
+			MageGameMode->PlayerRespawn(this, GetController()); // 玩家重生
+		}
+	});
+	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, DeathTime, false);
+	
+	// 防止相机在玩家角色死亡后跟随移动，将相机固定在世界坐标位置
+	Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+
 
 void AMageCharacte::LevelUp_Implementation()
 {

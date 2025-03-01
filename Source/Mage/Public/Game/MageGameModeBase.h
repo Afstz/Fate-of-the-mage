@@ -38,7 +38,9 @@ public:
 	void TraveToMap(UMVVM_LoadSlot* LoadSlotViewModel);
 	void SaveWorldState(UWorld* World, const FString& DestinationMapAssetName = FString(""));
 	void LoadWorldState(UWorld* World);
-	
+
+	/** Player */
+	void PlayerRespawn(ACharacter* DiedCharacter, AController* DiedController);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "SaveGame")
 	TSubclassOf<UMageSaveGame> MageSaveGameClass;

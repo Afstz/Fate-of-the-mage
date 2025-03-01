@@ -17,6 +17,7 @@
 #include "Interface/EnemyInterface.h"
 #include "UI/Widget/MageUserWidget.h"
 #include "GameFramework/Character.h"
+#include "Interface/CombatInterface.h"
 #include "Interface/HighlightInterface.h"
 #include "Mage/Mage.h"
 #include "UI/Widget/WidgetCompoent/DamageTextComponent.h"
@@ -274,6 +275,8 @@ void AMagePlayerController::SetSkillMenuWidget(UMageUserWidget* InSkillMenu)
 
 void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (IsCharacterDead()) return;
+	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
 	{
 		return;
@@ -301,6 +304,8 @@ void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (IsCharacterDead()) return;
+	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputHeld))
 	{
 		return;
@@ -341,6 +346,8 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (IsCharacterDead()) return;
+	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputReleased))
 	{
 		return;
@@ -393,7 +400,6 @@ void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		}
 	}
 }
-	
 
 UMageAbilitySystemComponent* AMagePlayerController::GetMageAbilitySystemComponent()
 {
@@ -403,5 +409,16 @@ UMageAbilitySystemComponent* AMagePlayerController::GetMageAbilitySystemComponen
 	}
 	return MageASC;
 }
+
+
+bool AMagePlayerController::IsCharacterDead()
+{
+	if (IsValid(GetCharacter()) && GetCharacter()->Implements<UCombatInterface>())
+	{
+		if (ICombatInterface::Execute_IsDead(GetCharacter())) return true;
+	}
+	return false;
+}
+
 
 

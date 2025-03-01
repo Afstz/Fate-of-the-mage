@@ -136,6 +136,26 @@ void UMageAbilitySystemLibrary::InitAttributesFromSaveGame(const UObject* WorldC
 	ASC->ApplyGameplayEffectSpecToSelf(*BaseAttributeSpecHandle.Data.Get());
 }
 
+void UMageAbilitySystemLibrary::InitAttributesWhenRespawn(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+{
+	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject);
+	if (!CharacterClassData || !IsValid(ASC)) return;
+
+	AActor* SourceAvatarActor = ASC->GetAvatarActor();
+	
+	// 设置次要属性
+	FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
+	SecondaryAttributeContextHandle.AddSourceObject(SourceAvatarActor);
+	FGameplayEffectSpecHandle SecondaryAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->SecondaryAttributes_Infinite, 1.0f, SecondaryAttributeContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeSpecHandle.Data.Get());
+
+	// 设置生命值和法力值
+	FGameplayEffectContextHandle BaseAttributeContextHande = ASC->MakeEffectContext();
+	BaseAttributeContextHande.AddSourceObject(SourceAvatarActor);
+	FGameplayEffectSpecHandle BaseAttributeSpecHandle = ASC->MakeOutgoingSpec(CharacterClassData->DefaultBaseEffects, 1.0f, BaseAttributeContextHande);
+	ASC->ApplyGameplayEffectSpecToSelf(*BaseAttributeSpecHandle.Data.Get());
+}
+
 void UMageAbilitySystemLibrary::GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassData* CharacterClassData = GetCharacterClassData(WorldContextObject); // 获取到Mode中的角色默认技能

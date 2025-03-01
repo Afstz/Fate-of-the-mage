@@ -49,6 +49,8 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MultiHandleDeath(const FVector& DeathImpulse);
+
+	void SetCharacterClass(ECharacterClass InCharacterClass) { CharacterClass = InCharacterClass; }
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -68,6 +70,7 @@ protected:
 	TObjectPtr<UAnimMontage> HitReactMontage;
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UNiagaraSystem> BloodEffect;
+	UPROPERTY(BlueprintReadOnly)
 	bool bDead = false; // 角色是否死亡
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USoundBase> DeathSound;

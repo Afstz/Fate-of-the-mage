@@ -85,7 +85,7 @@ void AMagePlayerState::OnRep_Level(int32 OldLevel)
 	LevelChangedDelegate.Broadcast(Level, true);
 }
 
-void AMagePlayerState::Onrep_XP(int32 OldXP)
+void AMagePlayerState::OnRep_XP(int32 OldXP)
 {
 	XPChangedDelegate.Broadcast(XP);
 }

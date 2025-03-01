@@ -50,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | CharacterClassDefaults")
 	static void InitAttributesFromSaveGame(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UMageSaveGame* MageSaveGame);
+
+	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | CharacterClassDefaults")
+	static void InitAttributesWhenRespawn(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 	
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | CharacterClassDefaults")
 	static void GiveCharacterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass);

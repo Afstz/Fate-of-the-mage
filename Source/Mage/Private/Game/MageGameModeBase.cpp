@@ -2,12 +2,12 @@
 
 
 #include "Game/MageGameModeBase.h"
-
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
 #include "Game/MageSaveGame.h"
 #include "Game/MageGameInstance.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "Interface/SaveInterface.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
@@ -91,7 +91,7 @@ void AMageGameModeBase::SaveWorldState(UWorld* World, const FString& Destination
 	
 	if (UMageSaveGame* MageSaveGame = GetSaveGameObjectByGameInstance(MageGameInstance))
 	{
-		if (DestinationMapAssetName != FString("")) // 切换新地图
+		if (DestinationMapAssetName != FString("")) // 切换到新地图
 		{
 			MageSaveGame->MapAssetName = DestinationMapAssetName;
 			// 用于更新UI
@@ -138,7 +138,6 @@ void AMageGameModeBase::SaveWorldState(UWorld* World, const FString& Destination
 				InSavedWorld = SavedWorld; // 覆盖
 			}
 		}
-		
 		SaveDataInGameProgress(MageSaveGame); // 保存
 	}
 }
@@ -189,7 +188,7 @@ void AMageGameModeBase::LoadWorldState(UWorld* World)
 
 FString AMageGameModeBase::GetMapNameByMapAssetName(const FString& MapAssetName)
 {
-	//D MapName: 显示到UI的名字 MapAssetName: 地图资产名
+	//MapName: 显示到UI的名字 MapAssetName: 地图资产名
 	for (auto [MapName, Map] : GameMaps)
 	{
 		if (Map.ToSoftObjectPath().GetAssetName() == MapAssetName)
@@ -198,6 +197,33 @@ FString AMageGameModeBase::GetMapNameByMapAssetName(const FString& MapAssetName)
 		}
 	}
 	return FString();
+}
+
+void AMageGameModeBase::PlayerRespawn(ACharacter* DiedCharacter, AController* DiedController)
+{
+	if (DiedCharacter)
+	{
+		DiedCharacter->Destroy();
+	}
+	if (DiedController)
+	{
+		TArray<AActor*>PlayerStarts;
+		UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
+		AActor* SelectedStart = nullptr;
+		if (PlayerStarts.Num() > 0)
+		{
+			for (AActor* Actor : PlayerStarts)
+			{
+				APlayerStart* PlayerStart = Cast<APlayerStart>(Actor);
+				if (PlayerStart->PlayerStartTag == UMageGameInstance::GetMageGameInstance()->PlayerStartTag)
+				{
+					SelectedStart = PlayerStart;
+					break;
+				}
+			}
+		}
+		RestartPlayerAtPlayerStart(DiedController, SelectedStart);
+	}
 }
 
 AActor* AMageGameModeBase::ChoosePlayerStart_Implementation(AController* Player)

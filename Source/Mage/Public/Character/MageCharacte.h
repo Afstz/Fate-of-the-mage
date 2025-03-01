@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/MageAbilitySystemComponent.h"
 #include "Character/MageCharacterBase.h"
 #include "Interface/PlayerInterface.h"
+#include "Player/MagePlayerState.h"
 #include "MageCharacte.generated.h"
 
 class UCameraComponent;
@@ -51,8 +53,19 @@ protected:
 	virtual void OnRep_Stunned(bool OldStunned) override;
 	virtual void OnStunTagChanged(const FGameplayTag StunTag, int32 NewCount) override;
 
+	/** Deid Status */
+	virtual void Die(const FVector& InDeathImpulse) override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	float DeathTime = 3.f;
+	FTimerHandle DeathTimer;
+
 	/** Save Game */
 	void LoadGameProgress();
+
+	/** Respawn */
+	void PlayerRespawnInit(AMagePlayerState* MagePlayerState, UMageAbilitySystemComponent* MageASC);
+	void ClientPlayerRespawnInit(AMagePlayerState* MagePlayerState, UMageAbilitySystemComponent* MageASC);
+	void ClientPlayerFirstInit(AMagePlayerState* MagePlayerState);
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;

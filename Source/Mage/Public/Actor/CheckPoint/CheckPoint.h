@@ -30,6 +30,7 @@ public:
 	// 需要被序列化的字段
 	UPROPERTY(BlueprintReadWrite, SaveGame)
 	bool bReached = false;
+	bool bLight = false;
 	
 	// Red:250 Blue:251 TAN:252
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -40,7 +41,8 @@ protected:
 
 	UFUNCTION()
 	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
+	
+	UFUNCTION(NetMulticast, Unreliable)
 	void HandleCheckPointGlow();
 	UFUNCTION(BlueprintImplementableEvent)
 	void CheckPointGlow(UMaterialInstanceDynamic* DynamicMaterialInstance);

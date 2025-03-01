@@ -65,7 +65,7 @@ protected:
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 	UFUNCTION()
-	void Onrep_XP(int32 OldXP);
+	void OnRep_XP(int32 OldXP);
 	UFUNCTION()
 	void OnRep_AttributePoints(int32 OldAttributePoints);
 	UFUNCTION()

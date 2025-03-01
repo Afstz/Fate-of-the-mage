@@ -51,6 +51,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReact = false;
 
+	/** Combat */
+	void SetLevel(int32 InLevel) { Level = InLevel; }
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float LifeSpan = 5.f;
 protected:
@@ -78,6 +80,6 @@ protected:
 private:
 	/** Widget */
 	void InitHealthBar();
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast, Unreliable)
 	void MultiHiddenWidget();
 };

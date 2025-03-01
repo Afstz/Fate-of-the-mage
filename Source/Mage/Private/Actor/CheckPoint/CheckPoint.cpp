@@ -13,6 +13,8 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	bReplicates = true;
+
 	CheckPointMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CheckPointMesh"));
 	CheckPointMesh->SetupAttachment(RootComponent);
 	CheckPointMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -66,9 +68,10 @@ void ACheckPoint::BeginPlay()
 
 void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	bool bIsServer = OtherActor->HasAuthority();
+	APawn* Pawn = Cast<APawn>(OtherActor);
+	bool bIsLocallyServer = OtherActor->HasAuthority() && Pawn->IsLocallyControlled();
 	
-	if (bIsServer && OtherActor->Implements<UPlayerInterface>())
+	if (bIsLocallyServer && OtherActor->Implements<UPlayerInterface>())
 	{
 		bReached = true;
 		if (AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(this)))
@@ -80,8 +83,10 @@ void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	}
 }
 
-void ACheckPoint::HandleCheckPointGlow()
+void ACheckPoint::HandleCheckPointGlow_Implementation()
 {
+	if (bLight) return;
+	bLight = true;
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	UMaterialInstanceDynamic* DynamicMaterialInstance = UMaterialInstanceDynamic::Create(CheckPointMesh->GetMaterial(0), this);
 	CheckPointMesh->SetMaterial(0, DynamicMaterialInstance);
