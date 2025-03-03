@@ -8,6 +8,7 @@
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/MageAbilitySystemComponent.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "Actor/MagicCircle.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -19,6 +20,7 @@
 #include "GameFramework/Character.h"
 #include "Interface/CombatInterface.h"
 #include "Interface/HighlightInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Mage/Mage.h"
 #include "UI/Widget/WidgetCompoent/DamageTextComponent.h"
 
@@ -55,6 +57,12 @@ void AMagePlayerController::PlayerTick(float DeltaTime)
 	AutoRunning();
 	UpdateMagicCircleLocation();
 }
+
+void AMagePlayerController::ServerPauseGame_Implementation(bool bShouldPause)
+{
+	UGameplayStatics::SetGamePaused(this, bShouldPause);
+}
+
 void AMagePlayerController::ShowDamageText_Implementation(ACharacter* TargetCharacter, float DamageValue, const bool bIsCriticalHit, const bool bIsBlockHit)
 {
 	// IsValid可以判断指针是否为空还可以判断指针标记为代销毁(最近一帧可能被调用了销毁)
@@ -275,7 +283,7 @@ void AMagePlayerController::SetSkillMenuWidget(UMageUserWidget* InSkillMenu)
 
 void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	if (IsCharacterDead()) return;
+	if (UMageAbilitySystemLibrary::IsCharacterDead(GetCharacter())) return;
 	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputPressed))
 	{
@@ -292,9 +300,9 @@ void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		{
 			TargetingStatus = ETargetingStatus::NoneTarget;
 		}
-		bAutoRunning = false;
-		HoldingTime = 0.f; // 重置自动移动按住时间
 	}
+	bAutoRunning = false;
+	HoldingTime = 0.f; // 重置自动移动按住时间
 
 	if (GetMageAbilitySystemComponent())
 	{
@@ -304,7 +312,7 @@ void AMagePlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (IsCharacterDead()) return;
+	if (UMageAbilitySystemLibrary::IsCharacterDead(GetCharacter())) return;
 	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputHeld))
 	{
@@ -346,7 +354,7 @@ void AMagePlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 void AMagePlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (IsCharacterDead()) return;
+	if (UMageAbilitySystemLibrary::IsCharacterDead(GetCharacter())) return;
 	
 	if (GetMageAbilitySystemComponent() && GetMageAbilitySystemComponent()->HasMatchingGameplayTag(FMageGameplayTags::Get().Block_Player_InputReleased))
 	{
@@ -410,15 +418,6 @@ UMageAbilitySystemComponent* AMagePlayerController::GetMageAbilitySystemComponen
 	return MageASC;
 }
 
-
-bool AMagePlayerController::IsCharacterDead()
-{
-	if (IsValid(GetCharacter()) && GetCharacter()->Implements<UCombatInterface>())
-	{
-		if (ICombatInterface::Execute_IsDead(GetCharacter())) return true;
-	}
-	return false;
-}
 
 
 

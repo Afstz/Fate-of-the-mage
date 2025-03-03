@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "MageGameModeBase.generated.h"
 
+class ULootTiers;
 class UMageGameInstance;
 class UMVVM_LoadSlot;
 class UMageSaveGame;
@@ -28,6 +29,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Data")
 	TObjectPtr<UAbilityData> AbilityData;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Data")
+	TObjectPtr<ULootTiers> LootTiers;
 
 	/** Save Game */
 	void SaveSlotData(UMVVM_LoadSlot* LoadSlotViewModel, int32 InSlotIndex); 

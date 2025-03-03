@@ -11,7 +11,6 @@
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interface/CombatInterface.h"
 #include "Interface/PlayerInterface.h"
-#include "Mage/LogMageChannels.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/MagePlayerController.h"
 
@@ -186,6 +185,7 @@ void UMageAttributeSet::HandleReceivedDamage(const FEffectProperties& EffectProp
 				// HitReact Ability
 				FGameplayTagContainer TagContainer;
 				TagContainer.AddTag(FMageGameplayTags::Get().Effects_HitReact);
+				EffectProps.TargetASC->CancelAbilities(&TagContainer);
 				EffectProps.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
 			// 击退
@@ -220,7 +220,7 @@ void UMageAttributeSet::HandleDebuff(const FEffectProperties& EffectProps)
 	const float DebuffFrequence = UMageAbilitySystemLibrary::GetDebuffFrequence(EffectProps.SourceEffectContextHandle);
 	
 	FString EffectName = FString::Printf(TEXT("DynamicDebuff_%s"), *DamageType.ToString());
-	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName), RF_WasLoaded);
+	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
 
 	// Effect属性设置
 	GameplayEffect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
@@ -322,6 +322,8 @@ void UMageAttributeSet::ShowCharacterDamageText(const FEffectProperties& EffectP
 
 void UMageAttributeSet::SendXPRewardEvent(const FEffectProperties& EffectProperties)
 {
+	if (!IsValid(EffectProperties.SourceCharacter) && !IsValid(EffectProperties.TargetCharacter)) return;
+	
 	if (EffectProperties.TargetCharacter->Implements<UCombatInterface>())
 	{
 		// 根据敌人等级和类型获取经验

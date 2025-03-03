@@ -74,7 +74,7 @@ void AMageProjectile::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedCompon
 			DamageEffectParams.DeathImpulse = DeathImpulse;
 			if (bool bKnockbackSuccessful = DamageEffectParams.KnockbackChance >= FMath::RandRange(1, 100))
 			{
-				FRotator ProjectileRotation = GetActorRotation();
+				FRotator ProjectileRotation = GetActorForwardVector().Rotation();
 				ProjectileRotation.Pitch = 45.f;
 				const FVector ProjectileForceDirection = ProjectileRotation.Vector();
 				

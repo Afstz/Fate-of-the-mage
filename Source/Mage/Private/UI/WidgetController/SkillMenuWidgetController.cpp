@@ -63,7 +63,7 @@ void USkillMenuWidgetController::OnSphereButtonSelected(const FGameplayTag& Abil
 {
 	if (bWaitingForEquip)
 	{
-		const FGameplayTag AbilityType = AbilityData->FindAbilityDataForTag(AbilityTag).AbilityType;
+		const FGameplayTag AbilityType = AbilityData->FindAbilityDataForTag(SelectedAbility.AbilityTag).AbilityType;
 		StopWaitForEquipDelegate.Broadcast(AbilityType);
 		bWaitingForEquip = false;
 	}

@@ -55,6 +55,8 @@ public:
 	void SetLevel(int32 InLevel) { Level = InLevel; }
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float LifeSpan = 5.f;
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLoot();
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;

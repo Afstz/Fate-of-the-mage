@@ -231,7 +231,7 @@ AActor* AMageGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	TArray<AActor*> PlayerStarts;
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
 	AActor* SelectedStart = nullptr;
-	if (PlayerStarts.Num() > 0)
+	if (PlayerStarts.Num() > 1)
 	{
 		for (AActor* Actor : PlayerStarts)
 		{
@@ -242,6 +242,10 @@ AActor* AMageGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 				break;
 			}
 		}
+	}
+	else if (PlayerStarts.Num() == 1)
+	{
+		SelectedStart = PlayerStarts[0];
 	}
 	return SelectedStart;
 }

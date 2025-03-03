@@ -2,12 +2,11 @@
 
 
 #include "AbilitySystem/MageAbilitySystemLibrary.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AsyncTreeDifferences.h"
 #include "MageAbilityTypes.h"
 #include "MageGameplayTags.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/OverlapResult.h"
 #include "Game/MageGameModeBase.h"
 #include "Game/MageSaveGame.h"
@@ -194,6 +193,13 @@ UAbilityData* UMageAbilitySystemLibrary::GetAbilityData(const UObject* WorldCont
 	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (MageGameModeBase == nullptr) return nullptr;
 	return MageGameModeBase->AbilityData;
+}
+
+ULootTiers* UMageAbilitySystemLibrary::GetLootTiers(const UObject* WorldContextObject)
+{
+	AMageGameModeBase* MageGameModeBase = Cast<AMageGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (MageGameModeBase == nullptr) return nullptr;
+	return MageGameModeBase->LootTiers;
 }
 
 int32 UMageAbilitySystemLibrary::GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level)
@@ -437,6 +443,8 @@ void UMageAbilitySystemLibrary::SetRadialDamageOuterRadius(FGameplayEffectContex
 
 void UMageAbilitySystemLibrary::ApplyDamageEffect(const FDamageEffectParams& DamageEffectParams)
 {
+	if (!IsValid(DamageEffectParams.SourceAbilitySystemComponent) && !IsValid(DamageEffectParams.TargetAbilitySystemComponent)) return;
+	
 	checkf(DamageEffectParams.TargetAbilitySystemComponent, TEXT("function [%hs] have not TargetAbilitySystemComponent"), __FUNCTION__);
 	
 	const AActor* AvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
@@ -524,6 +532,15 @@ bool UMageAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondAc
 	return !bFriend;
 }
 
+bool UMageAbilitySystemLibrary::IsCharacterDead(AActor* ActorToCheck)
+{
+	if (IsValid(ActorToCheck) && ActorToCheck->Implements<UCombatInterface>())
+	{
+		return ICombatInterface::Execute_IsDead(ActorToCheck);
+	}
+	return true;
+}
+
 TArray<FRotator> UMageAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumRotators)
 {
 	TArray<FRotator> OutRotators;
@@ -564,6 +581,49 @@ TArray<FVector> UMageAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& F
 		OutVectors.Add(Forward);	
 	}
 	return OutVectors;
+}
+
+float UMageAbilitySystemLibrary::ApplyRadialDamageWithFalloff(
+	AActor* TargetActor,
+	float BaseDamage,
+	float MinimumDamage,
+	const FVector& Origin,
+	float DamageInnerRadius,
+	float DamageOuterRadius,
+	float DamageFalloff,
+	TSubclassOf<UDamageType> DamageTypeClass,
+	const TArray<AActor*>& IgnoreActors,
+	AActor* DamageCauser,
+	AController* InstigatedByController,
+	ECollisionChannel DamagePreventionChannel)
+{
+	if (!IsValid(TargetActor) || !TargetActor->CanBeDamaged()) {
+		return 0.0f;
+	}
+
+	// 计算距离衰减后的伤害值
+	const float Distance = FVector::Distance(Origin, TargetActor->GetActorLocation());
+	if (Distance > DamageOuterRadius) {
+		return 0.0f; // 超出外半径，不造成伤害
+	}
+
+	// 计算衰减比例 (0~1)
+	const float DamageRatio = FMath::Clamp(
+		(Distance - DamageInnerRadius) / (DamageOuterRadius - DamageInnerRadius),
+		0.0f,
+		1.0f
+	);
+	const float FinalDamage = FMath::Lerp(BaseDamage, MinimumDamage, DamageFalloff * DamageRatio);
+
+	// 构造伤害事件（无需ComponentHits，因未实际检测碰撞）
+	FRadialDamageEvent DmgEvent;
+	DmgEvent.DamageTypeClass = DamageTypeClass;
+	DmgEvent.Origin = Origin;
+	DmgEvent.Params = FRadialDamageParams(BaseDamage, MinimumDamage, DamageInnerRadius, DamageOuterRadius, DamageFalloff);
+
+	TargetActor->TakeDamage(FinalDamage, DmgEvent, InstigatedByController, DamageCauser);
+	// 应用伤害并返回实际造成的数值
+	return FinalDamage;
 }
 
 void UMageAbilitySystemLibrary::SetRadialDamageEffectParams(FDamageEffectParams& OutDamageEffectParams,

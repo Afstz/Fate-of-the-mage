@@ -157,29 +157,19 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 		if (UMageAbilitySystemLibrary::GetIsRadialDamage(EffectContextHandle)) 
 		{
-			// 应用范围伤害
-			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(TargetAvatar))
-			{
-				// 提前绑定lambda函数接收伤害数据
-				CombatInterface->GetDamageDelegate().AddLambda([&](float InCausedDamage)
-				{
-					DamageTypeValue = InCausedDamage;
-				});
-				
-				// 重载的TakeDamage函数会广播范围伤害数据
-				UGameplayStatics::ApplyRadialDamageWithFalloff( 
-					TargetAvatar,
-					DamageTypeValue,
-					1.f,
-					UMageAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
-					UMageAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
-					UMageAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
-					1.f,
-					UDamageType::StaticClass(),
-					TArray<AActor*>(),
-					SourceAvatar,
-					nullptr);
-			}
+			// 范围伤害应用
+			DamageTypeValue = UMageAbilitySystemLibrary::ApplyRadialDamageWithFalloff( 
+				TargetAvatar,
+				DamageTypeValue,
+				1.f,
+				UMageAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UMageAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UMageAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f,
+				UDamageType::StaticClass(),
+				TArray<AActor*>(),
+				SourceAvatar,
+				nullptr);
 		}
 		
 		TotalDamage += DamageTypeValue; // 累加计算后的总伤害

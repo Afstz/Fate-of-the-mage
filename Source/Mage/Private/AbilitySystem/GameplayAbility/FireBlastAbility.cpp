@@ -22,7 +22,7 @@ FString UFireBlastAbility::GetDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，这些火球会向四周扩散，最后会折反回来发生一次爆炸伤害，有几率造成点燃和击退。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, NumFireBalls);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, NumFireBalls - 1);
 }
 
 FString UFireBlastAbility::GetNextLevelDescription(int32 AbilityLevel)
@@ -41,7 +41,7 @@ FString UFireBlastAbility::GetNextLevelDescription(int32 AbilityLevel)
 		// Description
 		"<Small>发射 %d 个火球，这些火球会向四周扩散，最后会折反回来发生一次爆炸伤害，升级造成更高的伤害。</>")
 		
-		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, NumFireBalls);
+		, AbilityLevel, CausedDamage, ManaCost, CooldownTime, NumFireBalls - 1);
 }
 
 TArray<AFireBlast*> UFireBlastAbility::SpawnFireBlast()

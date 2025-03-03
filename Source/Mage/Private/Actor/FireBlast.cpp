@@ -29,7 +29,9 @@ void AFireBlast::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, 
 		{
 			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
 			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			const FVector KonckbackImpulse = GetActorForwardVector() * DamageEffectParams.KnockbackMagnitude;
 			DamageEffectParams.DeathImpulse = DeathImpulse;
+			DamageEffectParams.KnockbackForce = KonckbackImpulse;
 			
 			UMageAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}

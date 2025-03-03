@@ -98,7 +98,6 @@ void AMageCharacte::PlayerRespawnInit(AMagePlayerState* MagePlayerState, UMageAb
 	AttributeSet = MagePlayerState->GetAttributeSet();
 	MageASC->SetAvatarActor(this);
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
-	MageASC->AbilityActorInfoIsSet(); // 绑定效果应用回调
 	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 	AbilitySystemComponent->RegisterGameplayTagEvent(FMageGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::OnStunTagChanged);
 	// 重生重新赋予Effect
@@ -117,7 +116,6 @@ void AMageCharacte::ClientPlayerRespawnInit(AMagePlayerState* MagePlayerState, U
 	AttributeSet = MagePlayerState->GetAttributeSet();
 	MageASC->SetAvatarActor(this);
 	AbilitySystemComponent->InitAbilityActorInfo(MagePlayerState, this);
-	MageASC->AbilityActorInfoIsSet(); // 绑定效果应用回调
 	ASCRegisteredDelegate.Broadcast(AbilitySystemComponent);
 }
 
@@ -348,9 +346,6 @@ void AMageCharacte::Die(const FVector& InDeathImpulse)
 		}
 	});
 	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, DeathTime, false);
-	
-	// 防止相机在玩家角色死亡后跟随移动，将相机固定在世界坐标位置
-	Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 

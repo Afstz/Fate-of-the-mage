@@ -203,6 +203,7 @@ void AMageEnemy::Die(const FVector& InDeathImpulseDir)
 	{
 		MageAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 	}
+	SpawnLoot();
 	SetLifeSpan(LifeSpan);
 	MultiHiddenWidget();
 	Super::Die(InDeathImpulseDir);

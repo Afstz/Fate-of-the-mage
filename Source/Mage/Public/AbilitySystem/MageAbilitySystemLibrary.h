@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | AbilityData")
 	static UAbilityData* GetAbilityData(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, meta = (DefaultToSelf = "WorldContextObject"), Category = "MageAbilitySystemLibrary | LootTiers")
+	static ULootTiers* GetLootTiers(const UObject* WorldContextObject);
+
 	/** Effect Context Getters */
 	
 	UFUNCTION(BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayEffects")
@@ -159,6 +162,9 @@ public:
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static bool IsNotFriend(AActor* FirstActor, AActor* SecondActor);
+	
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	static bool IsCharacterDead(AActor* ActorToCheck);
 
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, float Spread, int32 NumRotators);
@@ -168,6 +174,9 @@ public:
 	
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
 	static int32 GetXPRewardForClassAndLevel(UObject* WorldContextObject, ECharacterClass CharacterClass, int32 Level);
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "MageAbilitySystemLibrary | GameplayMechanics")
+	static float ApplyRadialDamageWithFalloff(AActor* TargetActor, float BaseDamage, float MinimumDamage, const FVector& Origin, float DamageInnerRadius, float DamageOuterRadius, float DamageFalloff, TSubclassOf<class UDamageType> DamageTypeClass, const TArray<AActor*>& IgnoreActors, AActor* DamageCauser = NULL, AController* InstigatedByController = NULL, ECollisionChannel DamagePreventionChannel = ECC_Visibility);
 
 	/** Damage Effect Params */
 	

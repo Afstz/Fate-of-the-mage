@@ -3,8 +3,8 @@
 
 #include "AI/BTService_FindNearstPlayer.h"
 #include "AIController.h"
+#include "AbilitySystem/MageAbilitySystemLibrary.h"
 #include "BehaviorTree/BTFunctionLibrary.h"
-#include "Interface/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 void UBTService_FindNearstPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -26,10 +26,7 @@ void UBTService_FindNearstPlayer::TickNode(UBehaviorTreeComponent& OwnerComp, ui
 		if (IsValid(OwningPawn) && IsValid(Target)) // 安全检查
 		{
 			// 角色死亡不执行
-			if (Target->Implements<UCombatInterface>())
-			{
-				if (ICombatInterface::Execute_IsDead(Target)) continue;
-			}
+			if (UMageAbilitySystemLibrary::IsCharacterDead(Target)) continue;
 			
 			const float DistanceToTarget = OwningPawn->GetDistanceTo(Target);
 			if (DistanceToTarget < DistanceToNearestTarget)

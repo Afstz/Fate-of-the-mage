@@ -5,17 +5,29 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AMageEffectActor::AMageEffectActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
-
+	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("SenceComp")));
+}
+
+void AMageEffectActor::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	ActorMovement(DeltaSeconds);
 }
 
 void AMageEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	OriginLocation = GetActorLocation();
+	CalculatedLocation = GetActorLocation();
+	CalculatedRotation = GetActorRotation();
 }
 
 void AMageEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> EffectDefaultClass)
@@ -112,4 +124,28 @@ void AMageEffectActor::OnEndOverlap(AActor* TargetActor)
 		}*/
 	}
  }
+
+void AMageEffectActor::StartMovement()
+{
+	bRotate = true;
+	bSinusoidal = true;
+}
+
+void AMageEffectActor::ActorMovement(float DeltaSeconds)
+{
+	if (bRotate)
+	{
+		const FRotator TargetRotation = FRotator(0.f, DeltaSeconds * RotateRate, 0.f);
+		// ComposeRotators:先应用A旋转再应用B旋转
+		CalculatedRotation = UKismetMathLibrary::ComposeRotators(CalculatedRotation, TargetRotation);
+		SetActorRotation(CalculatedRotation);
+	}
+	if (bSinusoidal)
+	{
+		SineTime += DeltaSeconds;
+		const float Sine = SineAmplitude * UKismetMathLibrary::Sin(SineTime * SineFrequency);
+		CalculatedLocation = OriginLocation + FVector(0.f, 0.f, Sine); // 在原点坐标基础上做Sin函数运动
+		SetActorLocation(CalculatedLocation);
+	}
+}
 

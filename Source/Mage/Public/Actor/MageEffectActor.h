@@ -38,6 +38,7 @@ class MAGE_API AMageEffectActor : public AActor
 	
 public:	
 	AMageEffectActor();
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -73,6 +74,28 @@ protected:
 
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles; // 存放已有的无限时间效果
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gameplay Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn), Category = "Gameplay Effects")
 	float ActorCurveLevel = 1.f;
+
+	/** Actor Effect */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn Effects")
+	bool bRotate = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Effects")
+	FRotator CalculatedRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn Effects")
+	float RotateRate = 45.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn Effects")
+	bool bSinusoidal = false;
+	float SineTime = 0.f;
+	FVector OriginLocation;
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn Effects")
+	FVector CalculatedLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn Effects")
+	float SineAmplitude = 8.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn Effects")
+	float SineFrequency = 4.f;
+
+	UFUNCTION(BlueprintCallable, Category = "Spawn Effects")
+	void StartMovement();
+	void ActorMovement(float DeltaSeconds);
 };

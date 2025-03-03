@@ -52,6 +52,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float DeltaTime) override;
+	UFUNCTION(Server, BlueprintCallable, Reliable)
+	void ServerPauseGame(bool bShouldPause);
 	
 	/** Menu */
 	UFUNCTION(BlueprintPure)
@@ -141,6 +143,4 @@ private:
 	UPROPERTY()
 	TObjectPtr<AMagicCircle> MagicCircleDecal; // 魔法贴花
 	void UpdateMagicCircleLocation() const;
-
-	bool IsCharacterDead();
 };
